@@ -285,13 +285,26 @@
         <div id="formPindahRT" class="p-2 mb-2 bg-light border rounded" style="display:none;">
             <label class="form-label text-danger fw-bold mb-1">Pindah ke RT / Wilayah Tujuan:</label>
             <select id="modalTargetRT" class="form-select form-select-sm mb-1"></select>
-            <input type="text" id="modalAlamatLain" class="form-control form-control-sm" placeholder="Atau ketik manual alamat tujuan">
+            <input type="text" id="modalAlamatLain" class="form-control form-control-sm" placeholder="Atau ketik manual RT tujuan (contoh: 02)">
         </div>
 
         <div id="formPecahKK" class="p-2 mb-2 bg-light border rounded" style="display:none;">
             <label class="form-label text-success fw-bold mb-1">Pengaturan Pisah KK:</label>
             <input type="text" id="modalNoKKBaru" class="form-control form-control-sm mb-1" placeholder="Nomor Kartu Keluarga Baru">
-            <input type="text" id="modalAlamatBaru" class="form-control form-control-sm" placeholder="Alamat / RT tempat tinggal baru">
+            <input type="text" id="modalAlamatBaru" class="form-control form-control-sm mb-1" placeholder="RT tempat tinggal baru (opsional)">
+            
+            <hr class="my-2">
+            <label class="form-label text-primary fw-bold mb-1">Data Pasangan (Istri / Suami):</label>
+            <input type="text" id="modalNamaPasangan" class="form-control form-control-sm mb-1" placeholder="Nama Pasangan (Kosongkan jika tidak ada)">
+            <div class="row g-1">
+                <div class="col-6"><input type="text" id="modalNikPasangan" class="form-control form-control-sm" placeholder="NIK Pasangan (Opsional)"></div>
+                <div class="col-6">
+                    <select id="modalLpPasangan" class="form-select form-select-sm">
+                        <option value="P">P - Perempuan (Istri)</option>
+                        <option value="L">L - Laki-laki (Suami)</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="mb-2">
@@ -403,6 +416,7 @@
                 status.innerHTML = `<span class="text-success fw-bold">✅ Sinkronisasi Berhasil (${pemilihData.length} Data Muat).</span>`;
                 document.getElementById('dashboardSection').style.display = 'flex';
                 populateRTFilter();
+                sortDataByKK();
                 filterData();
             })
             .catch(err => {
@@ -412,24 +426,48 @@
     }
 
     function kirimDataKeSheets(payload) {
+        const status = document.getElementById('status');
+        if (status) {
+            status.innerHTML = `<span class="spinner-border spinner-border-sm text-warning"></span> Menyimpan data ke Google Sheets...`;
+        }
+
         fetch(SCRIPT_URL, {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
-        }).catch(err => console.error("Kirim data error:", err));
+        })
+        .then(() => {
+            if (status) {
+                status.innerHTML = `<span class="text-success fw-bold">✅ Data berhasil dikirim ke Google Sheets.</span>`;
+            }
+        })
+        .catch(err => {
+            console.error("Kirim data error:", err);
+            if (status) {
+                status.innerHTML = `<span class="text-danger">❌ Gagal mengirim data ke Google Sheets.</span>`;
+            }
+        });
+    }
+
+    function sortDataByKK() {
+        pemilihData.sort((a, b) => {
+            if (a.noKK === b.noKK) return 0;
+            if (a.noKK === '-') return 1;
+            if (b.noKK === '-') return -1;
+            return a.noKK.localeCompare(b.noKK);
+        });
     }
 
     function hitungUmurDariString(tglStr) {
         if (!tglStr || tglStr === '-') return '-';
-        const tglPilkades = new Date(2026, 9, 29); // Bulan Oktober adalah indeks 9
+        const tglPilkades = new Date(2026, 9, 29);
         const parts = String(tglStr).trim().split(/[\/\-]/);
         if (parts.length === 3) {
             let day = parseInt(parts[0], 10);
             let month = parseInt(parts[1], 10) - 1;
             let year = parseInt(parts[2], 10);
 
-            // Menyesuaikan format 2 digit tahun agar akurat (misal: '97 jadi 1997)
             if (year < 100) {
                 year += (year > 30 ? 1900 : 2000);
             }
@@ -485,19 +523,16 @@
             else if (k === 'U') ubah++;
         }
 
-        // Statistik Layar Utama
         document.getElementById('statTotal').innerText = total;
         document.getElementById('statAktif').innerText = aktif;
         document.getElementById('statTMS').innerText = tms;
         document.getElementById('statUbah').innerText = ubah;
 
-        // Statistik Cetak / Print
         document.getElementById('printStatTotal').innerText = total;
         document.getElementById('printStatAktif').innerText = aktif;
         document.getElementById('printStatTMS').innerText = tms;
         document.getElementById('printStatUbah').innerText = ubah;
 
-        // Render Grafik Layar
         const ctx = document.getElementById('coklitChart').getContext('2d');
         if (myChart) myChart.destroy();
 
@@ -539,7 +574,6 @@
             }
         });
 
-        // Render Grafik Cetak (Print)
         const ctxPrint = document.getElementById('coklitChartPrint').getContext('2d');
         if (myChartPrint) myChartPrint.destroy();
 
@@ -649,6 +683,11 @@
         document.getElementById('modalKodeCoklit').value = target.kodeCoklit;
         document.getElementById('modalKet').value = target.keterangan;
 
+        document.getElementById('modalNoKKBaru').value = '';
+        document.getElementById('modalAlamatBaru').value = '';
+        document.getElementById('modalNamaPasangan').value = '';
+        document.getElementById('modalNikPasangan').value = '';
+
         updateKetOtomatis();
         modalInstance.show();
     }
@@ -723,6 +762,7 @@
 
         modalTambahInstance.hide();
         populateRTFilter();
+        sortDataByKK();
         filterData();
     }
 
@@ -739,14 +779,51 @@
             let rtTujuan = document.getElementById('modalTargetRT').value;
             const rtManual = document.getElementById('modalAlamatLain').value.trim();
             if (rtManual) rtTujuan = rtManual;
-            target.rtRw = rtTujuan;
-            ket = `Pindah ke RT/Wilayah: ${rtTujuan} | ` + ket;
+            
+            target.rtRw = rtTujuan; // Otomatis ubah RT pemilih
+            ket = `Pindah ke RT: ${rtTujuan} | ` + ket;
         } else if (kode === '7') {
             const noKKBaru = document.getElementById('modalNoKKBaru').value.trim();
             const alamatBaru = document.getElementById('modalAlamatBaru').value.trim();
-            if(noKKBaru) target.noKK = noKKBaru;
-            if(alamatBaru) target.rtRw = alamatBaru;
-            ket = `Pisah KK | ` + ket;
+            const namaPasangan = document.getElementById('modalNamaPasangan').value.trim();
+            const nikPasangan = document.getElementById('modalNikPasangan').value.trim();
+            const lpPasangan = document.getElementById('modalLpPasangan').value;
+
+            if (noKKBaru) target.noKK = noKKBaru;
+            if (alamatBaru) target.rtRw = alamatBaru;
+            target.statusHub = 'KEPALA KK';
+            ket = `Pisah KK (No KK: ${noKKBaru || target.noKK}) | ` + ket;
+
+            // Jika memasukkan nama pasangan, tambahkan pasangan secara otomatis
+            if (namaPasangan) {
+                const pasanganNew = {
+                    uid: 'U_NEW_' + Math.random().toString(36).substr(2, 5),
+                    dpId: 'BARU',
+                    noKK: noKKBaru || target.noKK,
+                    nik: nikPasangan || '-',
+                    nama: namaPasangan,
+                    lp: lpPasangan,
+                    tempatLahir: '-',
+                    tglLahir: '-',
+                    umur: '-',
+                    rtRw: target.rtRw,
+                    statusHub: lpPasangan === 'P' ? 'ISTRI' : 'KEPALA KK',
+                    kodeCoklit: 'B',
+                    keterangan: `Pasangan dari ${target.nama} (Pisah KK)`
+                };
+
+                pemilihData.push(pasanganNew);
+
+                kirimDataKeSheets({
+                    action: "tambahPemilih",
+                    nik: pasanganNew.nik,
+                    nama: pasanganNew.nama,
+                    noKK: pasanganNew.noKK,
+                    kode: pasanganNew.kodeCoklit,
+                    ket: pasanganNew.keterangan,
+                    rt: pasanganNew.rtRw
+                });
+            }
         }
 
         target.kodeCoklit = kode;
@@ -762,6 +839,8 @@
         });
 
         modalInstance.hide();
+        populateRTFilter();
+        sortDataByKK(); // Urutkan ulang agar terkumpul sesuai Nomor KK
         filterData();
     }
 
@@ -804,20 +883,18 @@
 
         let currentKK = "";
         let noUrut = 1;
-        let excelRowStartIndex = 5; // Baris data dimulai pada baris Excel ke-5
+        let currentRowNum = 5;
 
         for (let i = 0; i < dataToExport.length; i++) {
             const item = dataToExport[i];
             if (item.noKK !== '-' && item.noKK !== currentKK) {
                 if (currentKK !== "") {
                     excelRows.push([]);
-                    excelRowStartIndex++;
+                    currentRowNum++;
                 }
                 currentKK = item.noKK;
             }
 
-            const currentRowNum = excelRowStartIndex + i;
-            // Formula DATEDIF pada kolom H (Tanggal Lahir) ke tanggal target 2026-10-29
             const formulaUmur = { t: 'n', f: `DATEDIF(DATEVALUE(H${currentRowNum}), DATE(2026, 10, 29), "Y")` };
 
             excelRows.push([
@@ -835,6 +912,8 @@
                 item.kodeCoklit, 
                 item.keterangan
             ]);
+
+            currentRowNum++;
         }
 
         const worksheet = XLSX.utils.aoa_to_sheet(excelRows);
