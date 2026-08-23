@@ -25,7 +25,6 @@
             min-height: 100vh;
         }
         
-        /* Header / Kop Nuansa Indonesia Elegan */
         .indonesia-header {
             background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 50%, #450a0a 100%);
             color: white;
@@ -105,14 +104,14 @@
 <body onload="ambilDataDariSheets()">
 
 <div class="container-fluid px-3 my-3">
-    <!-- Header / Kop Nuansa Indonesia -->
+    <!-- Header / Kop -->
     <div class="indonesia-header text-center">
         <div class="small fw-bold text-uppercase tracking-wider mb-1" style="color: #fde047; letter-spacing: 2px;">PANITIA PEMUNGUTAN SUARA (PPS)</div>
         <h3 class="header-title mb-1">DAFTAR PEMILIH SEMENTARA (DPS)</h3>
         <h5 class="fw-semibold mb-0" style="color: #f8fafc;">PEMILIHAN KEPALA DESA PAYO LEBAR TAHUN 2026</h5>
     </div>
 
-    <!-- Panel Kontrol & Aksi -->
+    <!-- Panel Kontrol -->
     <div class="card card-custom p-3 mb-3 no-print">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
@@ -128,7 +127,7 @@
         </div>
     </div>
 
-    <!-- Statistik & Grafik Tampilan Layar -->
+    <!-- Dashboard Statistik -->
     <div id="dashboardSection" class="row mb-3 no-print" style="display: none;">
         <div class="col-md-4 mb-2">
             <div class="card card-custom p-3 h-100 border-start border-danger border-4">
@@ -151,7 +150,7 @@
         </div>
     </div>
 
-    <!-- Statistik & Grafik Khusus Saat Dicetak (Mengikuti Filter) -->
+    <!-- Statistik Cetak -->
     <div class="print-only mb-3">
         <div class="print-container-flex">
             <div style="flex: 1; border: 1px solid #000; padding: 8px; border-radius: 4px;">
@@ -203,7 +202,7 @@
         </div>
     </div>
 
-    <!-- Tabel Data Utama -->
+    <!-- Tabel Data -->
     <div class="card card-custom p-2">
         <div class="d-flex justify-content-between align-items-center mb-2 px-2 pt-1 no-print">
             <div class="d-flex align-items-center gap-2">
@@ -285,7 +284,7 @@
         <div id="formPindahRT" class="p-2 mb-2 bg-light border rounded" style="display:none;">
             <label class="form-label text-danger fw-bold mb-1">Pindah ke RT / Wilayah Tujuan:</label>
             <select id="modalTargetRT" class="form-select form-select-sm mb-1"></select>
-            <input type="text" id="modalAlamatLain" class="form-control form-control-sm" placeholder="Atau ketik manual RT tujuan (contoh: 02)">
+            <input type="text" id="modalAlamatLain" class="form-control form-control-sm" placeholder="Atau ketik manual RT tujuan (contoh: 28)">
         </div>
 
         <div id="formPecahKK" class="p-2 mb-2 bg-light border rounded" style="display:none;">
@@ -349,7 +348,7 @@
             </div>
         </div>
         <div class="row g-2 mb-2">
-            <div class="col-6"><label class="form-label mb-1 fw-bold">RT/RW</label><input type="text" id="addRTRW" class="form-control form-control-sm" placeholder="Contoh: 01"></div>
+            <div class="col-6"><label class="form-label mb-1 fw-bold">RT/RW</label><input type="text" id="addRTRW" class="form-control form-control-sm" placeholder="Contoh: 28"></div>
             <div class="col-6"><label class="form-label mb-1 fw-bold">Status Hubungan KK</label>
                 <select id="addStatusHub" class="form-select form-select-sm">
                     <option value="KEPALA KK">KEPALA KK</option><option value="ISTRI">ISTRI</option><option value="ANAK" selected>ANAK</option><option value="ORANG TUA">ORANG TUA</option><option value="FAMILI LAIN">FAMILI LAIN</option>
@@ -396,17 +395,18 @@
                 }
 
                 pemilihData = data.map((row, index) => {
+                    // Penyesuaian nama properti agar fleksibel membaca header dari sheets
                     return {
                         uid: 'U_' + index,
-                        dpId: row['DP-ID'] || row['dpId'] || '-',
-                        noKK: row['NO KK'] || row['noKK'] || '-',
-                        nik: row['NIK'] || row['nik'] || '-',
+                        dpId: String(row['DP-ID'] || row['dpId'] || '-').trim(),
+                        noKK: String(row['NO KK'] || row['noKK'] || row['NO. KK'] || '-').trim(),
+                        nik: String(row['NIK'] || row['nik'] || '-').trim(),
                         nama: row['NAMA LENGKAP'] || row['nama'] || '-',
                         lp: row['L/P'] || row['lp'] || '-',
                         tempatLahir: row['TEMPAT LAHIR'] || row['tempatLahir'] || '-',
                         tglLahir: row['TGL LAHIR'] || row['tglLahir'] || '-',
                         umur: row['UMUR'] || row['umur'] || '-',
-                        rtRw: row['RT/RW'] || row['rtRw'] || '-',
+                        rtRw: String(row['RT/RW'] || row['rtRw'] || '-').trim(),
                         statusHub: row['STATUS HUB'] || row['statusHub'] || '-',
                         kodeCoklit: String(row['KODE'] || row['kodeCoklit'] || '0').trim(),
                         keterangan: row['KETERANGAN'] || row['keterangan'] || 'Aktif'
@@ -452,10 +452,12 @@
 
     function sortDataByKK() {
         pemilihData.sort((a, b) => {
-            if (a.noKK === b.noKK) return 0;
-            if (a.noKK === '-') return 1;
-            if (b.noKK === '-') return -1;
-            return String(a.noKK).localeCompare(String(b.noKK));
+            const kkA = String(a.noKK).trim();
+            const kkB = String(b.noKK).trim();
+            if (kkA === kkB) return 0;
+            if (kkA === '-') return 1;
+            if (kkB === '-') return -1;
+            return kkA.localeCompare(kkB, undefined, { numeric: true });
         });
     }
 
@@ -700,7 +702,7 @@
         document.getElementById('addTempatLahir').value = '';
         document.getElementById('addTglLahir').value = '';
         document.getElementById('addUmur').value = '';
-        document.getElementById('addRTRW').value = '1';
+        document.getElementById('addRTRW').value = '28';
         document.getElementById('addStatusHub').value = 'ANAK';
         modalTambahInstance.show();
     }
@@ -734,7 +736,7 @@
 
         const newPemilih = {
             uid: 'U_NEW_' + Math.random().toString(36).substr(2, 5),
-            dpId: 'BARU',
+            dpId: '-',
             noKK: document.getElementById('addNoKK').value.trim() || '-',
             nik: document.getElementById('addNIK').value.trim() || '-',
             nama: nama,
@@ -742,7 +744,7 @@
             tempatLahir: document.getElementById('addTempatLahir').value.trim() || '-',
             tglLahir: document.getElementById('addTglLahir').value.trim() || '-',
             umur: isNaN(umurVal) ? '-' : umurVal,
-            rtRw: document.getElementById('addRTRW').value.trim() || '1',
+            rtRw: document.getElementById('addRTRW').value.trim() || '28',
             statusHub: statusHub,
             kodeCoklit: initialKode,
             keterangan: initialKet
@@ -752,12 +754,17 @@
 
         kirimDataKeSheets({
             action: "tambahPemilih",
+            noKK: newPemilih.noKK,
             nik: newPemilih.nik,
             nama: newPemilih.nama,
-            noKK: newPemilih.noKK,
+            lp: newPemilih.lp,
+            tempatLahir: newPemilih.tempatLahir,
+            tglLahir: newPemilih.tglLahir,
+            umur: newPemilih.umur,
+            rt: newPemilih.rtRw,
+            statusHub: newPemilih.statusHub,
             kode: newPemilih.kodeCoklit,
-            ket: newPemilih.keterangan,
-            rt: newPemilih.rtRw
+            ket: newPemilih.keterangan
         });
 
         modalTambahInstance.hide();
@@ -797,7 +804,7 @@
             if (namaPasangan) {
                 const pasanganNew = {
                     uid: 'U_NEW_' + Math.random().toString(36).substr(2, 5),
-                    dpId: 'BARU',
+                    dpId: '-',
                     noKK: noKKBaru || target.noKK,
                     nik: nikPasangan || '-',
                     nama: namaPasangan,
@@ -815,12 +822,17 @@
 
                 kirimDataKeSheets({
                     action: "tambahPemilih",
+                    noKK: pasanganNew.noKK,
                     nik: pasanganNew.nik,
                     nama: pasanganNew.nama,
-                    noKK: pasanganNew.noKK,
+                    lp: pasanganNew.lp,
+                    tempatLahir: pasanganNew.tempatLahir,
+                    tglLahir: pasanganNew.tglLahir,
+                    umur: pasanganNew.umur,
+                    rt: pasanganNew.rtRw,
+                    statusHub: pasanganNew.statusHub,
                     kode: pasanganNew.kodeCoklit,
-                    ket: pasanganNew.keterangan,
-                    rt: pasanganNew.rtRw
+                    ket: pasanganNew.keterangan
                 });
             }
         }
@@ -922,6 +934,6 @@
     }
 </script>
 <!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.bundle.min.js"></script>
 </body>
 </html>
