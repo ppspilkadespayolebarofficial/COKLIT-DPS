@@ -756,7 +756,6 @@
         modalEditInstance.hide();
         populateRTFilter();
         
-        // Memperbarui tampilan tanpa mereset halaman aktif
         updateDashboardStats(filteredData);
         renderPage();
     }
@@ -888,7 +887,6 @@
         modalTambahInstance.hide();
         populateRTFilter();
         
-        // Memperbarui tampilan tanpa mereset halaman aktif
         updateDashboardStats(filteredData);
         renderPage();
     }
@@ -916,10 +914,19 @@
             const nikPasangan = document.getElementById('modalNikPasangan').value.trim();
             const lpPasangan = document.getElementById('modalLpPasangan').value;
 
-            if (noKKBaru) target.noKK = noKKBaru;
+            if (noKKBaru) {
+                target.noKK = noKKBaru;
+            }
             if (alamatBaru) target.rtRw = alamatBaru;
             target.statusHub = 'KEPALA KK';
             ket = `Pisah KK (No KK: ${noKKBaru || target.noKK}) | ` + ket;
+
+            // Pindahkan posisi data ke urutan paling bawah agar anggota keluarga lama tidak teracak/terpisah
+            const indexAwal = pemilihData.indexOf(target);
+            if (indexAwal > -1) {
+                pemilihData.splice(indexAwal, 1);
+                pemilihData.push(target);
+            }
 
             if (namaPasangan) {
                 const pasanganNew = {
@@ -972,7 +979,6 @@
         modalInstance.hide();
         populateRTFilter();
         
-        // Memperbarui tampilan tanpa mereset halaman aktif
         updateDashboardStats(filteredData);
         renderPage();
     }
