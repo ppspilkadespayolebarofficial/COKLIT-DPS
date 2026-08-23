@@ -29,20 +29,14 @@
             background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 50%, #450a0a 100%);
             color: white;
             border-bottom: 5px solid var(--indo-gold);
-            padding: 25px 20px;
+            padding: 20px 15px;
             border-radius: 8px;
             box-shadow: 0 10px 25px -5px rgba(153, 27, 27, 0.3);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             position: relative;
             overflow: hidden;
         }
-        .indonesia-header::after {
-            content: "";
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            background: radial-gradient(circle at top right, rgba(217, 119, 6, 0.2), transparent 50%);
-            pointer-events: none;
-        }
+        
         .header-title {
             font-weight: 800;
             letter-spacing: 0.8px;
@@ -54,12 +48,19 @@
             border: none; 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
             background: #ffffff;
-            transition: transform 0.2s ease;
+        }
+        
+        .sticky-menu {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
         .kk-separator-empty { 
-            height: 12px; 
-            background: linear-gradient(90deg, #f1f5f9, #e2e8f0, #f1f5f9) !important; 
+            height: 10px; 
+            background: #e2e8f0 !important; 
             border-top: 1px solid #cbd5e1; 
             border-bottom: 1px solid #cbd5e1; 
         }
@@ -90,36 +91,34 @@
             .print-only { display: block !important; }
             @page { size: F4 landscape; margin: 6mm; }
             body { background-color: #fff; font-size: 9px; }
-            .indonesia-header { background: #991b1b !important; color: #fff !important; box-shadow: none; border-bottom: 2px solid #000; padding: 10px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .indonesia-header { background: #991b1b !important; color: #fff !important; box-shadow: none; border-bottom: 2px solid #000; padding: 10px; }
             .table-responsive { overflow: visible !important; }
             .table-custom { width: 100% !important; font-size: 8.5px; }
             .table-custom th, .table-custom td { padding: 2px 3px !important; border: 1px solid #000 !important; color: #000 !important; }
-            .table-custom th { background-color: #e2e8f0 !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .card-custom { border: none !important; box-shadow: none !important; padding: 0 !important; background: transparent !important; }
-            .print-container-flex { display: flex; gap: 10px; margin-bottom: 10px; align-items: stretch; }
+            .table-custom th { background-color: #e2e8f0 !important; color: #000 !important; }
         }
         .print-only { display: none; }
     </style>
 </head>
 <body onload="ambilDataDariSheets()">
 
-<div class="container-fluid px-3 my-3">
-    <!-- Header / Kop -->
+<div class="container-fluid px-3 my-2">
+    <!-- Header / Kop Banner -->
     <div class="indonesia-header text-center">
-        <div class="small fw-bold text-uppercase tracking-wider mb-1" style="color: #fde047; letter-spacing: 2px;">PANITIA PEMUNGUTAN SUARA (PPS)</div>
+        <div class="small fw-bold text-uppercase mb-1" style="color: #fde047; letter-spacing: 2px;">PANITIA PEMUNGUTAN SUARA (PPS) PAYO LEBAR</div>
         <h3 class="header-title mb-1">DAFTAR PEMILIH SEMENTARA (DPS)</h3>
         <h5 class="fw-semibold mb-0" style="color: #f8fafc;">PEMILIHAN KEPALA DESA PAYO LEBAR TAHUN 2026</h5>
     </div>
 
-    <!-- Panel Kontrol -->
-    <div class="card card-custom p-3 mb-3 no-print">
+    <!-- Panel Kontrol Utama -->
+    <div class="card card-custom p-3 mb-3 no-print sticky-menu">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
-                <span class="badge bg-danger mb-1">Sistem Coklit Real-Time</span>
+                <span class="badge bg-danger mb-1">Status Sinkronisasi Real-Time</span>
                 <div id="status" class="fw-bold text-dark small">Menghubungkan ke Google Sheets...</div>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                <button class="btn btn-sm btn-outline-danger fw-semibold" onclick="ambilDataDariSheets()">🔄 Sinkronisasi</button>
+                <button class="btn btn-sm btn-outline-danger fw-semibold" onclick="ambilDataDariSheets()">🔄 Sinkron Data</button>
                 <button class="btn btn-sm btn-outline-dark fw-semibold" onclick="window.print()">🖨️ Cetak Dokumen</button>
                 <button class="btn btn-sm btn-success fw-semibold" onclick="eksporExcel()">📥 Ekspor Excel</button>
                 <button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="openModalTambah()">➕ Tambah Pemilih</button>
@@ -127,51 +126,30 @@
         </div>
     </div>
 
-    <!-- Dashboard Statistik -->
-    <div id="dashboardSection" class="row mb-3 no-print" style="display: none;">
+    <!-- Dashboard Ringkasan & Grafik -->
+    <div id="dashboardSection" class="row mb-3 no-print">
         <div class="col-md-4 mb-2">
             <div class="card card-custom p-3 h-100 border-start border-danger border-4">
                 <h6 class="fw-bold text-uppercase text-secondary mb-3 small border-bottom pb-2">📊 Rekapitulasi Status Coklit</h6>
                 <div class="d-flex flex-column gap-2" style="font-size: 12px;">
-                    <div class="d-flex justify-content-between p-2 bg-light rounded shadow-sm"><span>Total Pemilih:</span><strong id="statTotal" class="text-dark">0</strong></div>
-                    <div class="d-flex justify-content-between p-2 bg-success-subtle rounded shadow-sm text-success"><span>Memenuhi Syarat (Aktif/Baru):</span><strong id="statAktif">0</strong></div>
-                    <div class="d-flex justify-content-between p-2 bg-danger-subtle rounded shadow-sm text-danger"><span>Tidak Memenuhi Syarat (TMS):</span><strong id="statTMS">0</strong></div>
-                    <div class="d-flex justify-content-between p-2 bg-warning-subtle rounded shadow-sm text-warning-emphasis"><span>Perbaikan Data (Ubah):</span><strong id="statUbah">0</strong></div>
+                    <div class="d-flex justify-content-between p-2 bg-light rounded"><span>Total Pemilih:</span><strong id="statTotal" class="text-dark">0</strong></div>
+                    <div class="d-flex justify-content-between p-2 bg-success-subtle rounded text-success"><span>Memenuhi Syarat (Aktif/Baru):</span><strong id="statAktif">0</strong></div>
+                    <div class="d-flex justify-content-between p-2 bg-danger-subtle rounded text-danger"><span>Tidak Memenuhi Syarat (TMS):</span><strong id="statTMS">0</strong></div>
+                    <div class="d-flex justify-content-between p-2 bg-warning-subtle rounded text-warning-emphasis"><span>Perbaikan Data (Ubah):</span><strong id="statUbah">0</strong></div>
                 </div>
             </div>
         </div>
         <div class="col-md-8 mb-2">
             <div class="card card-custom p-3 h-100 border-start border-warning border-4">
                 <h6 class="fw-bold text-uppercase text-secondary mb-2 small border-bottom pb-2">📈 Grafik Kode Coklit Pemilih</h6>
-                <div style="height: 165px; position: relative;">
+                <div style="height: 160px; position: relative;">
                     <canvas id="coklitChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Statistik Cetak -->
-    <div class="print-only mb-3">
-        <div class="print-container-flex">
-            <div style="flex: 1; border: 1px solid #000; padding: 8px; border-radius: 4px;">
-                <h6 class="fw-bold text-uppercase mb-2" style="font-size: 10px; border-bottom: 1px solid #000; padding-bottom: 3px;">📊 REKAPITULASI FILTER AKTIF</h6>
-                <table style="width: 100%; font-size: 9px;">
-                    <tr><td>Total Pemilih Filter:</td><td class="fw-bold text-end" id="printStatTotal">0</td></tr>
-                    <tr><td>Memenuhi Syarat (Aktif/Baru):</td><td class="fw-bold text-end" id="printStatAktif">0</td></tr>
-                    <tr><td>Tidak Memenuhi Syarat (TMS):</td><td class="fw-bold text-end" id="printStatTMS">0</td></tr>
-                    <tr><td>Perbaikan Data (Ubah):</td><td class="fw-bold text-end" id="printStatUbah">0</td></tr>
-                </table>
-            </div>
-            <div style="flex: 2; border: 1px solid #000; padding: 8px; border-radius: 4px;">
-                <h6 class="fw-bold text-uppercase mb-1" style="font-size: 10px; border-bottom: 1px solid #000; padding-bottom: 3px;">📈 GRAFIK KODE COKLIT (FILTER AKTIF)</h6>
-                <div style="height: 110px; position: relative;">
-                    <canvas id="coklitChartPrint"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filter & Pencarian -->
+    <!-- Filter & Pencarian Data -->
     <div class="card card-custom p-3 mb-3 no-print">
         <h6 class="fw-bold text-uppercase text-secondary mb-2 small">🔍 Filter & Pencarian Data Pemilih</h6>
         <div class="row g-2">
@@ -202,7 +180,7 @@
         </div>
     </div>
 
-    <!-- Tabel Data -->
+    <!-- Tabel Data Pemilih -->
     <div class="card card-custom p-2">
         <div class="d-flex justify-content-between align-items-center mb-2 px-2 pt-1 no-print">
             <div class="d-flex align-items-center gap-2">
@@ -227,15 +205,15 @@
                     <tr>
                         <th style="width: 30px;">NO</th>
                         <th style="width: 70px;">DP-ID</th>
-                        <th style="width: 110px;">NO. KK</th>
-                        <th style="width: 110px;">NIK</th>
+                        <th style="width: 120px;">NO. KK</th>
+                        <th style="width: 120px;">NIK</th>
                         <th>NAMA LENGKAP PEMILIH</th>
-                        <th style="width: 30px;">L/P</th>
+                        <th style="width: 35px;">L/P</th>
                         <th>TEMPAT LAHIR</th>
                         <th style="width: 80px;">TGL LAHIR</th>
                         <th style="width: 40px;">UMUR</th>
                         <th style="width: 45px;">RT/RW</th>
-                        <th style="width: 75px;">STATUS HUB</th>
+                        <th style="width: 80px;">STATUS HUB</th>
                         <th style="width: 40px;">KODE</th>
                         <th>KETERANGAN / STATUS COKLIT</th>
                         <th class="no-print" style="width: 50px;">AKSI</th>
@@ -243,7 +221,7 @@
                 </thead>
                 <tbody id="tableBody">
                     <tr>
-                        <td colspan="14" class="text-center text-muted py-4">Memuat data dari Google Sheets...</td>
+                        <td colspan="14" class="text-center text-muted py-4">Memuat database dari Google Sheets...</td>
                     </tr>
                 </tbody>
             </table>
@@ -365,6 +343,7 @@
 </div>
 
 <script>
+    // URL Web App Google Sheets Apps Script milik Abang
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzak7vgujmmI6ya5DToXW9V2Fw20bh9uAVej5hci_WyDkde1x0BqEz9GfOLARzu3sxFDg/exec";
 
     let pemilihData = [];
@@ -374,7 +353,6 @@
     let modalInstance = null;
     let modalTambahInstance = null;
     let myChart = null;
-    let myChartPrint = null;
 
     const mapKet = {
         '0': 'Aktif', '1': 'Meninggal', '2': 'Ganda', '3': 'TNI', '4': 'Polisi',
@@ -382,9 +360,28 @@
         '7': 'Pisah KK', '8': 'Belum Cukup Umur', 'U': 'Ubah', 'B': 'Baru'
     };
 
+    // Pembaca Header Pintar (Mencegah Kolom Berantakan)
+    function extractVal(obj, candidates) {
+        if (!obj) return '-';
+        const keys = Object.keys(obj);
+        for (let cand of candidates) {
+            const cleanCand = cand.toLowerCase().replace(/[^a-z0-9]/g, '');
+            for (let k of keys) {
+                const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (cleanK === cleanCand) {
+                    const val = obj[k];
+                    if (val !== undefined && val !== null && String(val).trim() !== "") {
+                        return String(val).trim();
+                    }
+                }
+            }
+        }
+        return '-';
+    }
+
     function ambilDataDariSheets() {
         const status = document.getElementById('status');
-        status.innerHTML = `<span class="spinner-border spinner-border-sm text-danger"></span> Memuat database dari Google Sheets...`;
+        status.innerHTML = `<span class="spinner-border spinner-border-sm text-danger"></span> Memuat database...`;
 
         fetch(SCRIPT_URL)
             .then(response => response.json())
@@ -395,28 +392,25 @@
                 }
 
                 pemilihData = data.map((row, index) => {
-                    // Penyesuaian nama properti agar fleksibel membaca header dari sheets
                     return {
                         uid: 'U_' + index,
-                        dpId: String(row['DP-ID'] || row['dpId'] || '-').trim(),
-                        noKK: String(row['NO KK'] || row['noKK'] || row['NO. KK'] || '-').trim(),
-                        nik: String(row['NIK'] || row['nik'] || '-').trim(),
-                        nama: row['NAMA LENGKAP'] || row['nama'] || '-',
-                        lp: row['L/P'] || row['lp'] || '-',
-                        tempatLahir: row['TEMPAT LAHIR'] || row['tempatLahir'] || '-',
-                        tglLahir: row['TGL LAHIR'] || row['tglLahir'] || '-',
-                        umur: row['UMUR'] || row['umur'] || '-',
-                        rtRw: String(row['RT/RW'] || row['rtRw'] || '-').trim(),
-                        statusHub: row['STATUS HUB'] || row['statusHub'] || '-',
-                        kodeCoklit: String(row['KODE'] || row['kodeCoklit'] || '0').trim(),
-                        keterangan: row['KETERANGAN'] || row['keterangan'] || 'Aktif'
+                        dpId: extractVal(row, ['DP-ID', 'DP ID', 'DP_ID', 'DPID', 'NO DP', 'NO_DP']),
+                        noKK: extractVal(row, ['NO KK', 'NO. KK', 'NO_KK', 'NOKK', 'KARTU KELUARGA']),
+                        nik: extractVal(row, ['NIK', 'NO NIK', 'NO_NIK', 'NOMOR NIK']),
+                        nama: extractVal(row, ['NAMA LENGKAP', 'NAMA_LENGKAP', 'NAMA PEMILIH', 'NAMA']),
+                        lp: extractVal(row, ['L/P', 'LP', 'JENIS KELAMIN', 'JK']),
+                        tempatLahir: extractVal(row, ['TEMPAT LAHIR', 'TEMPAT_LAHIR', 'TMP LAHIR', 'TMP_LAHIR']),
+                        tglLahir: extractVal(row, ['TGL LAHIR', 'TGL_LAHIR', 'TANGGAL LAHIR', 'TGL']),
+                        umur: extractVal(row, ['UMUR', 'USIA']),
+                        rtRw: extractVal(row, ['RT/RW', 'RT_RW', 'RT', 'RTRW', 'ALAMAT']),
+                        statusHub: extractVal(row, ['STATUS HUB', 'STATUS_HUB', 'STATUS HUBUNGAN', 'SHDK', 'HUBUNGAN']),
+                        kodeCoklit: extractVal(row, ['KODE', 'KODE COKLIT', 'STATUS']) === '-' ? '0' : extractVal(row, ['KODE', 'KODE COKLIT', 'STATUS']),
+                        keterangan: extractVal(row, ['KETERANGAN', 'KET']) === '-' ? 'Aktif' : extractVal(row, ['KETERANGAN', 'KET'])
                     };
                 });
 
-                status.innerHTML = `<span class="text-success fw-bold">✅ Sinkronisasi Berhasil (${pemilihData.length} Data Muat).</span>`;
-                document.getElementById('dashboardSection').style.display = 'flex';
+                status.innerHTML = `<span class="text-success fw-bold">✅ Terhubung ke Google Sheets (${pemilihData.length} Data Loaded).</span>`;
                 populateRTFilter();
-                sortDataByKK();
                 filterData();
             })
             .catch(err => {
@@ -428,7 +422,7 @@
     function kirimDataKeSheets(payload) {
         const status = document.getElementById('status');
         if (status) {
-            status.innerHTML = `<span class="spinner-border spinner-border-sm text-warning"></span> Menyimpan data ke Google Sheets...`;
+            status.innerHTML = `<span class="spinner-border spinner-border-sm text-warning"></span> Menyimpan ke Google Sheets...`;
         }
 
         fetch(SCRIPT_URL, {
@@ -439,52 +433,15 @@
         })
         .then(() => {
             if (status) {
-                status.innerHTML = `<span class="text-success fw-bold">✅ Data berhasil dikirim ke Google Sheets.</span>`;
+                status.innerHTML = `<span class="text-success fw-bold">✅ Berhasil disimpan ke Google Sheets.</span>`;
             }
         })
         .catch(err => {
             console.error("Kirim data error:", err);
             if (status) {
-                status.innerHTML = `<span class="text-danger">❌ Gagal mengirim data ke Google Sheets.</span>`;
+                status.innerHTML = `<span class="text-danger">❌ Gagal menyimpan ke Google Sheets.</span>`;
             }
         });
-    }
-
-    function sortDataByKK() {
-        pemilihData.sort((a, b) => {
-            const kkA = String(a.noKK).trim();
-            const kkB = String(b.noKK).trim();
-            if (kkA === kkB) return 0;
-            if (kkA === '-') return 1;
-            if (kkB === '-') return -1;
-            return kkA.localeCompare(kkB, undefined, { numeric: true });
-        });
-    }
-
-    function hitungUmurDariString(tglStr) {
-        if (!tglStr || tglStr === '-') return '-';
-        const tglPilkades = new Date(2026, 9, 29);
-        const parts = String(tglStr).trim().split(/[\/\-]/);
-        if (parts.length === 3) {
-            let day = parseInt(parts[0], 10);
-            let month = parseInt(parts[1], 10) - 1;
-            let year = parseInt(parts[2], 10);
-
-            if (year < 100) {
-                year += (year > 30 ? 1900 : 2000);
-            }
-
-            if (!isNaN(day) && !isNaN(month) && !isNaN(year) && year > 1900) {
-                const tglLahir = new Date(year, month, day);
-                let umur = tglPilkades.getFullYear() - tglLahir.getFullYear();
-                const m = tglPilkades.getMonth() - tglLahir.getMonth();
-                if (m < 0 || (m === 0 && tglPilkades.getDate() < tglLahir.getDate())) {
-                    umur--;
-                }
-                return (umur >= 0 && umur < 120) ? umur : '-';
-            }
-        }
-        return '-';
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -530,17 +487,8 @@
         document.getElementById('statTMS').innerText = tms;
         document.getElementById('statUbah').innerText = ubah;
 
-        document.getElementById('printStatTotal').innerText = total;
-        document.getElementById('printStatAktif').innerText = aktif;
-        document.getElementById('printStatTMS').innerText = tms;
-        document.getElementById('printStatUbah').innerText = ubah;
-
         const ctx = document.getElementById('coklitChart').getContext('2d');
         if (myChart) myChart.destroy();
-
-        const chartGradient = ctx.createLinearGradient(0, 0, 0, 160);
-        chartGradient.addColorStop(0, '#dc2626');
-        chartGradient.addColorStop(1, '#991b1b');
 
         myChart = new Chart(ctx, {
             type: 'bar',
@@ -549,46 +497,10 @@
                 datasets: [{
                     label: 'Jumlah Pemilih',
                     data: Object.values(counts),
-                    backgroundColor: chartGradient,
+                    backgroundColor: '#b91c1c',
                     borderColor: '#7f1d1d',
                     borderWidth: 1,
-                    borderRadius: 4,
-                    hoverBackgroundColor: '#b91c1c'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                        titleFont: { size: 12, weight: 'bold' },
-                        bodyFont: { size: 11 },
-                        padding: 10,
-                        cornerRadius: 6
-                    }
-                },
-                scales: {
-                    x: { ticks: { font: { size: 9 }, color: '#475569' }, grid: { display: false } },
-                    y: { beginAtZero: true, ticks: { font: { size: 10 }, color: '#475569' }, grid: { color: '#f1f5f9' } }
-                }
-            }
-        });
-
-        const ctxPrint = document.getElementById('coklitChartPrint').getContext('2d');
-        if (myChartPrint) myChartPrint.destroy();
-
-        myChartPrint = new Chart(ctxPrint, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(mapKet),
-                datasets: [{
-                    label: 'Jumlah',
-                    data: Object.values(counts),
-                    backgroundColor: '#991b1b',
-                    borderColor: '#450a0a',
-                    borderWidth: 1
+                    borderRadius: 4
                 }]
             },
             options: {
@@ -596,8 +508,8 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { font: { size: 8 }, color: '#000' }, grid: { display: false } },
-                    y: { beginAtZero: true, ticks: { font: { size: 8 }, color: '#000' }, grid: { color: '#e2e8f0' } }
+                    x: { ticks: { font: { size: 9 }, color: '#475569' }, grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { font: { size: 10 }, color: '#475569' }, grid: { color: '#f1f5f9' } }
                 }
             }
         });
@@ -707,32 +619,9 @@
         modalTambahInstance.show();
     }
 
-    function hitungUmurOtomatis() {
-        const inputTgl = document.getElementById('addTglLahir').value.trim();
-        const inputUmur = document.getElementById('addUmur');
-        const hasil = hitungUmurDariString(inputTgl);
-        inputUmur.value = hasil !== '-' ? hasil : '';
-    }
-
     function simpanPemilihBaru() {
         const nama = document.getElementById('addNama').value.trim();
         if (!nama) return alert('Nama Lengkap wajib diisi!');
-
-        let umurVal = parseInt(document.getElementById('addUmur').value.trim(), 10);
-        const statusHub = document.getElementById('addStatusHub').value;
-
-        if (isNaN(umurVal)) {
-            hitungUmurOtomatis();
-            umurVal = parseInt(document.getElementById('addUmur').value.trim(), 10);
-        }
-
-        let initialKode = 'B';
-        let initialKet = 'Pemilih Baru';
-
-        if (!isNaN(umurVal) && umurVal < 17 && statusHub !== 'KEPALA KK' && statusHub !== 'ISTRI') {
-            initialKode = '8';
-            initialKet = 'Belum Cukup Umur';
-        }
 
         const newPemilih = {
             uid: 'U_NEW_' + Math.random().toString(36).substr(2, 5),
@@ -743,11 +632,11 @@
             lp: document.getElementById('addLP').value,
             tempatLahir: document.getElementById('addTempatLahir').value.trim() || '-',
             tglLahir: document.getElementById('addTglLahir').value.trim() || '-',
-            umur: isNaN(umurVal) ? '-' : umurVal,
+            umur: document.getElementById('addUmur').value.trim() || '-',
             rtRw: document.getElementById('addRTRW').value.trim() || '28',
-            statusHub: statusHub,
-            kodeCoklit: initialKode,
-            keterangan: initialKet
+            statusHub: document.getElementById('addStatusHub').value,
+            kodeCoklit: 'B',
+            keterangan: 'Pemilih Baru'
         };
 
         pemilihData.push(newPemilih);
@@ -769,7 +658,6 @@
 
         modalTambahInstance.hide();
         populateRTFilter();
-        sortDataByKK();
         filterData();
     }
 
@@ -851,7 +739,6 @@
 
         modalInstance.hide();
         populateRTFilter();
-        sortDataByKK();
         filterData();
     }
 
@@ -894,37 +781,19 @@
 
         let currentKK = "";
         let noUrut = 1;
-        let currentRowNum = 5;
 
         for (let i = 0; i < dataToExport.length; i++) {
             const item = dataToExport[i];
             if (item.noKK !== '-' && item.noKK !== currentKK) {
-                if (currentKK !== "") {
-                    excelRows.push([]);
-                    currentRowNum++;
-                }
+                if (currentKK !== "") excelRows.push([]);
                 currentKK = item.noKK;
             }
 
-            const formulaUmur = { t: 'n', f: `DATEDIF(DATEVALUE(H${currentRowNum}), DATE(2026, 10, 29), "Y")` };
-
             excelRows.push([
-                noUrut++, 
-                item.dpId, 
-                item.noKK, 
-                item.nik, 
-                item.nama, 
-                item.lp,
-                item.tempatLahir, 
-                item.tglLahir, 
-                formulaUmur, 
-                item.rtRw, 
-                item.statusHub,
-                item.kodeCoklit, 
-                item.keterangan
+                noUrut++, item.dpId, item.noKK, item.nik, item.nama, item.lp,
+                item.tempatLahir, item.tglLahir, item.umur, item.rtRw, item.statusHub,
+                item.kodeCoklit, item.keterangan
             ]);
-
-            currentRowNum++;
         }
 
         const worksheet = XLSX.utils.aoa_to_sheet(excelRows);
@@ -933,7 +802,7 @@
         XLSX.writeFile(workbook, "DPS_Pilkades_Payo_Lebar_2026.xlsx");
     }
 </script>
-<!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.bundle.min.js"></script>
+<!-- Script Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
