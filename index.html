@@ -149,24 +149,24 @@
                 .then(res => res.json())
                 .then(rows => {
                     if (!rows || rows.length === 0) {
-                        status.innerHTML = `<span class="text-warning">⚠️ Google Sheets masih kosong. Silakan isi data di Google Sheets.</span>`;
+                        status.innerHTML = `<span class="text-warning">⚠️ Google Sheets masih kosong.</span>`;
                         return;
                     }
 
                     pemilihData = rows.map((r, index) => ({
                         uid: 'U_' + index,
-                        dpId: r['DP-ID'] || r['dpId'] || '-',
-                        noKK: r['No KK'] || r['NO KK'] || r['noKK'] || '-',
-                        nik: String(r['NIK'] || r['nik'] || '-'),
-                        nama: r['Nama'] || r['NAMA LENGKAP'] || r['nama'] || '-',
-                        lp: r['L/P'] || r['lp'] || 'L',
-                        tempatLahir: r['Tempat Lahir'] || r['tempatLahir'] || '-',
-                        tglLahir: r['Tgl Lahir'] || r['tglLahir'] || '-',
-                        umur: r['Umur'] || r['umur'] || '-',
-                        rtRw: String(r['RT/RW'] || r['RT'] || r['rtRw'] || '1'),
-                        statusHub: r['Status Hub'] || r['statusHub'] || 'ANAK',
-                        kodeCoklit: String(r['Kode Coklit'] || r['KODE'] || r['kodeCoklit'] || '0'),
-                        keterangan: r['Keterangan'] || r['keterangan'] || 'Aktif'
+                        dpId: r['DP-ID'] || '-',
+                        noKK: r['NO KK'] || r['No KK'] || '-',
+                        nik: String(r['NIK'] || '-'),
+                        nama: r['NAMA LENGKAP'] || r['Nama'] || '-',
+                        lp: r['L/P'] || 'L',
+                        tempatLahir: r['TEMPAT LAHIR'] || r['Tempat Lahir'] || '-',
+                        tglLahir: r['TGL LAHIR'] || r['Tgl Lahir'] || '-',
+                        umur: r['UMUR'] || r['Umur'] || '-',
+                        rtRw: String(r['RT/RW'] || '1'),
+                        statusHub: r['STATUS HUB'] || 'ANAK',
+                        kodeCoklit: String(r['KODE'] || r['Kode Coklit'] || '0'),
+                        keterangan: r['KETERANGAN'] || r['Keterangan'] || 'Aktif'
                     }));
 
                     status.innerHTML = `<span class="text-success">✅ Berhasil memuat ${pemilihData.length} data pemilih secara otomatis!</span>`;
@@ -176,7 +176,7 @@
                     filterData();
                 })
                 .catch(err => {
-                    status.innerHTML = `<span class="text-danger">❌ Gagal memuat data otomatis dari Google Sheets.</span>`;
+                    status.innerHTML = `<span class="text-danger">❌ Gagal memuat data dari Google Sheets.</span>`;
                     console.error(err);
                 });
         }
@@ -267,7 +267,6 @@
                 p.kodeCoklit = kodeBaru;
                 p.keterangan = ketBaru;
 
-                // Kirim perubahan secara otomatis ke Google Sheets
                 fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: "updateCoklit", nik: p.nik, nama: p.nama, kode: kodeBaru, ket: ketBaru, rt: p.rtRw })
