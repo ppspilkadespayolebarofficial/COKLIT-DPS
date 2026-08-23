@@ -28,25 +28,23 @@
         .indonesia-header {
             background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 50%, #450a0a 100%);
             color: white;
-            border-bottom: 5px solid var(--indo-gold);
-            padding: 20px 15px;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px -5px rgba(153, 27, 27, 0.3);
-            margin-bottom: 15px;
-            position: relative;
-            overflow: hidden;
+            border-bottom: 4px solid var(--indo-gold);
+            padding: 12px 10px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(153, 27, 27, 0.2);
+            margin-bottom: 12px;
         }
         
         .header-title {
             font-weight: 800;
-            letter-spacing: 0.8px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
+            font-size: 1.25rem;
         }
         
         .card-custom { 
-            border-radius: 8px; 
+            border-radius: 6px; 
             border: none; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             background: #ffffff;
         }
         
@@ -55,30 +53,32 @@
             top: 0;
             z-index: 1020;
             background: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
         
         .kk-separator-empty { 
-            height: 10px; 
-            background: #e2e8f0 !important; 
-            border-top: 1px solid #cbd5e1; 
-            border-bottom: 1px solid #cbd5e1; 
+            height: 6px; 
+            background: #cbd5e1 !important; 
+            border-top: 1px solid #94a3b8; 
+            border-bottom: 1px solid #94a3b8; 
         }
         
-        .table-custom { font-size: 11px; }
+        .table-custom { font-size: 10.5px; }
         .table-custom th {
-            background: linear-gradient(180deg, #334155 0%, #1e293b 100%) !important;
+            background: #1e293b !important;
             color: #ffffff !important;
             text-align: center;
             vertical-align: middle;
             font-weight: 600;
             border: 1px solid #475569 !important;
-            padding: 8px 4px !important;
+            padding: 4px 2px !important;
+            white-space: nowrap;
         }
         .table-custom td { 
-            padding: 5px 6px !important; 
+            padding: 3px 4px !important; 
             vertical-align: middle; 
             border-color: #cbd5e1 !important;
+            white-space: nowrap;
         }
         
         .badge-status-0 { background-color: #10b981; color: #fff; }
@@ -89,29 +89,32 @@
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
-            @page { size: F4 landscape; margin: 6mm; }
-            body { background-color: #fff; font-size: 9px; }
-            .indonesia-header { background: #991b1b !important; color: #fff !important; box-shadow: none; border-bottom: 2px solid #000; padding: 10px; }
+            @page { size: F4 landscape; margin: 4mm 5mm 4mm 5mm; }
+            body { background-color: #fff; font-size: 8px; color: #000; }
+            .container-fluid { padding: 0 !important; margin: 0 !important; }
+            .indonesia-header { background: #991b1b !important; color: #fff !important; padding: 4px; border-bottom: 2px solid #000; margin-bottom: 5px; }
+            .header-title { font-size: 11pt; }
             .table-responsive { overflow: visible !important; }
-            .table-custom { width: 100% !important; font-size: 8.5px; }
-            .table-custom th, .table-custom td { padding: 2px 3px !important; border: 1px solid #000 !important; color: #000 !important; }
-            .table-custom th { background-color: #e2e8f0 !important; color: #000 !important; }
+            .table-custom { width: 100% !important; font-size: 7.5pt; table-layout: auto; }
+            .table-custom th, .table-custom td { padding: 1px 2px !important; border: 0.5px solid #000 !important; color: #000 !important; }
+            .table-custom th { background-color: #f1f5f9 !important; color: #000 !important; font-weight: bold; }
+            .kk-separator-empty { height: 3px; background: #94a3b8 !important; border: none !important; }
         }
         .print-only { display: none; }
     </style>
 </head>
 <body onload="ambilDataDariSheets()">
 
-<div class="container-fluid px-3 my-2">
+<div class="container-fluid px-2 my-2">
     <!-- Header / Kop Banner -->
     <div class="indonesia-header text-center">
-        <div class="small fw-bold text-uppercase mb-1" style="color: #fde047; letter-spacing: 2px;">PANITIA PEMUNGUTAN SUARA (PPS) PAYO LEBAR</div>
-        <h3 class="header-title mb-1">DAFTAR PEMILIH SEMENTARA (DPS)</h3>
-        <h5 class="fw-semibold mb-0" style="color: #f8fafc;">PEMILIHAN KEPALA DESA PAYO LEBAR TAHUN 2026</h5>
+        <div class="small fw-bold text-uppercase mb-0" style="color: #fde047; letter-spacing: 1px;">PANITIA PEMUNGUTAN SUARA (PPS) PAYO LEBAR</div>
+        <h4 class="header-title mb-0">DAFTAR PEMILIH SEMENTARA (DPS)</h4>
+        <div class="fw-semibold small" style="color: #f8fafc;">PEMILIHAN KEPALA DESA PAYO LEBAR TAHUN 2026</div>
     </div>
 
     <!-- Panel Kontrol Utama -->
-    <div class="card card-custom p-3 mb-3 no-print sticky-menu">
+    <div class="card card-custom p-2 mb-2 no-print sticky-menu">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
                 <span class="badge bg-danger mb-1">Status Sinkronisasi Real-Time</span>
@@ -127,22 +130,22 @@
     </div>
 
     <!-- Dashboard Ringkasan & Grafik -->
-    <div id="dashboardSection" class="row mb-3 no-print">
-        <div class="col-md-4 mb-2">
-            <div class="card card-custom p-3 h-100 border-start border-danger border-4">
-                <h6 class="fw-bold text-uppercase text-secondary mb-3 small border-bottom pb-2">📊 Rekapitulasi Status Coklit</h6>
-                <div class="d-flex flex-column gap-2" style="font-size: 12px;">
-                    <div class="d-flex justify-content-between p-2 bg-light rounded"><span>Total Pemilih:</span><strong id="statTotal" class="text-dark">0</strong></div>
-                    <div class="d-flex justify-content-between p-2 bg-success-subtle rounded text-success"><span>Memenuhi Syarat (Aktif/Baru):</span><strong id="statAktif">0</strong></div>
-                    <div class="d-flex justify-content-between p-2 bg-danger-subtle rounded text-danger"><span>Tidak Memenuhi Syarat (TMS):</span><strong id="statTMS">0</strong></div>
-                    <div class="d-flex justify-content-between p-2 bg-warning-subtle rounded text-warning-emphasis"><span>Perbaikan Data (Ubah):</span><strong id="statUbah">0</strong></div>
+    <div id="dashboardSection" class="row mb-2 no-print">
+        <div class="col-md-4 mb-1">
+            <div class="card card-custom p-2 h-100 border-start border-danger border-4">
+                <h6 class="fw-bold text-uppercase text-secondary mb-2 small border-bottom pb-1">📊 Rekapitulasi Status Coklit</h6>
+                <div class="d-flex flex-column gap-1" style="font-size: 11px;">
+                    <div class="d-flex justify-content-between p-1 bg-light rounded"><span>Total Pemilih:</span><strong id="statTotal" class="text-dark">0</strong></div>
+                    <div class="d-flex justify-content-between p-1 bg-success-subtle rounded text-success"><span>Memenuhi Syarat (Aktif/Baru):</span><strong id="statAktif">0</strong></div>
+                    <div class="d-flex justify-content-between p-1 bg-danger-subtle rounded text-danger"><span>Tidak Memenuhi Syarat (TMS):</span><strong id="statTMS">0</strong></div>
+                    <div class="d-flex justify-content-between p-1 bg-warning-subtle rounded text-warning-emphasis"><span>Perbaikan Data (Ubah):</span><strong id="statUbah">0</strong></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-8 mb-2">
-            <div class="card card-custom p-3 h-100 border-start border-warning border-4">
-                <h6 class="fw-bold text-uppercase text-secondary mb-2 small border-bottom pb-2">📈 Grafik Kode Coklit Pemilih</h6>
-                <div style="height: 160px; position: relative;">
+        <div class="col-md-8 mb-1">
+            <div class="card card-custom p-2 h-100 border-start border-warning border-4">
+                <h6 class="fw-bold text-uppercase text-secondary mb-1 small border-bottom pb-1">📈 Grafik Kode Coklit Pemilih</h6>
+                <div style="height: 120px; position: relative;">
                     <canvas id="coklitChart"></canvas>
                 </div>
             </div>
@@ -150,8 +153,7 @@
     </div>
 
     <!-- Filter & Pencarian Data -->
-    <div class="card card-custom p-3 mb-3 no-print">
-        <h6 class="fw-bold text-uppercase text-secondary mb-2 small">🔍 Filter & Pencarian Data Pemilih</h6>
+    <div class="card card-custom p-2 mb-2 no-print">
         <div class="row g-2">
             <div class="col-md-5">
                 <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari Nama, NIK, DP-ID, No KK..." onkeyup="filterData()">
@@ -181,11 +183,11 @@
     </div>
 
     <!-- Tabel Data Pemilih -->
-    <div class="card card-custom p-2">
-        <div class="d-flex justify-content-between align-items-center mb-2 px-2 pt-1 no-print">
-            <div class="d-flex align-items-center gap-2">
-                <span class="fw-bold text-muted small">Baris per halaman:</span>
-                <select id="rowsPerPageSelect" class="form-select form-select-sm" style="width: auto;" onchange="changeRowsPerPage()">
+    <div class="card card-custom p-1">
+        <div class="d-flex justify-content-between align-items-center mb-1 px-1 no-print">
+            <div class="d-flex align-items-center gap-1">
+                <span class="fw-bold text-muted style-sm" style="font-size: 11px;">Baris per halaman:</span>
+                <select id="rowsPerPageSelect" class="form-select form-select-sm" style="width: auto; padding: 1px 5px;" onchange="changeRowsPerPage()">
                     <option value="50">50</option>
                     <option value="100">100</option>
                     <option value="500">500</option>
@@ -203,25 +205,25 @@
             <table class="table table-bordered table-hover align-middle table-custom">
                 <thead>
                     <tr>
-                        <th style="width: 30px;">NO</th>
-                        <th style="width: 70px;">DP-ID</th>
-                        <th style="width: 120px;">NO. KK</th>
-                        <th style="width: 120px;">NIK</th>
+                        <th style="width: 25px;">NO</th>
+                        <th style="width: 55px;">DP-ID</th>
+                        <th style="width: 100px;">NO. KK</th>
+                        <th style="width: 100px;">NIK</th>
                         <th>NAMA LENGKAP PEMILIH</th>
-                        <th style="width: 35px;">L/P</th>
+                        <th style="width: 30px;">L/P</th>
                         <th>TEMPAT LAHIR</th>
-                        <th style="width: 80px;">TGL LAHIR</th>
-                        <th style="width: 40px;">UMUR</th>
-                        <th style="width: 45px;">RT/RW</th>
-                        <th style="width: 80px;">STATUS HUB</th>
-                        <th style="width: 40px;">KODE</th>
+                        <th style="width: 65px;">TGL LAHIR</th>
+                        <th style="width: 35px;">UMUR</th>
+                        <th style="width: 35px;">RT/RW</th>
+                        <th style="width: 75px;">STATUS HUB</th>
+                        <th style="width: 35px;">KODE</th>
                         <th>KETERANGAN / STATUS COKLIT</th>
-                        <th class="no-print" style="width: 50px;">AKSI</th>
+                        <th class="no-print" style="width: 65px;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
                     <tr>
-                        <td colspan="14" class="text-center text-muted py-4">Memuat database dari Google Sheets...</td>
+                        <td colspan="14" class="text-center text-muted py-3">Memuat database dari Google Sheets...</td>
                     </tr>
                 </tbody>
             </table>
@@ -297,6 +299,54 @@
   </div>
 </div>
 
+<!-- Modal Edit Data Pemilih & Hapus -->
+<div class="modal fade" id="modalEditPemilih" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header py-2 text-white" style="background: linear-gradient(135deg, #1e293b, #0f172a);">
+        <h6 class="modal-title fw-bold">✏️ Edit Profil Data Pemilih</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body small">
+        <input type="hidden" id="editUid">
+        <div class="row g-2 mb-2">
+            <div class="col-6"><label class="form-label mb-1 fw-bold">DP-ID</label><input type="text" id="editDpId" class="form-control form-control-sm"></div>
+            <div class="col-6"><label class="form-label mb-1 fw-bold">Nomor KK</label><input type="text" id="editNoKK" class="form-control form-control-sm"></div>
+        </div>
+        <div class="row g-2 mb-2">
+            <div class="col-6"><label class="form-label mb-1 fw-bold">NIK Pemilih</label><input type="text" id="editNIK" class="form-control form-control-sm"></div>
+            <div class="col-6"><label class="form-label mb-1 fw-bold">Jenis Kelamin</label><select id="editLP" class="form-select form-select-sm"><option value="L">L</option><option value="P">P</option></select></div>
+        </div>
+        <div class="mb-2"><label class="form-label mb-1 fw-bold">Nama Lengkap</label><input type="text" id="editNama" class="form-control form-control-sm"></div>
+        <div class="row g-2 mb-2">
+            <div class="col-6"><label class="form-label mb-1 fw-bold">Tempat Lahir</label><input type="text" id="editTempatLahir" class="form-control form-control-sm"></div>
+            <div class="col-6"><label class="form-label mb-1 fw-bold">Tanggal Lahir (DD/MM/YYYY)</label><input type="text" id="editTglLahir" class="form-control form-control-sm" oninput="hitungUmurEditOtomatis()"></div>
+        </div>
+        <div class="row g-2 mb-2">
+            <div class="col-4"><label class="form-label mb-1 fw-bold">Umur (29-10-2026)</label><input type="text" id="editUmur" class="form-control form-control-sm bg-light" readonly></div>
+            <div class="col-4"><label class="form-label mb-1 fw-bold">RT/RW</label><input type="text" id="editRTRW" class="form-control form-control-sm"></div>
+            <div class="col-4"><label class="form-label mb-1 fw-bold">Status Hubungan</label>
+                <select id="editStatusHub" class="form-select form-select-sm">
+                    <option value="KEPALA KK">KEPALA KK</option>
+                    <option value="ISTRI">ISTRI</option>
+                    <option value="ANAK">ANAK</option>
+                    <option value="ORANG TUA">ORANG TUA</option>
+                    <option value="FAMILI LAIN">FAMILI LAIN</option>
+                </select>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer py-1 bg-light d-flex justify-content-between">
+        <button type="button" class="btn btn-sm btn-outline-danger fw-bold" onclick="hapusPemilih()">🗑️ Hapus Pemilih</button>
+        <div>
+            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="simpanEditPemilih()">Simpan Perubahan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Tambah Pemilih -->
 <div class="modal fade" id="modalTambahPemilih" tabindex="-1">
   <div class="modal-dialog">
@@ -318,7 +368,7 @@
         <div class="row g-2 mb-2">
             <div class="col-6">
                 <label class="form-label mb-1 fw-bold">Tanggal Lahir</label>
-                <input type="text" id="addTglLahir" class="form-control form-control-sm" placeholder="DD/MM/YYYY" oninput="hitungUmurOtomatis()">
+                <input type="text" id="addTglLahir" class="form-control form-control-sm" placeholder="DD/MM/YYYY" oninput="hitungUmurTambahOtomatis()">
             </div>
             <div class="col-6">
                 <label class="form-label mb-1 fw-bold">Umur (Per 29-10-2026)</label>
@@ -343,7 +393,6 @@
 </div>
 
 <script>
-    // URL Web App Google Sheets Apps Script milik Abang
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzak7vgujmmI6ya5DToXW9V2Fw20bh9uAVej5hci_WyDkde1x0BqEz9GfOLARzu3sxFDg/exec";
 
     let pemilihData = [];
@@ -351,6 +400,7 @@
     let currentPage = 1;
     let rowsPerPage = 50;
     let modalInstance = null;
+    let modalEditInstance = null;
     let modalTambahInstance = null;
     let myChart = null;
 
@@ -360,7 +410,61 @@
         '7': 'Pisah KK', '8': 'Belum Cukup Umur', 'U': 'Ubah', 'B': 'Baru'
     };
 
-    // Pembaca Header Pintar (Mencegah Kolom Berantakan)
+    function formatTanggalSpreadsheet(val) {
+        if (!val || val === '-') return '-';
+        let strVal = String(val).trim();
+        if (strVal.includes('T') && strVal.includes('Z')) {
+            let d = new Date(strVal);
+            if (!isNaN(d.getTime())) {
+                let day = String(d.getDate()).padStart(2, '0');
+                let month = String(d.getMonth() + 1).padStart(2, '0');
+                let year = d.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+        }
+        return strVal;
+    }
+
+    function hitungUmurPer29Okt2026(tglStr) {
+        if (!tglStr || tglStr === '-') return '-';
+        let day, month, year;
+
+        if (tglStr.includes('/')) {
+            let parts = tglStr.split('/');
+            if (parts.length === 3) {
+                day = parseInt(parts[0], 10);
+                month = parseInt(parts[1], 10) - 1;
+                year = parseInt(parts[2], 10);
+            }
+        } else if (tglStr.includes('-')) {
+            let parts = tglStr.split('-');
+            if (parts.length === 3) {
+                if (parts[0].length === 4) {
+                    year = parseInt(parts[0], 10);
+                    month = parseInt(parts[1], 10) - 1;
+                    day = parseInt(parts[2], 10);
+                } else {
+                    day = parseInt(parts[0], 10);
+                    month = parseInt(parts[1], 10) - 1;
+                    year = parseInt(parts[2], 10);
+                }
+            }
+        }
+
+        if (!year || isNaN(year)) return '-';
+
+        let birthDate = new Date(year, month, day);
+        let targetDate = new Date(2026, 9, 29);
+        let age = targetDate.getFullYear() - birthDate.getFullYear();
+        let m = targetDate.getMonth() - birthDate.getMonth();
+
+        if (m < 0 || (m === 0 && targetDate.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        return age >= 0 ? age : 0;
+    }
+
     function extractVal(obj, candidates) {
         if (!obj) return '-';
         const keys = Object.keys(obj);
@@ -392,6 +496,10 @@
                 }
 
                 pemilihData = data.map((row, index) => {
+                    let rawTgl = extractVal(row, ['TGL LAHIR', 'TGL_LAHIR', 'TANGGAL LAHIR', 'TGL']);
+                    let cleanTgl = formatTanggalSpreadsheet(rawTgl);
+                    let computedUmur = hitungUmurPer29Okt2026(cleanTgl);
+
                     return {
                         uid: 'U_' + index,
                         dpId: extractVal(row, ['DP-ID', 'DP ID', 'DP_ID', 'DPID', 'NO DP', 'NO_DP']),
@@ -400,8 +508,8 @@
                         nama: extractVal(row, ['NAMA LENGKAP', 'NAMA_LENGKAP', 'NAMA PEMILIH', 'NAMA']),
                         lp: extractVal(row, ['L/P', 'LP', 'JENIS KELAMIN', 'JK']),
                         tempatLahir: extractVal(row, ['TEMPAT LAHIR', 'TEMPAT_LAHIR', 'TMP LAHIR', 'TMP_LAHIR']),
-                        tglLahir: extractVal(row, ['TGL LAHIR', 'TGL_LAHIR', 'TANGGAL LAHIR', 'TGL']),
-                        umur: extractVal(row, ['UMUR', 'USIA']),
+                        tglLahir: cleanTgl,
+                        umur: computedUmur !== '-' ? computedUmur : extractVal(row, ['UMUR', 'USIA']),
                         rtRw: extractVal(row, ['RT/RW', 'RT_RW', 'RT', 'RTRW', 'ALAMAT']),
                         statusHub: extractVal(row, ['STATUS HUB', 'STATUS_HUB', 'STATUS HUBUNGAN', 'SHDK', 'HUBUNGAN']),
                         kodeCoklit: extractVal(row, ['KODE', 'KODE COKLIT', 'STATUS']) === '-' ? '0' : extractVal(row, ['KODE', 'KODE COKLIT', 'STATUS']),
@@ -433,7 +541,7 @@
         })
         .then(() => {
             if (status) {
-                status.innerHTML = `<span class="text-success fw-bold">✅ Berhasil disimpan ke Google Sheets.</span>`;
+                status.innerHTML = `<span class="text-success fw-bold">✅ Berhasil sinkronisasi dengan Google Sheets.</span>`;
             }
         })
         .catch(err => {
@@ -446,6 +554,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         modalInstance = new bootstrap.Modal(document.getElementById('modalCoklit'));
+        modalEditInstance = new bootstrap.Modal(document.getElementById('modalEditPemilih'));
         modalTambahInstance = new bootstrap.Modal(document.getElementById('modalTambahPemilih'));
     });
 
@@ -508,8 +617,8 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { font: { size: 9 }, color: '#475569' }, grid: { display: false } },
-                    y: { beginAtZero: true, ticks: { font: { size: 10 }, color: '#475569' }, grid: { color: '#f1f5f9' } }
+                    x: { ticks: { font: { size: 8 }, color: '#475569' }, grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { font: { size: 9 }, color: '#475569' }, grid: { color: '#f1f5f9' } }
                 }
             }
         });
@@ -566,18 +675,106 @@
                 <td class="text-center font-monospace">${item.lp}</td>
                 <td>${item.tempatLahir}</td>
                 <td class="text-center">${item.tglLahir}</td>
-                <td class="text-center">${item.umur}</td>
+                <td class="text-center fw-bold">${item.umur}</td>
                 <td class="text-center">${item.rtRw}</td>
                 <td class="text-center">${item.statusHub}</td>
                 <td class="text-center"><span class="badge ${badgeClass}">${item.kodeCoklit}</span></td>
                 <td>${item.keterangan}</td>
                 <td class="no-print text-center">
-                    <button class="btn btn-sm btn-outline-danger py-0 px-1" onclick="openModal('${item.uid}')" title="Coklit Pemilih">Coklit</button>
+                    <button class="btn btn-sm btn-outline-danger py-0 px-1 me-1" style="font-size: 10px;" onclick="openModal('${item.uid}')" title="Coklit Pemilih">Coklit</button>
+                    <button class="btn btn-sm btn-outline-dark py-0 px-1" style="font-size: 10px;" onclick="openModalEdit('${item.uid}')" title="Edit Data">✏️</button>
                 </td>
             </tr>`;
         }
 
         tbody.innerHTML = htmlStr;
+    }
+
+    function hitungUmurEditOtomatis() {
+        let tgl = document.getElementById('editTglLahir').value;
+        document.getElementById('editUmur').value = hitungUmurPer29Okt2026(tgl);
+    }
+
+    function hitungUmurTambahOtomatis() {
+        let tgl = document.getElementById('addTglLahir').value;
+        document.getElementById('addUmur').value = hitungUmurPer29Okt2026(tgl);
+    }
+
+    function openModalEdit(uid) {
+        const target = pemilihData.find(i => i.uid === uid);
+        if (!target) return;
+
+        document.getElementById('editUid').value = target.uid;
+        document.getElementById('editDpId').value = target.dpId;
+        document.getElementById('editNoKK').value = target.noKK;
+        document.getElementById('editNIK').value = target.nik;
+        document.getElementById('editNama').value = target.nama;
+        document.getElementById('editLP').value = target.lp === 'P' ? 'P' : 'L';
+        document.getElementById('editTempatLahir').value = target.tempatLahir;
+        document.getElementById('editTglLahir').value = target.tglLahir;
+        document.getElementById('editUmur').value = target.umur;
+        document.getElementById('editRTRW').value = target.rtRw;
+        document.getElementById('editStatusHub').value = target.statusHub;
+
+        modalEditInstance.show();
+    }
+
+    function simpanEditPemilih() {
+        const uid = document.getElementById('editUid').value;
+        const target = pemilihData.find(i => i.uid === uid);
+        if (!target) return alert("Data tidak ditemukan!");
+
+        target.dpId = document.getElementById('editDpId').value.trim() || '-';
+        target.noKK = document.getElementById('editNoKK').value.trim() || '-';
+        target.nik = document.getElementById('editNIK').value.trim() || '-';
+        target.nama = document.getElementById('editNama').value.trim();
+        target.lp = document.getElementById('editLP').value;
+        target.tempatLahir = document.getElementById('editTempatLahir').value.trim() || '-';
+        target.tglLahir = document.getElementById('editTglLahir').value.trim() || '-';
+        target.umur = hitungUmurPer29Okt2026(target.tglLahir);
+        target.rtRw = document.getElementById('editRTRW').value.trim() || '-';
+        target.statusHub = document.getElementById('editStatusHub').value;
+        target.kodeCoklit = 'U';
+        target.keterangan = 'Perbaikan Data Pemilih';
+
+        kirimDataKeSheets({
+            action: "editPemilih",
+            dpId: target.dpId,
+            noKK: target.noKK,
+            nik: target.nik,
+            nama: target.nama,
+            lp: target.lp,
+            tempatLahir: target.tempatLahir,
+            tglLahir: target.tglLahir,
+            umur: target.umur,
+            rt: target.rtRw,
+            statusHub: target.statusHub,
+            kode: target.kodeCoklit,
+            ket: target.keterangan
+        });
+
+        modalEditInstance.hide();
+        populateRTFilter();
+        filterData();
+    }
+
+    function hapusPemilih() {
+        const uid = document.getElementById('editUid').value;
+        const target = pemilihData.find(i => i.uid === uid);
+        if (!target) return;
+
+        if (!confirm(`Yakin ingin menghapus pemilih atas nama "${target.nama}" (NIK: ${target.nik})? Data juga akan terhapus dari Google Sheets.`)) return;
+
+        kirimDataKeSheets({
+            action: "hapusPemilih",
+            nik: target.nik,
+            nama: target.nama
+        });
+
+        pemilihData = pemilihData.filter(i => i.uid !== uid);
+        modalEditInstance.hide();
+        populateRTFilter();
+        filterData();
     }
 
     function updateKetOtomatis() {
@@ -623,6 +820,16 @@
         const nama = document.getElementById('addNama').value.trim();
         if (!nama) return alert('Nama Lengkap wajib diisi!');
 
+        const tgl = document.getElementById('addTglLahir').value.trim() || '-';
+        const umurVal = hitungUmurPer29Okt2026(tgl);
+
+        let defaultKode = 'B';
+        let defaultKet = 'Pemilih Baru';
+        if (typeof umurVal === 'number' && umurVal < 17) {
+            defaultKode = '8';
+            defaultKet = 'Belum Cukup Umur';
+        }
+
         const newPemilih = {
             uid: 'U_NEW_' + Math.random().toString(36).substr(2, 5),
             dpId: '-',
@@ -631,15 +838,34 @@
             nama: nama,
             lp: document.getElementById('addLP').value,
             tempatLahir: document.getElementById('addTempatLahir').value.trim() || '-',
-            tglLahir: document.getElementById('addTglLahir').value.trim() || '-',
-            umur: document.getElementById('addUmur').value.trim() || '-',
+            tglLahir: tgl,
+            umur: umurVal,
             rtRw: document.getElementById('addRTRW').value.trim() || '28',
             statusHub: document.getElementById('addStatusHub').value,
-            kodeCoklit: 'B',
-            keterangan: 'Pemilih Baru'
+            kodeCoklit: defaultKode,
+            keterangan: defaultKet
         };
 
-        pemilihData.push(newPemilih);
+        let targetIndex = -1;
+        if (newPemilih.noKK !== '-') {
+            for (let i = 0; i < pemilihData.length; i++) {
+                if (pemilihData[i].noKK === newPemilih.noKK) {
+                    targetIndex = i;
+                }
+            }
+        }
+
+        if (targetIndex !== -1) {
+            let lastIndexForThisKK = targetIndex;
+            for (let i = targetIndex; i < pemilihData.length; i++) {
+                if (pemilihData[i].noKK === newPemilih.noKK) {
+                    lastIndexForThisKK = i;
+                }
+            }
+            pemilihData.splice(lastIndexForThisKK + 1, 0, newPemilih);
+        } else {
+            pemilihData.push(newPemilih);
+        }
 
         kirimDataKeSheets({
             action: "tambahPemilih",
