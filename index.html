@@ -248,7 +248,8 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZxJmDgSEdTdUnVdZb_Z2huvsq98Qzei8LkXzrm7JjlK34PjToBgdgCH_UG2PlqyTyKw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzak7vgujmmI6ya5DToXW9V2Fw20bh9uAVej5hci_WyDkde1x0BqEz9GfOLARzu3sxFDg/exec";
+```[cite: 1]
 
     let pemilihData = [];
     let filteredData = [];
@@ -302,12 +303,7 @@
         return '-';
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        modalInstance = new bootstrap.Modal(document.getElementById('modalCoklit'));
-        modalTambahInstance = new bootstrap.Modal(document.getElementById('modalTambahPemilih'));
-    });
-
-    document.getElementById('excelFile').addEventListener('change', function(e) {
+        document.getElementById('excelFile').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
 
