@@ -366,7 +366,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = https://script.google.com/macros/s/AKfycbzak7vgujmmI6ya5DToXW9V2Fw20bh9uAVej5hci_WyDkde1x0BqEz9GfOLARzu3sxFDg/exec
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzak7vgujmmI6ya5DToXW9V2Fw20bh9uAVej5hci_WyDkde1x0BqEz9GfOLARzu3sxFDg/exec";
 
     let pemilihData = [];
     let filteredData = [];
@@ -408,7 +408,7 @@
                         umur: row['UMUR'] || row['umur'] || '-',
                         rtRw: row['RT/RW'] || row['rtRw'] || '-',
                         statusHub: row['STATUS HUB'] || row['statusHub'] || '-',
-                        kodeCoklit: row['KODE'] || row['kodeCoklit'] || '0',
+                        kodeCoklit: String(row['KODE'] || row['kodeCoklit'] || '0').trim(),
                         keterangan: row['KETERANGAN'] || row['keterangan'] || 'Aktif'
                     };
                 });
@@ -455,7 +455,7 @@
             if (a.noKK === b.noKK) return 0;
             if (a.noKK === '-') return 1;
             if (b.noKK === '-') return -1;
-            return a.noKK.localeCompare(b.noKK);
+            return String(a.noKK).localeCompare(String(b.noKK));
         });
     }
 
@@ -780,7 +780,7 @@
             const rtManual = document.getElementById('modalAlamatLain').value.trim();
             if (rtManual) rtTujuan = rtManual;
             
-            target.rtRw = rtTujuan; // Otomatis ubah RT pemilih
+            target.rtRw = rtTujuan;
             ket = `Pindah ke RT: ${rtTujuan} | ` + ket;
         } else if (kode === '7') {
             const noKKBaru = document.getElementById('modalNoKKBaru').value.trim();
@@ -794,7 +794,6 @@
             target.statusHub = 'KEPALA KK';
             ket = `Pisah KK (No KK: ${noKKBaru || target.noKK}) | ` + ket;
 
-            // Jika memasukkan nama pasangan, tambahkan pasangan secara otomatis
             if (namaPasangan) {
                 const pasanganNew = {
                     uid: 'U_NEW_' + Math.random().toString(36).substr(2, 5),
@@ -840,7 +839,7 @@
 
         modalInstance.hide();
         populateRTFilter();
-        sortDataByKK(); // Urutkan ulang agar terkumpul sesuai Nomor KK
+        sortDataByKK();
         filterData();
     }
 
@@ -858,8 +857,8 @@
                                 item.nik.includes(keyword) || 
                                 item.dpId.toLowerCase().includes(keyword) || 
                                 item.noKK.includes(keyword);
-            const matchRT = selectedRT === '' || item.rtRw === selectedRT;
-            const matchStatus = selectedStatus === '' || item.kodeCoklit === selectedStatus;
+            const matchRT = selectedRT === '' || String(item.rtRw) === String(selectedRT);
+            const matchStatus = selectedStatus === '' || String(item.kodeCoklit) === String(selectedStatus);
 
             return matchSearch && matchRT && matchStatus;
         });
