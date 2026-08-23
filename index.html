@@ -517,6 +517,13 @@
                     };
                 });
 
+                // Urutkan data berdasarkan Nomor KK agar anggota keluarga selalu mengumpul otomatis
+                pemilihData.sort((a, b) => {
+                    if (a.noKK === '-' && b.noKK !== '-') return 1;
+                    if (a.noKK !== '-' && b.noKK === '-') return -1;
+                    return String(a.noKK).localeCompare(String(b.noKK));
+                });
+
                 status.innerHTML = `<span class="text-success fw-bold">✅ Terhubung ke Google Sheets (${pemilihData.length} Data Loaded).</span>`;
                 populateRTFilter();
                 filterData();
@@ -737,6 +744,9 @@
         target.kodeCoklit = 'U';
         target.keterangan = 'Perbaikan Data Pemilih';
 
+        // Urutkan kembali berdasarkan KK agar langsung merapikan posisi jika No KK berubah
+        pemilihData.sort((a, b) => String(a.noKK).localeCompare(String(b.noKK)));
+
         kirimDataKeSheets({
             action: "editPemilih",
             dpId: target.dpId,
@@ -755,9 +765,7 @@
 
         modalEditInstance.hide();
         populateRTFilter();
-        
-        updateDashboardStats(filteredData);
-        renderPage();
+        filterData();
     }
 
     function hapusPemilih() {
@@ -848,26 +856,8 @@
             keterangan: defaultKet
         };
 
-        let targetIndex = -1;
-        if (newPemilih.noKK !== '-') {
-            for (let i = 0; i < pemilihData.length; i++) {
-                if (pemilihData[i].noKK === newPemilih.noKK) {
-                    targetIndex = i;
-                }
-            }
-        }
-
-        if (targetIndex !== -1) {
-            let lastIndexForThisKK = targetIndex;
-            for (let i = targetIndex; i < pemilihData.length; i++) {
-                if (pemilihData[i].noKK === newPemilih.noKK) {
-                    lastIndexForThisKK = i;
-                }
-            }
-            pemilihData.splice(lastIndexForThisKK + 1, 0, newPemilih);
-        } else {
-            pemilihData.push(newPemilih);
-        }
+        pemilihData.push(newPemilih);
+        pemilihData.sort((a, b) => String(a.noKK).localeCompare(String(b.noKK)));
 
         kirimDataKeSheets({
             action: "tambahPemilih",
@@ -886,9 +876,7 @@
 
         modalTambahInstance.hide();
         populateRTFilter();
-        
-        updateDashboardStats(filteredData);
-        renderPage();
+        filterData();
     }
 
     function simpanCoklit() {
@@ -920,13 +908,6 @@
             if (alamatBaru) target.rtRw = alamatBaru;
             target.statusHub = 'KEPALA KK';
             ket = `Pisah KK (No KK: ${noKKBaru || target.noKK}) | ` + ket;
-
-            // Pindahkan posisi baris Dol Rohim ke paling bawah agar kelompok KK lama tidak rusak
-            const indexAwal = pemilihData.indexOf(target);
-            if (indexAwal > -1) {
-                pemilihData.splice(indexAwal, 1);
-                pemilihData.push(target);
-            }
 
             if (namaPasangan) {
                 const pasanganNew = {
@@ -967,6 +948,9 @@
         target.kodeCoklit = kode;
         target.keterangan = ket;
 
+        // Urutkan ulang seluruh data secara otomatis berdasarkan No KK agar keluarga yang baru dipecah langsung berkumpul rapi
+        pemilihData.sort((a, b) => String(a.noKK).localeCompare(String(b.noKK)));
+
         kirimDataKeSheets({
             action: "updateCoklit",
             nik: target.nik,
@@ -978,9 +962,7 @@
 
         modalInstance.hide();
         populateRTFilter();
-        
-        updateDashboardStats(filteredData);
-        renderPage();
+        filterData();
     }
 
     function prevPage() { if (currentPage > 1) { currentPage--; renderPage(); } }
