@@ -921,7 +921,7 @@
             target.statusHub = 'KEPALA KK';
             ket = `Pisah KK (No KK: ${noKKBaru || target.noKK}) | ` + ket;
 
-            // Pindahkan posisi data ke urutan paling bawah agar anggota keluarga lama tidak teracak/terpisah
+            // Pindahkan posisi baris Dol Rohim ke paling bawah agar kelompok KK lama tidak rusak
             const indexAwal = pemilihData.indexOf(target);
             if (indexAwal > -1) {
                 pemilihData.splice(indexAwal, 1);
