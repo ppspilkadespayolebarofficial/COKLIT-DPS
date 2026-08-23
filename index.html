@@ -495,6 +495,7 @@
                     return;
                 }
 
+                // Data dimuat persis sesuai urutan baris asli dari Google Sheets (mulai dari Warsono, dsb.)
                 pemilihData = data.map((row, index) => {
                     let rawTgl = extractVal(row, ['TGL LAHIR', 'TGL_LAHIR', 'TANGGAL LAHIR', 'TGL']);
                     let cleanTgl = formatTanggalSpreadsheet(rawTgl);
@@ -515,13 +516,6 @@
                         kodeCoklit: extractVal(row, ['KODE', 'KODE COKLIT', 'STATUS']) === '-' ? '0' : extractVal(row, ['KODE', 'KODE COKLIT', 'STATUS']),
                         keterangan: extractVal(row, ['KETERANGAN', 'KET']) === '-' ? 'Aktif' : extractVal(row, ['KETERANGAN', 'KET'])
                     };
-                });
-
-                // Urutkan data berdasarkan Nomor KK agar anggota keluarga selalu mengumpul otomatis
-                pemilihData.sort((a, b) => {
-                    if (a.noKK === '-' && b.noKK !== '-') return 1;
-                    if (a.noKK !== '-' && b.noKK === '-') return -1;
-                    return String(a.noKK).localeCompare(String(b.noKK));
                 });
 
                 status.innerHTML = `<span class="text-success fw-bold">✅ Terhubung ke Google Sheets (${pemilihData.length} Data Loaded).</span>`;
@@ -744,9 +738,6 @@
         target.kodeCoklit = 'U';
         target.keterangan = 'Perbaikan Data Pemilih';
 
-        // Urutkan kembali berdasarkan KK agar langsung merapikan posisi jika No KK berubah
-        pemilihData.sort((a, b) => String(a.noKK).localeCompare(String(b.noKK)));
-
         kirimDataKeSheets({
             action: "editPemilih",
             dpId: target.dpId,
@@ -857,7 +848,6 @@
         };
 
         pemilihData.push(newPemilih);
-        pemilihData.sort((a, b) => String(a.noKK).localeCompare(String(b.noKK)));
 
         kirimDataKeSheets({
             action: "tambahPemilih",
@@ -947,9 +937,6 @@
 
         target.kodeCoklit = kode;
         target.keterangan = ket;
-
-        // Urutkan ulang seluruh data secara otomatis berdasarkan No KK agar keluarga yang baru dipecah langsung berkumpul rapi
-        pemilihData.sort((a, b) => String(a.noKK).localeCompare(String(b.noKK)));
 
         kirimDataKeSheets({
             action: "updateCoklit",
