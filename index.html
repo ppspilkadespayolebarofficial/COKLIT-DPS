@@ -755,7 +755,10 @@
 
         modalEditInstance.hide();
         populateRTFilter();
-        filterData();
+        
+        // Memperbarui tampilan tanpa mereset halaman aktif
+        updateDashboardStats(filteredData);
+        renderPage();
     }
 
     function hapusPemilih() {
@@ -884,7 +887,10 @@
 
         modalTambahInstance.hide();
         populateRTFilter();
-        filterData();
+        
+        // Memperbarui tampilan tanpa mereset halaman aktif
+        updateDashboardStats(filteredData);
+        renderPage();
     }
 
     function simpanCoklit() {
@@ -965,7 +971,10 @@
 
         modalInstance.hide();
         populateRTFilter();
-        filterData();
+        
+        // Memperbarui tampilan tanpa mereset halaman aktif
+        updateDashboardStats(filteredData);
+        renderPage();
     }
 
     function prevPage() { if (currentPage > 1) { currentPage--; renderPage(); } }
