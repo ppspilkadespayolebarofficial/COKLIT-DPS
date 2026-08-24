@@ -63,7 +63,6 @@
         .form-control, .form-select { border-radius: 8px; font-size: 0.85rem; padding: 8px 12px; border: 1px solid #cbd5e1; }
         .form-control:focus, .form-select:focus { box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.15); border-color: var(--primary-color); }
 
-        /* Judul khusus cetak yang awalnya tersembunyi */
         .print-title { display: none; }
 
         @media print {
@@ -211,7 +210,6 @@
     </div>
 
     <div class="card card-custom p-3 print-area">
-        <!-- Judul Dinamis yang Tampil Hanya Saat Dicetak -->
         <div class="print-title">
             <h4 class="fw-bold m-0">DAFTAR PEMILIH SEMENTARA (DPS)</h4>
             <h5 class="fw-semibold m-0 text-secondary" id="printFilterSubTitle">Desa Payo Lebar Tahun 2026</h5>
@@ -270,7 +268,7 @@
                         <div class="col-md-6"><label class="form-label small fw-bold">NIK</label><input type="text" id="editNik" class="form-control bg-light" readonly></div>
                         <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="editNama" class="form-control"></div>
                         <div class="col-md-3"><label class="form-label small fw-bold">KODE COKLIT</label>
-                            <select id="editKode" class="form-select" onchange="toggleEditDynamicFields()">
+                            <select id="editKode" class="form-select" onchange="onEditKodeChange()">
                                 <option value="0">0 - Aktif</option>
                                 <option value="1">1 - Meninggal</option>
                                 <option value="2">2 - Ganda</option>
@@ -346,6 +344,20 @@
     let currentPage = 1;
     let pageSize = 50;
 
+    const KODE_KETERANGAN_MAP = {
+        "0": "Aktif",
+        "1": "Meninggal",
+        "2": "Ganda",
+        "3": "TNI",
+        "4": "Polisi",
+        "5": "Pindah Luar Desa",
+        "6": "Pindah Dalam Desa/RT",
+        "7": "Pisah KK",
+        "8": "Belum Umur",
+        "U": "Ubah Data",
+        "B": "Pemilih Baru"
+    };
+
     document.addEventListener("DOMContentLoaded", () => {
         modalEditObj = new bootstrap.Modal(document.getElementById('modalEdit'));
         modalTambahObj = new bootstrap.Modal(document.getElementById('modalTambah'));
@@ -388,6 +400,12 @@
         syncIcon.classList.add('fa-spin-custom');
         btnSync.disabled = true;
 
+        // Simpan filter saat ini agar tidak tereset saat sync
+        const currentSearch = document.getElementById('searchInput').value;
+        const currentRt = document.getElementById('filterRt').value;
+        const currentKode = document.getElementById('filterKode').value;
+        const savedPage = currentPage;
+
         fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
@@ -422,7 +440,15 @@
                         }));
 
                     populateRtFilter();
+
+                    // Kembalikan filter sebelumnya
+                    document.getElementById('searchInput').value = currentSearch;
+                    document.getElementById('filterRt').value = currentRt;
+                    document.getElementById('filterKode').value = currentKode;
+                    
                     filterData();
+                    currentPage = savedPage;
+                    renderTable();
                 }
             })
             .catch(err => { 
@@ -435,6 +461,7 @@
 
     function populateRtFilter() {
         const select = document.getElementById('filterRt');
+        const selectedBefore = select.value;
         const rtSet = new Set(globalDataPemilih.map(item => item.rtRw).filter(Boolean));
         
         const sortedRt = Array.from(rtSet).sort((a, b) => {
@@ -446,6 +473,8 @@
 
         select.innerHTML = '<option value="">Semua RT</option>';
         sortedRt.forEach(rt => { select.innerHTML += `<option value="${rt}">RT ${rt}</option>`; });
+        
+        if (selectedBefore) select.value = selectedBefore;
     }
 
     function filterData() {
@@ -603,13 +632,19 @@
         document.getElementById('editRt').value = item.rtRw;
         document.getElementById('editKeterangan').value = item.keterangan;
         
-        toggleEditDynamicFields();
+        onEditKodeChange();
         modalEditObj.show();
     }
 
-    function toggleEditDynamicFields() {
+    function onEditKodeChange() {
         const kode = document.getElementById('editKode').value;
         const container = document.getElementById('dynamicEditContainer');
+        const inputKeterangan = document.getElementById('editKeterangan');
+        
+        if (KODE_KETERANGAN_MAP[kode]) {
+            inputKeterangan.value = KODE_KETERANGAN_MAP[kode];
+        }
+
         container.innerHTML = "";
 
         if (kode === "7") {
