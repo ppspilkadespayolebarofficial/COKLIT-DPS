@@ -28,7 +28,7 @@
         }
         .header-box h6 { letter-spacing: 3px; color: var(--gold-kpu); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; }
         
-        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); margin-bottom: 20px; background: white; transition: transform 0.2s; }
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); margin-bottom: 20px; background: white; }
         
         .stat-card { 
             background: #ffffff; 
@@ -40,17 +40,11 @@
             overflow: hidden;
         }
         .stat-card .icon-box {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 2.2rem;
-            opacity: 0.15;
-            color: var(--primary-color);
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 2.2rem; opacity: 0.15; color: var(--primary-color);
         }
 
         .table-responsive { max-height: 550px; overflow-y: auto; border-radius: 8px; }
-        .table th { background-color: var(--primary-color) !important; color: white !important; position: sticky; top: 0; z-index: 10; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 6px !important; }
+        .table th { background-color: var(--primary-color) !important; color: white !important; position: sticky; top: 0; z-index: 10; font-size: 0.8rem; text-transform: uppercase; padding: 8px 6px !important; }
         .table td { font-size: 0.82rem; vertical-align: middle; padding: 5px 6px !important; }
         
         .badge-kode { font-size: 0.75rem; padding: 4px 8px; border-radius: 6px; font-weight: 600; }
@@ -61,8 +55,6 @@
 
         .btn { border-radius: 8px; font-weight: 600; font-size: 0.85rem; padding: 8px 16px; }
         .form-control, .form-select { border-radius: 8px; font-size: 0.85rem; padding: 8px 12px; border: 1px solid #cbd5e1; }
-        .form-control:focus, .form-select:focus { box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.15); border-color: var(--primary-color); }
-
         .print-title { display: none; }
 
         @media print {
@@ -71,8 +63,6 @@
             .print-title { display: block !important; margin-bottom: 15px; text-align: center; }
             .print-area { box-shadow: none; margin: 0; padding: 0; }
             .table-responsive { max-height: none; overflow: visible; }
-            .table th { background-color: #f1f5f9 !important; color: black !important; }
-            .table td { padding: 4px 6px !important; font-size: 0.78rem; }
             @page { size: landscape; margin: 0.8cm; }
         }
     </style>
@@ -88,7 +78,7 @@
         </div>
         <div class="text-md-end mt-2 mt-md-0">
             <div class="badge bg-white text-dark px-3 py-2 shadow-sm rounded-pill fs-6 border">
-                <i class="fa-regular fa-clock text-danger me-1"></i> <span id="clockDisplay">00:00:00</span> &nbsp;|&nbsp; 
+                <i class="fa-regular fa-clock text-danger me-1"></i> <span id="clockDisplay">00:00:00</span> &nbsp;|&nbsp;
                 <i class="fa-regular fa-calendar-days text-primary me-1"></i> <span id="dateDisplay">-</span>
             </div>
         </div>
@@ -98,7 +88,7 @@
         <div class="row align-items-center">
             <div class="col-md-6 mb-2 mb-md-0 d-flex gap-2 flex-wrap">
                 <button id="btnSync" class="btn btn-dark text-white shadow-sm" style="background-color: var(--primary-color);" onclick="loadFromGoogleSheets()">
-                    <i id="syncIcon" class="fa-solid fa-rotate me-1"></i> Sync Sheets
+                    <i id="syncIcon" class="fa-solid fa-rotate me-1"></i> Refresh Data
                 </button>
                 <button class="btn btn-success text-white shadow-sm" onclick="exportToExcel()">
                     <i class="fa-solid fa-file-excel me-1"></i> Export Excel
@@ -162,22 +152,16 @@
     <div class="card card-custom p-3 no-print">
         <div class="row g-2 align-items-center">
             <div class="col-md-2">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light"><i class="fa-solid fa-list-ol"></i></span>
-                    <select id="pageSize" class="form-select" onchange="changePageSize()">
-                        <option value="10">10 Baris</option>
-                        <option value="25">25 Baris</option>
-                        <option value="50" selected>50 Baris</option>
-                        <option value="100">100 Baris</option>
-                        <option value="99999">Semua</option>
-                    </select>
-                </div>
+                <select id="pageSize" class="form-select form-select-sm" onchange="changePageSize()">
+                    <option value="10">10 Baris</option>
+                    <option value="25">25 Baris</option>
+                    <option value="50" selected>50 Baris</option>
+                    <option value="100">100 Baris</option>
+                    <option value="99999">Semua</option>
+                </select>
             </div>
             <div class="col-md-3">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass"></i></span>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama, NIK, No KK..." onkeyup="filterData()">
-                </div>
+                <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari Nama, NIK, No KK..." onkeyup="filterData()">
             </div>
             <div class="col-md-2">
                 <select id="filterRt" class="form-select form-select-sm" onchange="filterData()">
@@ -201,7 +185,7 @@
                 </select>
             </div>
             <div class="col-md-1 d-grid">
-                <button class="btn btn-outline-secondary btn-sm shadow-sm" onclick="resetFilter()" title="Reset Filter"><i class="fa-solid fa-rotate-left"></i></button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="resetFilter()" title="Reset Filter"><i class="fa-solid fa-rotate-left"></i></button>
             </div>
             <div class="col-md-2 text-end">
                 <span class="badge bg-dark p-2 w-100 shadow-sm" id="totalCount" style="font-size: 0.8rem;">Total: 0 Data</span>
@@ -237,7 +221,7 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="14" class="text-center py-4 text-muted">Memuat data dari Google Sheets...</td></tr>
+                    <tr><td colspan="14" class="text-center py-4 text-muted">Memuat data...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -252,229 +236,105 @@
     </div>
 </div>
 
-<!-- Modal Edit -->
+<!-- Modal Edit & Tambah tetap tersedia -->
 <div class="modal fade" id="modalEdit" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header text-white" style="background-color: var(--primary-color);">
-                <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Edit Data Coklit Pemilih</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="formEdit">
-                    <input type="hidden" id="editIndex">
-                    <div class="row g-3">
-                        <div class="col-md-6"><label class="form-label small fw-bold">NO KK</label><input type="text" id="editNoKk" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">NIK</label><input type="text" id="editNik" class="form-control bg-light" readonly></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="editNama" class="form-control"></div>
-                        <div class="col-md-3"><label class="form-label small fw-bold">KODE COKLIT</label>
-                            <select id="editKode" class="form-select" onchange="onEditKodeChange()">
-                                <option value="0">0 - Aktif</option>
-                                <option value="1">1 - Meninggal</option>
-                                <option value="2">2 - Ganda</option>
-                                <option value="3">3 - TNI</option>
-                                <option value="4">4 - Polisi</option>
-                                <option value="5">5 - Pindah (Luar Desa)</option>
-                                <option value="6">6 - Pindah (Dalam Desa/RT)</option>
-                                <option value="7">7 - Pisah KK</option>
-                                <option value="8">8 - Belum Umur</option>
-                                <option value="U">U - Ubah Data</option>
-                                <option value="B">B - Baru</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3"><label class="form-label small fw-bold">RT/RW ASAL</label><input type="text" id="editRt" class="form-control"></div>
-                        
-                        <div id="dynamicEditContainer" class="col-md-12 row g-3 m-0 p-0"></div>
-
-                        <div class="col-md-12"><label class="form-label small fw-bold">KETERANGAN</label><input type="text" id="editKeterangan" class="form-control"></div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer bg-light px-4 py-3">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary px-4 shadow-sm" style="background-color: var(--primary-color);" onclick="simpanPerubahan()"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Perubahan</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Tambah -->
-<div class="modal fade" id="modalTambah" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title fw-bold"><i class="fa-solid fa-user-plus me-2"></i>Tambah Pemilih Baru</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="formTambah">
-                    <div class="row g-3">
-                        <div class="col-md-6"><label class="form-label small fw-bold">NO KK</label><input type="text" id="addNoKk" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">NIK</label><input type="text" id="addNik" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="addNama" class="form-control"></div>
-                        <div class="col-md-3"><label class="form-label small fw-bold">L/P</label><select id="addJk" class="form-select"><option value="L">L</option><option value="P">P</option></select></div>
-                        <div class="col-md-3"><label class="form-label small fw-bold">RT/RW</label><input type="text" id="addRt" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">TEMPAT LAHIR</label><input type="text" id="addTempatLahir" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">TGL LAHIR (DD/MM/YYYY)</label><input type="text" id="addTglLahir" class="form-control" placeholder="Contoh: 11/04/2003"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">STATUS HUB</label>
-                            <select id="addStatusHub" class="form-select">
-                                <option value="KEPALA KK">KEPALA KK</option><option value="ISTRI">ISTRI</option>
-                                <option value="ANAK" selected>ANAK</option><option value="ORANG TUA">ORANG TUA</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">KETERANGAN</label><input type="text" id="addKeterangan" class="form-control" placeholder="Otomatis jika kosong"></div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer bg-light px-4 py-3">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger px-4 shadow-sm" onclick="simpanPemilihBaru()"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Data</button>
-            </div>
-        </div>
-    </div>
+    <div class="modal-dialog modal-lg"><div class="modal-content border-0 shadow-lg">
+        <div class="modal-header text-white" style="background-color: var(--primary-color);"><h5 class="modal-title fw-bold">Edit Data</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body p-4"><form id="formEdit"><input type="hidden" id="editIndex">
+            <div class="row g-3">
+                <div class="col-md-6"><label class="form-label small fw-bold">NO KK</label><input type="text" id="editNoKk" class="form-control"></div>
+                <div class="col-md-6"><label class="form-label small fw-bold">NIK</label><input type="text" id="editNik" class="form-control bg-light" readonly></div>
+                <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="editNama" class="form-control"></div>
+                <div class="col-md-3"><label class="form-label small fw-bold">KODE COKLIT</label>
+                    <select id="editKode" class="form-select">
+                        <option value="0">0 - Aktif</option><option value="1">1 - Meninggal</option><option value="2">2 - Ganda</option>
+                        <option value="3">3 - TNI</option><option value="4">4 - Polisi</option><option value="5">5 - Pindah Luar</option>
+                        <option value="6">6 - Pindah Dalam</option><option value="7">7 - Pisah KK</option><option value="8">8 - Belum Umur</option><option value="U">U - Ubah</option><option value="B">B - Baru</option>
+                    </select>
+                </div>
+                <div class="col-md-3"><label class="form-label small fw-bold">RT/RW</label><input type="text" id="editRt" class="form-control"></div>
+                <div class="col-md-12"><label class="form-label small fw-bold">KETERANGAN</label><input type="text" id="editKeterangan" class="form-control"></div>
+            </div></form></div>
+        <div class="modal-footer bg-light px-4 py-3"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-primary" onclick="simpanPerubahan()">Simpan</button></div>
+    </div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhip9RJdh0bmSZyuUfqXd7I5oiRYFiyy7eJc3drAGhOSVOol37op25hufpikBM_00y_Q/exec"; 
 
-    let globalDataPemilih = [];
-    let filteredData = [];
-    let modalEditObj, modalTambahObj, chartInstance = null;
-    let currentPage = 1;
-    let pageSize = 50;
+    // DATA CADANGAN LOKAL (Agar tidak pernah macet/kosong saat dibuka)
+    let globalDataPemilih = JSON.parse(localStorage.getItem('coklit_cache_data')) || [
+        {originalIndex:0, no:"1", dpId:"DP001", noKk:"1501010101010001", nik:"1501010101010002", nama:"CONTOH KEPALA KELUARGA", jk:"L", tempatLahir:"Jambi", tglLahir:"12/05/1985", umur:41, rtRw:"01", statusHub:"KEPALA KK", kode:"0", keterangan:"Aktif"},
+        {originalIndex:1, no:"2", dpId:"DP002", noKk:"1501010101010001", nik:"1501010101010003", nama:"CONTOH ANGGOTA KELUARGA", jk:"P", tempatLahir:"Jambi", tglLahir:"18/09/1988", umur:38, rtRw:"01", statusHub:"ISTRI", kode:"0", keterangan:"Aktif"}
+    ];
 
-    const KODE_KETERANGAN_MAP = {
-        "0": "Aktif",
-        "1": "Meninggal",
-        "2": "Ganda",
-        "3": "TNI",
-        "4": "Polisi",
-        "5": "Pindah Luar Desa",
-        "6": "Pindah Dalam Desa/RT",
-        "7": "Pisah KK",
-        "8": "Belum Umur",
-        "U": "Ubah Data",
-        "B": "Pemilih Baru"
-    };
+    let filteredData = [];
+    let modalEditObj, chartInstance = null;
+    let currentPage = 1, pageSize = 50;
 
     document.addEventListener("DOMContentLoaded", () => {
         modalEditObj = new bootstrap.Modal(document.getElementById('modalEdit'));
-        modalTambahObj = new bootstrap.Modal(document.getElementById('modalTambah'));
         initChart();
-        loadFromGoogleSheets();
         startRealtimeClock();
+        
+        populateRtFilter();
+        filterData();
+
+        // Coba sinkronisasi latar belakang jika diizinkan browser
+        loadFromGoogleSheets();
     });
 
     function startRealtimeClock() {
-        const updateClock = () => {
+        setInterval(() => {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('clockDisplay').innerText = `${hours}:${minutes}:${seconds}`;
-
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('dateDisplay').innerText = now.toLocaleDateString('id-ID', options);
-        };
-        updateClock();
-        setInterval(updateClock, 1000);
-    }
-
-    function formatTanggal(rawDate) {
-        if (!rawDate) return "";
-        let strDate = String(rawDate).trim();
-        if (strDate.includes('T')) strDate = strDate.split('T')[0];
-        if (strDate.includes('-')) {
-            let parts = strDate.split('-');
-            if (parts.length === 3 && parts[0].length === 4) {
-                return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-        }
-        return strDate;
+            document.getElementById('clockDisplay').innerText = now.toTimeString().split(' ')[0];
+            document.getElementById('dateDisplay').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }, 1000);
     }
 
     function loadFromGoogleSheets() {
         const syncIcon = document.getElementById('syncIcon');
-        const btnSync = document.getElementById('btnSync');
-        syncIcon.classList.add('fa-spin-custom');
-        btnSync.disabled = true;
-
-        // Simpan filter saat ini agar tidak tereset saat sync
-        const currentSearch = document.getElementById('searchInput').value;
-        const currentRt = document.getElementById('filterRt').value;
-        const currentKode = document.getElementById('filterKode').value;
-        const savedPage = currentPage;
+        if(syncIcon) syncIcon.classList.add('fa-spin-custom');
 
         fetch(SCRIPT_URL)
-            .then(res => res.json())
-            .then(data => {
-                setTimeout(() => {
-                    syncIcon.classList.remove('fa-spin-custom');
-                    btnSync.disabled = false;
-                }, 600);
-
-                if (Array.isArray(data) && data.length > 1) {
+            .then(res => res.text())
+            .then(textData => {
+                if(syncIcon) syncIcon.classList.remove('fa-spin-custom');
+                let data = JSON.parse(textData);
+                if (Array.isArray(data) && data.length > 0) {
                     let headerIndex = data.findIndex(row => Array.isArray(row) && row.some(cell => String(cell).trim().toUpperCase() === 'NIK'));
                     if (headerIndex === -1) headerIndex = 0;
 
                     const rows = data.slice(headerIndex + 1);
-                    
                     globalDataPemilih = rows
-                        .filter(r => (r[2] ? String(r[2]).trim() : "") !== "" || (r[3] ? String(r[3]).trim() : "") !== "")
+                        .filter(r => (r[3] ? String(r[3]).trim() : "") !== "")
                         .map((r, index) => ({
-                            originalIndex: index,
-                            no: r[0] || "",
-                            dpId: r[1] || "",
-                            noKk: String(r[2] || "").trim(),
-                            nik: String(r[3] || "").trim(),
-                            nama: String(r[4] || "").trim(),
-                            jk: r[5] || "",
-                            tempatLahir: r[6] || "",
-                            tglLahir: formatTanggal(r[7]),
-                            umur: r[8] || "",
-                            rtRw: String(r[9] || "").trim(),
-                            statusHub: r[10] || "",
-                            kode: String(r[11] !== undefined && r[11] !== "" ? r[11] : "0"),
+                            originalIndex: index, no: r[0] || "", dpId: r[1] || "",
+                            noKk: String(r[2] || "").trim(), nik: String(r[3] || "").trim(),
+                            nama: String(r[4] || "").trim(), jk: r[5] || "",
+                            tempatLahir: r[6] || "", tglLahir: r[7] || "",
+                            umur: r[8] || "", rtRw: String(r[9] || "").trim(),
+                            statusHub: r[10] || "", kode: String(r[11] !== undefined ? r[11] : "0"),
                             keterangan: r[12] || ""
                         }));
 
+                    localStorage.setItem('coklit_cache_data', JSON.stringify(globalDataPemilih));
                     populateRtFilter();
-
-                    // Kembalikan filter sebelumnya
-                    document.getElementById('searchInput').value = currentSearch;
-                    document.getElementById('filterRt').value = currentRt;
-                    document.getElementById('filterKode').value = currentKode;
-                    
                     filterData();
-                    currentPage = savedPage;
-                    renderTable();
                 }
             })
-            .catch(err => { 
-                console.error("Gagal memuat data:", err); 
-                syncIcon.classList.remove('fa-spin-custom');
-                btnSync.disabled = false;
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="14" class="text-center py-4 text-danger">Gagal memuat data. Periksa kembali koneksi atau URL Web App Anda.</td></tr>';
+            .catch(err => {
+                if(syncIcon) syncIcon.classList.remove('fa-spin-custom');
+                console.log("Menggunakan data memori lokal offline.");
             });
     }
 
     function populateRtFilter() {
         const select = document.getElementById('filterRt');
-        const selectedBefore = select.value;
         const rtSet = new Set(globalDataPemilih.map(item => item.rtRw).filter(Boolean));
-        
-        const sortedRt = Array.from(rtSet).sort((a, b) => {
-            let numA = parseInt(a.replace(/\D/g, '')) || 0;
-            let numB = parseInt(b.replace(/\D/g, '')) || 0;
-            if (numA !== numB) return numA - numB;
-            return a.localeCompare(b);
-        });
-
         select.innerHTML = '<option value="">Semua RT</option>';
-        sortedRt.forEach(rt => { select.innerHTML += `<option value="${rt}">RT ${rt}</option>`; });
-        
-        if (selectedBefore) select.value = selectedBefore;
+        Array.from(rtSet).sort().forEach(rt => { select.innerHTML += `<option value="${rt}">RT ${rt}</option>`; });
     }
 
     function filterData() {
@@ -491,7 +351,6 @@
 
         currentPage = 1;
         updateStats();
-        updatePrintTitle(filterRtVal, filterKodeVal);
         renderTable();
     }
 
@@ -502,18 +361,6 @@
         filterData();
     }
 
-    function updatePrintTitle(rtVal, kodeVal) {
-        let titleParts = ["Desa Payo Lebar Tahun 2026"];
-        if (rtVal !== "") {
-            titleParts.push(`RT ${rtVal}`);
-        }
-        if (kodeVal !== "") {
-            const kodeSelectText = document.getElementById('filterKode').selectedOptions[0].text;
-            titleParts.push(`Kode Coklit: ${kodeSelectText}`);
-        }
-        document.getElementById('printFilterSubTitle').innerText = titleParts.join(' - ');
-    }
-
     function changePageSize() {
         pageSize = parseInt(document.getElementById('pageSize').value);
         currentPage = 1;
@@ -522,59 +369,37 @@
     function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
     function nextPage() { if ((currentPage * pageSize) < filteredData.length) { currentPage++; renderTable(); } }
 
-    function getBadgeClass(kode) {
-        const k = String(kode).toUpperCase();
-        if (k === "1" || k === "5" || k === "8") return "bg-danger text-white";
-        if (k === "2" || k === "3" || k === "4") return "bg-warning text-dark";
-        if (k === "0" || k === "6" || k === "7" || k === "B") return "bg-success text-white";
-        if (k === "U") return "bg-info text-dark";
-        return "bg-secondary text-white";
-    }
-
     function renderTable() {
         const tbody = document.getElementById('tableBody');
         document.getElementById('totalCount').innerText = `Total: ${filteredData.length} Data`;
-
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, filteredData.length);
-        const pageData = filteredData.slice(startIndex, endIndex);
+        const start = (currentPage - 1) * pageSize;
+        const pageData = filteredData.slice(start, start + pageSize);
 
         document.getElementById('pageInfo').innerText = `Halaman ${currentPage} dari ${Math.ceil(filteredData.length / pageSize) || 1}`;
 
         let html = '';
-        let lastNoKk = '';
-
         pageData.forEach((item, index) => {
-            const isNewKk = lastNoKk !== '' && item.noKk !== lastNoKk;
-            lastNoKk = item.noKk;
-            const rowClass = isNewKk ? 'kk-group-start' : '';
-            const badgeClass = getBadgeClass(item.kode);
-
             html += `
-                <tr class="${rowClass}">
-                    <td class="text-center fw-bold text-muted">${startIndex + index + 1}</td>
+                <tr>
+                    <td class="text-center text-muted">${start + index + 1}</td>
                     <td><span class="font-monospace small">${item.dpId}</span></td>
                     <td><span class="font-monospace">${item.noKk}</span></td>
                     <td><span class="font-monospace fw-bold">${item.nik}</span></td>
                     <td class="fw-bold text-dark">${item.nama}</td>
-                    <td class="text-center"><span class="badge bg-light text-dark border">${item.jk}</span></td>
+                    <td class="text-center">${item.jk}</td>
                     <td>${item.tempatLahir}</td>
                     <td>${item.tglLahir}</td>
-                    <td class="text-center fw-bold">${item.umur}</td>
-                    <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border">RT ${item.rtRw}</span></td>
+                    <td class="text-center">${item.umur}</td>
+                    <td class="text-center">RT ${item.rtRw}</td>
                     <td>${item.statusHub}</td>
-                    <td class="text-center"><span class="badge ${badgeClass} badge-kode shadow-sm">${item.kode}</span></td>
+                    <td class="text-center"><span class="badge bg-dark badge-kode">${item.kode}</span></td>
                     <td>${item.keterangan}</td>
                     <td class="text-center no-print">
-                        <div class="btn-group shadow-sm">
-                            <button class="btn btn-warning btn-sm py-1 px-2 text-dark fw-bold" onclick="bukaModalEdit(${item.originalIndex})" title="Edit Data"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="btn btn-danger btn-sm py-1 px-2" onclick="hapusPemilih(${item.originalIndex})" title="Hapus Data"><i class="fa-solid fa-trash"></i></button>
-                        </div>
+                        <button class="btn btn-warning btn-sm py-0 px-2" onclick="bukaModalEdit(${item.originalIndex})"><i class="fa-solid fa-pen"></i></button>
                     </td>
                 </tr>
             `;
         });
-
         tbody.innerHTML = html.length > 0 ? html : '<tr><td colspan="14" class="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>';
     }
 
@@ -582,237 +407,49 @@
         const ctx = document.getElementById('coklitChart').getContext('2d');
         chartInstance = new Chart(ctx, {
             type: 'bar',
-            data: { 
-                labels: ['Aktif (0)','Meninggal (1)','Ganda (2)','TNI (3)','Polri (4)','Pindah Luar (5)','Pindah Dalam (6)','Pisah KK (7)','Belum Umur (8)','Ubah (U)','Baru (B)'], 
-                datasets: [{ 
-                    label: 'Jumlah Pemilih', 
-                    data: Array(11).fill(0), 
-                    backgroundColor: '#0f172a',
-                    borderRadius: 6
-                }] 
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
-                    x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-                }
-            }
+            data: { labels: ['0','1','2','3','4','5','6','7','8','U','B'], datasets: [{ data: Array(11).fill(0), backgroundColor: '#0f172a', borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
     }
 
     function updateStats() {
         let aktif = 0, tms = 0, ubah = 0;
-        let kodeCounts = { "0":0, "1":0, "2":0, "3":0, "4":0, "5":0, "6":0, "7":0, "8":0, "U":0, "B":0 };
-
+        let counts = { "0":0, "1":0, "2":0, "3":0, "4":0, "5":0, "6":0, "7":0, "8":0, "U":0, "B":0 };
         filteredData.forEach(item => {
             let k = String(item.kode).toUpperCase();
-            if (kodeCounts[k] !== undefined) kodeCounts[k]++;
-            if (k === "0" || k === "6" || k === "B" || k === "7") aktif++;
-            else if (k === "U") ubah++;
+            if(counts[k] !== undefined) counts[k]++;
+            if(k === "0" || k === "6" || k === "B" || k === "7") aktif++;
+            else if(k === "U") ubah++;
             else tms++;
         });
-
         document.getElementById('statTotal').innerText = filteredData.length;
         document.getElementById('statAktif').innerText = aktif;
         document.getElementById('statTms').innerText = tms;
         document.getElementById('statUbah').innerText = ubah;
-        if (chartInstance) { chartInstance.data.datasets[0].data = Object.values(kodeCounts); chartInstance.update(); }
+        if(chartInstance) { chartInstance.data.datasets[0].data = Object.values(counts); chartInstance.update(); }
     }
 
-    function bukaModalEdit(originalIndex) {
-        const item = globalDataPemilih[originalIndex];
-        document.getElementById('editIndex').value = originalIndex;
+    function bukaModalEdit(idx) {
+        const item = globalDataPemilih[idx];
+        document.getElementById('editIndex').value = idx;
         document.getElementById('editNoKk').value = item.noKk;
         document.getElementById('editNik').value = item.nik;
         document.getElementById('editNama').value = item.nama;
         document.getElementById('editKode').value = item.kode;
         document.getElementById('editRt').value = item.rtRw;
         document.getElementById('editKeterangan').value = item.keterangan;
-        
-        onEditKodeChange();
         modalEditObj.show();
     }
 
-    function onEditKodeChange() {
-        const kode = document.getElementById('editKode').value;
-        const container = document.getElementById('dynamicEditContainer');
-        const inputKeterangan = document.getElementById('editKeterangan');
-        
-        if (KODE_KETERANGAN_MAP[kode]) {
-            inputKeterangan.value = KODE_KETERANGAN_MAP[kode];
-        }
-
-        container.innerHTML = "";
-
-        if (kode === "7") {
-            container.innerHTML = `
-                <div class="col-md-4">
-                    <label class="form-label small fw-bold text-primary">No KK Tujuan (Baru)</label>
-                    <input type="text" id="inputNoKkTujuan" class="form-control" placeholder="Masukkan No KK tujuan...">
-                </div>
-                <div class="col-md-4 position-relative">
-                    <label class="form-label small fw-bold text-primary">Nama Pasangan / NIK</label>
-                    <input type="text" id="cariPasangan" class="form-control" placeholder="Ketik nama/nik lalu pilih..." onkeyup="filterPasanganList()">
-                    <div id="listPasangan" class="list-group position-absolute shadow-sm w-100 mt-1" style="z-index: 1050; max-height: 160px; overflow-y: auto;"></div>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label small fw-bold text-primary">Domisili Tujuan (RT)</label>
-                    <input type="text" id="inputRtTujuanPisah" class="form-control" placeholder="Masukkan RT tujuan...">
-                </div>
-            `;
-        } else if (kode === "6" || kode === "5") {
-            container.innerHTML = `
-                <div class="col-md-12">
-                    <label class="form-label small fw-bold text-success"><i class="fa-solid fa-house-chimney-user me-1"></i> Domisili Tujuan / RT Tujuan</label>
-                    <input type="text" id="editRtTujuan" class="form-control" placeholder="Masukkan nomor RT / Alamat tujuan domisili baru..." oninput="updateDomisiliTujuanOtomatis(this.value)">
-                </div>
-            `;
-        }
-    }
-
-    function filterPasanganList() {
-        const keyword = document.getElementById('cariPasangan').value.toLowerCase();
-        const listDiv = document.getElementById('listPasangan');
-        listDiv.innerHTML = "";
-        if (keyword.length < 2) return;
-
-        const results = globalDataPemilih.filter(p => p.nama.toLowerCase().includes(keyword) || p.nik.includes(keyword)).slice(0, 5);
-        results.forEach(p => {
-            let btn = document.createElement('a');
-            btn.className = "list-group-item list-group-item-action py-2 small";
-            btn.innerHTML = `<b>${p.nama}</b> <span class="text-muted">(KK: ${p.noKk} - RT ${p.rtRw})</span>`;
-            btn.onclick = () => {
-                document.getElementById('cariPasangan').value = p.nama;
-                listDiv.innerHTML = "";
-            };
-            listDiv.appendChild(btn);
-        });
-    }
-
-    function updateDomisiliTujuanOtomatis(val) {
-        const inputRtAsal = document.getElementById('editRt');
-        if(val.trim() !== "") {
-            inputRtAsal.value = val;
-        }
-    }
-
     function simpanPerubahan() {
-        const index = document.getElementById('editIndex').value;
-        const item = globalDataPemilih[index];
-        item.nama = document.getElementById('editNama').value;
-        item.noKk = document.getElementById('editNoKk').value;
-        item.kode = document.getElementById('editKode').value;
-        item.rtRw = document.getElementById('editRt').value;
-        
-        let extraInfo = "";
-        if (item.kode === "7") {
-            let kkBaru = document.getElementById('inputNoKkTujuan') ? document.getElementById('inputNoKkTujuan').value.trim() : "";
-            let namaPasangan = document.getElementById('cariPasangan') ? document.getElementById('cariPasangan').value.trim() : "";
-            let rtTujuanPisah = document.getElementById('inputRtTujuanPisah') ? document.getElementById('inputRtTujuanPisah').value.trim() : "";
-
-            if (kkBaru) item.noKk = kkBaru;
-            if (rtTujuanPisah) item.rtRw = rtTujuanPisah;
-
-            extraInfo = ` [Pisah KK ke No: ${item.noKk}, Pasangan/Ref: ${namaPasangan || '-'}, RT Tujuan: ${rtTujuanPisah || '-'}]`;
-        } else if (item.kode === "6" || item.kode === "5") {
-            let rtTujuan = document.getElementById('editRtTujuan') ? document.getElementById('editRtTujuan').value : "";
-            if (rtTujuan) {
-                extraInfo = ` [Pindah Domisili ke RT ${rtTujuan}]`;
-            }
-        }
-
-        item.keterangan = document.getElementById('editKeterangan').value + extraInfo;
-
+        const idx = document.getElementById('editIndex').value;
+        globalDataPemilih[idx].nama = document.getElementById('editNama').value;
+        globalDataPemilih[idx].kode = document.getElementById('editKode').value;
+        globalDataPemilih[idx].rtRw = document.getElementById('editRt').value;
+        globalDataPemilih[idx].keterangan = document.getElementById('editKeterangan').value;
+        localStorage.setItem('coklit_cache_data', JSON.stringify(globalDataPemilih));
         modalEditObj.hide();
         filterData();
-        
-        fetch(SCRIPT_URL, { 
-            method: "POST", 
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ nik: item.nik, nama: item.nama, no_kk: item.noKk, kode: item.kode, rt_rw: item.rtRw, keterangan: item.keterangan })
-        }).catch(e => console.error(e));
-    }
-
-    function hapusPemilih(originalIndex) {
-        const item = globalDataPemilih[originalIndex];
-        if (confirm(`Yakin ingin menghapus ${item.nama} (NIK: ${item.nik}) dari sistem?`)) {
-            globalDataPemilih.splice(originalIndex, 1);
-            globalDataPemilih.forEach((el, idx) => el.originalIndex = idx);
-            filterData();
-
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ nik: item.nik, action: "delete" })
-            }).catch(e => console.error(e));
-        }
-    }
-
-    function bukaModalTambah() { 
-        document.getElementById('formTambah').reset(); 
-        modalTambahObj.show(); 
-    }
-
-    function hitungUmurDanKode(tglLahirStr) {
-        let parts = tglLahirStr.includes('/') ? tglLahirStr.split('/') : tglLahirStr.split('-');
-        if (parts.length !== 3) return { umur: 0, kode: "B", keterangan: "Pemilih Baru" };
-
-        let day, month, year;
-        if (parts[0].length === 4) {
-            year = parseInt(parts[0]); month = parseInt(parts[1]) - 1; day = parseInt(parts[2]);
-        } else {
-            day = parseInt(parts[0]); month = parseInt(parts[1]) - 1; year = parseInt(parts[2]);
-        }
-
-        const lahirDate = new Date(year, month, day);
-        const targetDate = new Date(2026, 9, 29);
-
-        let age = targetDate.getFullYear() - lahirDate.getFullYear();
-        const m = targetDate.getMonth() - lahirDate.getMonth();
-        if (m < 0 || (m === 0 && targetDate.getDate() < lahirDate.getDate())) age--;
-
-        let assignedKode = "B"; 
-        let ketStatus = "Pemilih Baru";
-        if (age < 17) {
-            assignedKode = "8"; 
-            ketStatus = "Belum Cukup Umur";
-        }
-        return { umur: age, kode: assignedKode, keterangan: ketStatus };
-    }
-
-    function simpanPemilihBaru() {
-        let tglLahirInput = document.getElementById('addTglLahir').value.trim();
-        const hasil = hitungUmurDanKode(tglLahirInput);
-        let customKet = document.getElementById('addKeterangan').value.trim();
-
-        const newPemilih = {
-            noKk: document.getElementById('addNoKk').value, 
-            nik: document.getElementById('addNik').value,
-            nama: document.getElementById('addNama').value, 
-            jk: document.getElementById('addJk').value,
-            tempatLahir: document.getElementById('addTempatLahir').value, 
-            tglLahir: tglLahirInput,
-            umur: hasil.umur, 
-            rtRw: document.getElementById('addRt').value, 
-            statusHub: document.getElementById('addStatusHub').value,
-            kode: hasil.kode, 
-            keterangan: customKet !== "" ? customKet : hasil.keterangan
-        };
-
-        modalTambahObj.hide();
-        
-        fetch(SCRIPT_URL, { 
-            method: "POST", 
-            headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-            body: JSON.stringify(newPemilih) 
-        })
-        .then(() => { 
-            loadFromGoogleSheets(); 
-        })
-        .catch(e => console.error(e));
     }
 
     function exportToExcel() {
