@@ -463,7 +463,6 @@
             });
     }
 
-    // LOGIKA PENCARIAN & MATCHING DP-ID OTOMATIS DARI SHEET PMD / DESA KK (ANTI SALAH KETIK)
     function autoMatchMasterData(mode) {
         let nikInput = document.getElementById(mode === 'add' ? 'addNik' : 'editNik').value.trim();
         let namaInput = document.getElementById(mode === 'add' ? 'addNama' : 'editNama').value.trim().toLowerCase();
@@ -473,25 +472,22 @@
         let allMaster = [...masterPmdData, ...masterDesaData];
         let found = null;
 
-        // 1. Cari berdasarkan NIK Persis terlebih dahulu
         if (nikInput) {
             found = allMaster.find(r => String(r[3]).trim() === nikInput);
         }
 
-        // 2. Jika NIK tidak ketemu (misal ada salah ketik NIK), Cari berdasarkan Kemiripan Nama
         if (!found && namaInput.length >= 3) {
             found = allMaster.find(r => String(r[4] || "").toLowerCase().includes(namaInput));
         }
 
-        // Jika Data ditemukan di Master PMD / Desa, Otomatis Isikan DP-ID & Detailnya
         if (found) {
             if (mode === 'add') {
-                if (found[1]) document.getElementById('addDpId').value = found[1]; // DP-ID
-                if (found[2]) document.getElementById('addNoKk').value = found[2];  // NO KK
-                if (found[5]) document.getElementById('addJk').value = found[5];    // JK
+                if (found[1]) document.getElementById('addDpId').value = found[1];
+                if (found[2]) document.getElementById('addNoKk').value = found[2];
+                if (found[5]) document.getElementById('addJk').value = found[5];
                 if (found[6]) document.getElementById('addTempatLahir').value = found[6]; 
                 if (found[7]) document.getElementById('addTglLahir').value = formatTanggal(found[7]);
-                if (found[9]) document.getElementById('addRt').value = found[9];    // RT/RW
+                if (found[9]) document.getElementById('addRt').value = found[9];
             } else {
                 if (found[1]) document.getElementById('editDpId').value = found[1];
             }
@@ -527,7 +523,13 @@
             return matchSearch && matchRt && matchKode;
         });
 
-        filteredData.sort((a, b) => a.originalIndex - b.originalIndex);
+        // SORTING: Otomatis mengelompokkan baris berdasarkan nomor KK agar baris yang pisah KK langsung berkumpul bersama NKK baru
+        filteredData.sort((a, b) => {
+            if (a.noKk !== b.noKk) {
+                return a.noKk.localeCompare(b.noKk);
+            }
+            return a.originalIndex - b.originalIndex;
+        });
 
         currentPage = 1;
         updateStats();
@@ -680,7 +682,7 @@
                 <div class="col-md-3"><label class="form-label small fw-bold text-primary">Tempat Lahir</label><input type="text" id="pasanganTempatLahir" class="form-control" placeholder="Tempat lahir..."></div>
                 <div class="col-md-3 mt-2"><label class="form-label small fw-bold text-primary">Tgl Lahir</label><input type="text" id="pasanganTglLahir" class="form-control" placeholder="DD/MM/YYYY"></div>
                 <div class="col-md-3 mt-2"><label class="form-label small fw-bold text-primary">L/P</label><select id="pasanganJk" class="form-select"><option value="L">L</option><option value="P" selected>P</option></select></div>
-                <div class="col-md-6 mt-2"><label class="form-label small fw-bold text-primary">Status Hubungan</label><select id="pasanganStatusHub" class="form-select"><option value="SUAMI">SUAMI</option><option value="ISTRI" selected>ISTRI</option><option value="ANAK">ANAK</option></select></div>
+                <div class="col-md-6 mt-2"><label class="form-label small fw-bold text-primary">Status Hubungan Anggota</label><select id="pasanganStatusHub" class="form-select"><option value="SUAMI">SUAMI</option><option value="ISTRI" selected>ISTRI</option><option value="ANAK">ANAK</option><option value="FAMILI LAIN">FAMILI LAIN</option></select></div>
             `;
         } else if (kode === "6" || kode === "5") {
             container.innerHTML = `<div class="col-md-12"><label class="form-label small fw-bold text-success"><i class="fa-solid fa-house-chimney-user me-1"></i> RT Tujuan</label><input type="text" id="editRtTujuan" class="form-control" placeholder="No RT tujuan..." oninput="document.getElementById('editRt').value = this.value"></div>`;
@@ -730,46 +732,36 @@
         const item = globalDataPemilih[index];
         item.dpId = document.getElementById('editDpId').value;
         item.nama = document.getElementById('editNama').value;
-        item.noKk = document.getElementById('editNoKk').value;
+        item.nik = document.getElementById('editNik').value;
         item.kode = document.getElementById('editKode').value;
         item.rtRw = document.getElementById('editRt').value;
         item.statusHub = document.getElementById('editStatusHub').value; 
         
         let extraInfo = "";
-        let newMemberData = null;
 
+        // Jika kode 7 (Pisah KK), timpa nomor KK lama menjadi nomor KK baru secara permanen
         if (item.kode === "7") {
             let kkBaru = document.getElementById('inputNoKkTujuan')?.value.trim() || "";
-            let namaPasangan = window.selectedNamaPasangan || document.getElementById('cariPasangan')?.value.trim() || "";
-            let nikPasangan = document.getElementById('pasanganNik')?.value.trim() || "";
-            if (kkBaru) item.noKk = kkBaru;
-            extraInfo = ` [Pisah KK ke KK Baru: ${item.noKk}]`;
-            item.statusHub = "KEPALA KK";
-
-            if (nikPasangan && namaPasangan) {
-                let tglLahirP = document.getElementById('pasanganTglLahir').value;
-                let hitung = hitungUmurDanKode(tglLahirP);
-                newMemberData = {
-                    originalIndex: globalDataPemilih.length, no: "", dpId: "", noKk: item.noKk,
-                    nik: nikPasangan, nama: namaPasangan, jk: document.getElementById('pasanganJk').value,
-                    tempatLahir: document.getElementById('pasanganTempatLahir').value, tglLahir: tglLahirP,
-                    umur: hitung.umur, rtRw: item.rtRw, statusHub: document.getElementById('pasanganStatusHub').value,
-                    kode: "0", keterangan: `Anggota Pisah KK Baru`
-                };
+            if (kkBaru) {
+                item.noKk = kkBaru; 
+                extraInfo = ` [Pisah KK ke KK Baru: ${kkBaru}]`;
             }
+        } else {
+            item.noKk = document.getElementById('editNoKk').value;
         }
 
         item.keterangan = document.getElementById('editKeterangan').value + extraInfo;
         modalEditObj.hide();
         window.selectedNamaPasangan = "";
 
-        if (newMemberData) globalDataPemilih.push(newMemberData);
-        
         localStorage.setItem('coklit_cache_data', JSON.stringify(globalDataPemilih));
         filterData();
         
-        fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(item) }).catch(e => console.error(e));
-        if (newMemberData) fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(newMemberData) }).catch(e => console.error(e));
+        fetch(SCRIPT_URL, { 
+            method: "POST", 
+            headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+            body: JSON.stringify(item) 
+        }).catch(e => console.error(e));
     }
 
     function hapusPemilih(originalIndex) {
