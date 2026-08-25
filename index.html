@@ -48,7 +48,6 @@
         .table td { font-size: 0.82rem; vertical-align: middle; padding: 5px 6px !important; }
         
         .badge-kode { font-size: 0.75rem; padding: 4px 8px; border-radius: 6px; font-weight: 600; }
-        .kk-group-start td { border-top: 3px solid #cbd5e1 !important; }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .fa-spin-custom { animation: spin 1s linear infinite; }
@@ -176,6 +175,11 @@
                     <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass"></i></span>
                     <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama, NIK, No KK..." onkeyup="filterData()">
                 </div>
+            </div>
+            <div class="col-md-2">
+                <select id="filterNkk" class="form-select form-select-sm" onchange="filterData()">
+                    <option value="">Semua NKK</option>
+                </select>
             </div>
             <div class="col-md-2">
                 <select id="filterRt" class="form-select form-select-sm" onchange="filterData()">
@@ -382,9 +386,14 @@
             try { globalDataPemilih = JSON.parse(cachedData); } catch(e) {}
         }
 
+        populateNkkFilter();
         populateRtFilter();
         filterData();
         loadFromGoogleSheets(false);
+
+        // Sinkronisasi otomatis agar perubahan di Google Sheets masuk ke halaman
+        // tanpa perlu menekan tombol Sync Sheets. Filter NKK/RT tetap dipertahankan.
+        setInterval(() => loadFromGoogleSheets(false), 30000);
     });
 
     function startRealtimeClock() {
@@ -451,6 +460,7 @@
 
                     localStorage.setItem('coklit_cache_data', JSON.stringify(globalDataPemilih));
 
+                    populateNkkFilter();
                     populateRtFilter();
                     filterData();
                     if(isManual) alert("Data berhasil disinkronkan dari Sheet Hasil Coklit, Data PMD & Data Desa!");
@@ -498,11 +508,32 @@
         }
     }
 
+    function populateNkkFilter() {
+        const select = document.getElementById('filterNkk');
+        if (!select) return;
+        const selectedBefore = select.value;
+        const nkkSet = new Set(
+            globalDataPemilih.map(item => String(item.noKk || '').trim()).filter(Boolean)
+        );
+        const sortedNkk = Array.from(nkkSet).sort((a, b) => a.localeCompare(b, 'id', {numeric: true}));
+        select.innerHTML = '<option value="">Semua NKK</option>';
+        sortedNkk.forEach(nkk => {
+            const opt = document.createElement('option');
+            opt.value = nkk;
+            opt.textContent = nkk;
+            select.appendChild(opt);
+        });
+        if (selectedBefore && nkkSet.has(selectedBefore)) select.value = selectedBefore;
+    }
+
     function populateRtFilter() {
         const select = document.getElementById('filterRt');
+        if (!select) return;
         const selectedBefore = select.value;
-        const rtSet = new Set(globalDataPemilih.map(item => item.rtRw).filter(Boolean));
-        
+        const rtSet = new Set(
+            globalDataPemilih.map(item => String(item.rtRw || '').trim()).filter(Boolean)
+        );
+
         const sortedRt = Array.from(rtSet).sort((a, b) => {
             let numA = parseInt(a.replace(/\D/g, '')) || 0;
             let numB = parseInt(b.replace(/\D/g, '')) || 0;
@@ -511,39 +542,54 @@
         });
 
         select.innerHTML = '<option value="">Semua RT</option>';
-        sortedRt.forEach(rt => { select.innerHTML += `<option value="${rt}">RT ${rt}</option>`; });
-        if (selectedBefore) select.value = selectedBefore;
+        sortedRt.forEach(rt => {
+            const opt = document.createElement('option');
+            opt.value = rt;
+            opt.textContent = `RT ${rt}`;
+            select.appendChild(opt);
+        });
+        if (selectedBefore && rtSet.has(selectedBefore)) select.value = selectedBefore;
     }
 
     function filterData() {
         const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+        const filterNkkVal = document.getElementById('filterNkk')?.value || "";
         const filterRtVal = document.getElementById('filterRt').value;
         const filterKodeVal = document.getElementById('filterKode').value;
 
         filteredData = globalDataPemilih.filter(item => {
-            const matchSearch = item.nama.toLowerCase().includes(searchVal) || item.nik.includes(searchVal) || item.noKk.includes(searchVal);
-            const matchRt = filterRtVal === "" || item.rtRw === filterRtVal;
+            const matchSearch =
+                String(item.nama || '').toLowerCase().includes(searchVal) ||
+                String(item.nik || '').includes(searchVal) ||
+                String(item.noKk || '').includes(searchVal);
+
+            const matchNkk = filterNkkVal === "" || String(item.noKk || "") === filterNkkVal;
+            const matchRt = filterRtVal === "" || String(item.rtRw || "") === filterRtVal;
             const matchKode = filterKodeVal === "" || String(item.kode) === String(filterKodeVal);
-            return matchSearch && matchRt && matchKode;
+
+            return matchSearch && matchNkk && matchRt && matchKode;
         });
 
+        // Tetap mengikuti urutan data dari Google Sheets.
         filteredData.sort((a, b) => a.originalIndex - b.originalIndex);
 
         currentPage = 1;
         updateStats();
-        updatePrintTitle(filterRtVal, filterKodeVal);
+        updatePrintTitle(filterRtVal, filterKodeVal, filterNkkVal);
         renderTable();
     }
 
     function resetFilter() {
         document.getElementById('searchInput').value = '';
+        if (document.getElementById('filterNkk')) document.getElementById('filterNkk').value = '';
         document.getElementById('filterRt').value = '';
         document.getElementById('filterKode').value = '';
         filterData();
     }
 
-    function updatePrintTitle(rtVal, kodeVal) {
+    function updatePrintTitle(rtVal, kodeVal, nkkVal = '') {
         let titleParts = ["Desa Payo Lebar Tahun 2026"];
+        if (nkkVal !== "") titleParts.push(`NKK ${nkkVal}`);
         if (rtVal !== "") titleParts.push(`RT ${rtVal}`);
         if (kodeVal !== "") titleParts.push(`Kode Coklit: ${document.getElementById('filterKode').selectedOptions[0].text}`);
         document.getElementById('printFilterSubTitle').innerText = titleParts.join(' - ');
@@ -577,12 +623,8 @@
         document.getElementById('pageInfo').innerText = `Halaman ${currentPage} dari ${Math.ceil(filteredData.length / pageSize) || 1}`;
 
         let html = '';
-        let lastNoKk = '';
-
         pageData.forEach((item, index) => {
-            const isNewKk = lastNoKk !== '' && item.noKk !== lastNoKk;
-            lastNoKk = item.noKk;
-            const rowClass = isNewKk ? 'kk-group-start' : '';
+            const rowClass = '';
             const badgeClass = getBadgeClass(item.kode);
 
             html += `
