@@ -192,7 +192,7 @@
                     <option value="4">4 - Polisi</option>
                     <option value="5">5 - Pindah Luar</option>
                     <option value="6">6 - Pindah Dalam</option>
-                    <option value="7">7 - Pisah KK</option>
+                    <option value="7">7 - Pisah KK[cite: 2]</option>
                     <option value="8">8 - Belum Umur</option>
                     <option value="U">U - Ubah Data</option>
                     <option value="B">B - Baru</option>
@@ -279,7 +279,7 @@
                                 <option value="4">4 - Polisi</option>
                                 <option value="5">5 - Pindah (Luar Desa)</option>
                                 <option value="6">6 - Pindah (Dalam Desa/RT)</option>
-                                <option value="7">7 - Pisah KK</option>
+                                <option value="7">7 - Pisah KK[cite: 2]</option>
                                 <option value="8">8 - Belum Umur</option>
                                 <option value="U">U - Ubah Data</option>
                                 <option value="B">B - Baru</option>
@@ -367,7 +367,7 @@
 
     const KODE_KETERANGAN_MAP = {
         "0": "Aktif", "1": "Meninggal", "2": "Ganda", "3": "TNI", "4": "Polisi",
-        "5": "Pindah Luar Desa", "6": "Pindah Dalam Desa/RT", "7": "Pisah KK",
+        "5": "Pindah Luar Desa", "6": "Pindah Dalam Desa/RT", "7": "Pisah KK[cite: 2]",
         "8": "Belum Umur", "U": "Ubah Data", "B": "Pemilih Baru"
     };
 
@@ -463,7 +463,6 @@
             });
     }
 
-    // LOGIKA PENCARIAN & MATCHING DP-ID OTOMATIS DARI SHEET PMD / DESA KK (ANTI SALAH KETIK)
     function autoMatchMasterData(mode) {
         let nikInput = document.getElementById(mode === 'add' ? 'addNik' : 'editNik').value.trim();
         let namaInput = document.getElementById(mode === 'add' ? 'addNama' : 'editNama').value.trim().toLowerCase();
@@ -473,25 +472,22 @@
         let allMaster = [...masterPmdData, ...masterDesaData];
         let found = null;
 
-        // 1. Cari berdasarkan NIK Persis terlebih dahulu
         if (nikInput) {
             found = allMaster.find(r => String(r[3]).trim() === nikInput);
         }
 
-        // 2. Jika NIK tidak ketemu (misal ada salah ketik NIK), Cari berdasarkan Kemiripan Nama
         if (!found && namaInput.length >= 3) {
             found = allMaster.find(r => String(r[4] || "").toLowerCase().includes(namaInput));
         }
 
-        // Jika Data ditemukan di Master PMD / Desa, Otomatis Isikan DP-ID & Detailnya
         if (found) {
             if (mode === 'add') {
-                if (found[1]) document.getElementById('addDpId').value = found[1]; // DP-ID
-                if (found[2]) document.getElementById('addNoKk').value = found[2];  // NO KK
-                if (found[5]) document.getElementById('addJk').value = found[5];    // JK
+                if (found[1]) document.getElementById('addDpId').value = found[1];
+                if (found[2]) document.getElementById('addNoKk').value = found[2];
+                if (found[5]) document.getElementById('addJk').value = found[5];
                 if (found[6]) document.getElementById('addTempatLahir').value = found[6]; 
                 if (found[7]) document.getElementById('addTglLahir').value = formatTanggal(found[7]);
-                if (found[9]) document.getElementById('addRt').value = found[9];    // RT/RW
+                if (found[9]) document.getElementById('addRt').value = found[9];
             } else {
                 if (found[1]) document.getElementById('editDpId').value = found[1];
             }
@@ -618,7 +614,7 @@
         chartInstance = new Chart(ctx, {
             type: 'bar',
             data: { 
-                labels: ['Aktif (0)','Meninggal (1)','Ganda (2)','TNI (3)','Polri (4)','Pindah Luar (5)','Pindah Dalam (6)','Pisah KK (7)','Belum Umur (8)','Ubah (U)','Baru (B)'], 
+                labels: ['Aktif (0)','Meninggal (1)','Ganda (2)','TNI (3)','Polri (4)','Pindah Luar (5)','Pindah Dalam (6)','Pisah KK (7)[cite: 2]','Belum Umur (8)','Ubah (U)','Baru (B)'], 
                 datasets: [{ label: 'Jumlah Pemilih', data: Array(11).fill(0), backgroundColor: '#0f172a', borderRadius: 6 }] 
             },
             options: { 
@@ -680,7 +676,7 @@
                 <div class="col-md-3"><label class="form-label small fw-bold text-primary">Tempat Lahir</label><input type="text" id="pasanganTempatLahir" class="form-control" placeholder="Tempat lahir..."></div>
                 <div class="col-md-3 mt-2"><label class="form-label small fw-bold text-primary">Tgl Lahir</label><input type="text" id="pasanganTglLahir" class="form-control" placeholder="DD/MM/YYYY"></div>
                 <div class="col-md-3 mt-2"><label class="form-label small fw-bold text-primary">L/P</label><select id="pasanganJk" class="form-select"><option value="L">L</option><option value="P" selected>P</option></select></div>
-                <div class="col-md-6 mt-2"><label class="form-label small fw-bold text-primary">Status Hubungan</label><select id="pasanganStatusHub" class="form-select"><option value="SUAMI">SUAMI</option><option value="ISTRI" selected>ISTRI</option><option value="ANAK">ANAK</option></select></div>
+                <div class="col-md-6 mt-2"><label class="form-label small fw-bold text-primary">Status Hubungan Anggota</label><select id="pasanganStatusHub" class="form-select"><option value="SUAMI">SUAMI</option><option value="ISTRI" selected>ISTRI</option><option value="ANAK">ANAK</option><option value="FAMILI LAIN">FAMILI LAIN</option></select></div>
             `;
         } else if (kode === "6" || kode === "5") {
             container.innerHTML = `<div class="col-md-12"><label class="form-label small fw-bold text-success"><i class="fa-solid fa-house-chimney-user me-1"></i> RT Tujuan</label><input type="text" id="editRtTujuan" class="form-control" placeholder="No RT tujuan..." oninput="document.getElementById('editRt').value = this.value"></div>`;
@@ -733,6 +729,8 @@
         item.noKk = document.getElementById('editNoKk').value;
         item.kode = document.getElementById('editKode').value;
         item.rtRw = document.getElementById('editRt').value;
+        
+        // Status hubungan untuk pemilih yang pisah KK diambil secara manual dari pilihan dropdown form edit
         item.statusHub = document.getElementById('editStatusHub').value; 
         
         let extraInfo = "";
@@ -744,7 +742,8 @@
             let nikPasangan = document.getElementById('pasanganNik')?.value.trim() || "";
             if (kkBaru) item.noKk = kkBaru;
             extraInfo = ` [Pisah KK ke KK Baru: ${item.noKk}]`;
-            item.statusHub = "KEPALA KK";
+            
+            // Catatan: item.statusHub TIDAK diubah otomatis jadi KEPALA KK, tetap mengikuti pilihan manual pada form edit.
 
             if (nikPasangan && namaPasangan) {
                 let tglLahirP = document.getElementById('pasanganTglLahir').value;
