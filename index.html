@@ -192,7 +192,7 @@
                     <option value="4">4 - Polisi</option>
                     <option value="5">5 - Pindah Luar</option>
                     <option value="6">6 - Pindah Dalam</option>
-                    <option value="7">7 - Pisah KK[cite: 2]</option>
+                    <option value="7">7 - Pisah KK</option>
                     <option value="8">8 - Belum Umur</option>
                     <option value="U">U - Ubah Data</option>
                     <option value="B">B - Baru</option>
@@ -279,7 +279,7 @@
                                 <option value="4">4 - Polisi</option>
                                 <option value="5">5 - Pindah (Luar Desa)</option>
                                 <option value="6">6 - Pindah (Dalam Desa/RT)</option>
-                                <option value="7">7 - Pisah KK[cite: 2]</option>
+                                <option value="7">7 - Pisah KK</option>
                                 <option value="8">8 - Belum Umur</option>
                                 <option value="U">U - Ubah Data</option>
                                 <option value="B">B - Baru</option>
@@ -367,7 +367,7 @@
 
     const KODE_KETERANGAN_MAP = {
         "0": "Aktif", "1": "Meninggal", "2": "Ganda", "3": "TNI", "4": "Polisi",
-        "5": "Pindah Luar Desa", "6": "Pindah Dalam Desa/RT", "7": "Pisah KK[cite: 2]",
+        "5": "Pindah Luar Desa", "6": "Pindah Dalam Desa/RT", "7": "Pisah KK",
         "8": "Belum Umur", "U": "Ubah Data", "B": "Pemilih Baru"
     };
 
@@ -614,7 +614,7 @@
         chartInstance = new Chart(ctx, {
             type: 'bar',
             data: { 
-                labels: ['Aktif (0)','Meninggal (1)','Ganda (2)','TNI (3)','Polri (4)','Pindah Luar (5)','Pindah Dalam (6)','Pisah KK (7)[cite: 2]','Belum Umur (8)','Ubah (U)','Baru (B)'], 
+                labels: ['Aktif (0)','Meninggal (1)','Ganda (2)','TNI (3)','Polri (4)','Pindah Luar (5)','Pindah Dalam (6)','Pisah KK (7)','Belum Umur (8)','Ubah (U)','Baru (B)'], 
                 datasets: [{ label: 'Jumlah Pemilih', data: Array(11).fill(0), backgroundColor: '#0f172a', borderRadius: 6 }] 
             },
             options: { 
@@ -742,20 +742,6 @@
             let nikPasangan = document.getElementById('pasanganNik')?.value.trim() || "";
             if (kkBaru) item.noKk = kkBaru;
             extraInfo = ` [Pisah KK ke KK Baru: ${item.noKk}]`;
-            
-            // Catatan: item.statusHub TIDAK diubah otomatis jadi KEPALA KK, tetap mengikuti pilihan manual pada form edit.
-
-            if (nikPasangan && namaPasangan) {
-                let tglLahirP = document.getElementById('pasanganTglLahir').value;
-                let hitung = hitungUmurDanKode(tglLahirP);
-                newMemberData = {
-                    originalIndex: globalDataPemilih.length, no: "", dpId: "", noKk: item.noKk,
-                    nik: nikPasangan, nama: namaPasangan, jk: document.getElementById('pasanganJk').value,
-                    tempatLahir: document.getElementById('pasanganTempatLahir').value, tglLahir: tglLahirP,
-                    umur: hitung.umur, rtRw: item.rtRw, statusHub: document.getElementById('pasanganStatusHub').value,
-                    kode: "0", keterangan: `Anggota Pisah KK Baru`
-                };
-            }
         }
 
         item.keterangan = document.getElementById('editKeterangan').value + extraInfo;
