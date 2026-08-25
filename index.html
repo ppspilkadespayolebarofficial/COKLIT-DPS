@@ -251,7 +251,7 @@
     </div>
 </div>
 
-<!-- MODAL EDIT LENGKAP (DP-ID Bisa Diedit Manual) -->
+<!-- MODAL EDIT LENGKAP -->
 <div class="modal fade" id="modalEdit" tabindex="-1">
     <div class="modal-dialog modal-lg" style="max-width: 950px;">
         <div class="modal-content border-0 shadow-lg">
@@ -264,12 +264,12 @@
                     <input type="hidden" id="editIndex">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-primary">DP-ID (Dapat Diedit Manual)</label>
+                            <label class="form-label small fw-bold text-primary">DP-ID (Otomatis/Manual)</label>
                             <input type="text" id="editDpId" class="form-control fw-bold" placeholder="Contoh: DP-0320">
                         </div>
                         <div class="col-md-6"><label class="form-label small fw-bold">NO KK</label><input type="text" id="editNoKk" class="form-control"></div>
                         <div class="col-md-6"><label class="form-label small fw-bold">NIK</label><input type="text" id="editNik" class="form-control bg-light" readonly></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="editNama" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="editNama" class="form-control" oninput="autoMatchMasterData('edit')"></div>
                         <div class="col-md-3"><label class="form-label small fw-bold">KODE COKLIT</label>
                             <select id="editKode" class="form-select" onchange="onEditKodeChange()">
                                 <option value="0">0 - Aktif</option>
@@ -310,7 +310,7 @@
     </div>
 </div>
 
-<!-- MODAL TAMBAH LENGKAP (DP-ID Diisi Manual) -->
+<!-- MODAL TAMBAH LENGKAP -->
 <div class="modal fade" id="modalTambah" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow-lg">
@@ -322,12 +322,15 @@
                 <form id="formTambah">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-danger">DP-ID (Diisi Manual)</label>
-                            <input type="text" id="addDpId" class="form-control fw-bold" placeholder="Contoh: DP-0320">
+                            <label class="form-label small fw-bold text-danger">NIK (Ketik NIK untuk auto-search)</label>
+                            <input type="text" id="addNik" class="form-control" oninput="autoMatchMasterData('add')">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-primary">DP-ID (Otomatis/Manual)</label>
+                            <input type="text" id="addDpId" class="form-control fw-bold" placeholder="Terisi otomatis jika ada di master">
                         </div>
                         <div class="col-md-6"><label class="form-label small fw-bold">NO KK</label><input type="text" id="addNoKk" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">NIK</label><input type="text" id="addNik" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="addNama" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="addNama" class="form-control" oninput="autoMatchMasterData('add')"></div>
                         <div class="col-md-3"><label class="form-label small fw-bold">L/P</label><select id="addJk" class="form-select"><option value="L">L</option><option value="P">P</option></select></div>
                         <div class="col-md-3"><label class="form-label small fw-bold">RT/RW</label><input type="text" id="addRt" class="form-control"></div>
                         <div class="col-md-6"><label class="form-label small fw-bold">TEMPAT LAHIR</label><input type="text" id="addTempatLahir" class="form-control"></div>
@@ -354,13 +357,9 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhip9RJdh0bmSZyuUfqXd7I5oiRYFiyy7eJc3drAGhOSVOol37op25hufpikBM_00y_Q/exec"; 
 
-    const defaultFallbackData = [
-        { originalIndex: 0, no: "1", dpId: "DP-0319", noKk: "1503090208100004", nik: "1503090107790009", nama: "Siswanto", jk: "L", tempatLahir: "Payo Lebar", tglLahir: "01/07/1979", umur: "47", rtRw: "01", statusHub: "KEPALA KK", kode: "0", keterangan: "Aktif" },
-        { originalIndex: 1, no: "2", dpId: "DP-0318", noKk: "1503090208100004", nik: "15030904107850012", nama: "Ernawati", jk: "P", tempatLahir: "Payo Lebar", tglLahir: "10/04/1985", umur: "41", rtRw: "01", statusHub: "ISTRI", kode: "0", keterangan: "Aktif" },
-        { originalIndex: 2, no: "3", dpId: "", noKk: "1503090208100004", nik: "15030901303130001", nama: "Farhan Kamil Khairan", jk: "L", tempatLahir: "Payo Lebar", tglLahir: "13/03/2013", umur: "13", rtRw: "01", statusHub: "ANAK", kode: "8", keterangan: "Belum Cukup Umur" }
-    ];
-
     let globalDataPemilih = [];
+    let masterPmdData = [];
+    let masterDesaData = [];
     let filteredData = [];
     let modalEditObj, modalTambahObj, chartInstance = null;
     let currentPage = 1;
@@ -380,9 +379,7 @@
 
         const cachedData = localStorage.getItem('coklit_cache_data');
         if (cachedData) {
-            try { globalDataPemilih = JSON.parse(cachedData); } catch(e) { globalDataPemilih = defaultFallbackData; }
-        } else {
-            globalDataPemilih = defaultFallbackData;
+            try { globalDataPemilih = JSON.parse(cachedData); } catch(e) {}
         }
 
         populateRtFilter();
@@ -417,25 +414,21 @@
         if(syncIcon) syncIcon.classList.add('fa-spin-custom');
         if(btnSync) btnSync.disabled = true;
 
-        const currentSearch = document.getElementById('searchInput').value;
-        const currentRt = document.getElementById('filterRt').value;
-        const currentKode = document.getElementById('filterKode').value;
-        const savedPage = currentPage;
-
         fetch(SCRIPT_URL, { redirect: "follow" })
-            .then(res => res.text())
-            .then(textData => {
+            .then(res => res.json())
+            .then(data => {
                 if(syncIcon) syncIcon.classList.remove('fa-spin-custom');
                 if(btnSync) btnSync.disabled = false;
 
-                let data;
-                try { data = JSON.parse(textData); } catch (e) { throw new Error("Gagal parsing JSON."); }
+                let rawCoklit = Array.isArray(data) ? data : (data.hasilCoklit || []);
+                masterPmdData = data.dataPmd || [];
+                masterDesaData = data.dataDesa || [];
 
-                if (Array.isArray(data) && data.length > 0) {
-                    let headerIndex = data.findIndex(row => Array.isArray(row) && row.some(cell => String(cell).trim().toUpperCase() === 'NIK'));
+                if (rawCoklit.length > 0) {
+                    let headerIndex = rawCoklit.findIndex(row => Array.isArray(row) && row.some(cell => String(cell).trim().toUpperCase() === 'NIK'));
                     if (headerIndex === -1) headerIndex = 0;
 
-                    const rows = data.slice(headerIndex + 1);
+                    const rows = rawCoklit.slice(headerIndex + 1);
                     
                     globalDataPemilih = rows
                         .filter(r => (r[2] ? String(r[2]).trim() : "") !== "" || (r[3] ? String(r[3]).trim() : "") !== "")
@@ -459,22 +452,50 @@
                     localStorage.setItem('coklit_cache_data', JSON.stringify(globalDataPemilih));
 
                     populateRtFilter();
-                    document.getElementById('searchInput').value = currentSearch;
-                    document.getElementById('filterRt').value = currentRt;
-                    document.getElementById('filterKode').value = currentKode;
-                    
                     filterData();
-                    currentPage = savedPage;
-                    renderTable();
-                    if(isManual) alert("Data berhasil disinkronkan dari Google Sheets!");
+                    if(isManual) alert("Data berhasil disinkronkan dari Sheet Hasil Coklit, Data PMD & Data Desa!");
                 }
             })
             .catch(err => { 
                 console.warn("Gagal sinkronisasi online:", err); 
                 if(syncIcon) syncIcon.classList.remove('fa-spin-custom');
                 if(btnSync) btnSync.disabled = false;
-                if(isManual) alert("Koneksi Google Sheets dibatasi browser (CORS). Menggunakan data lokal.");
             });
+    }
+
+    // LOGIKA PENCARIAN & MATCHING DP-ID OTOMATIS DARI SHEET PMD / DESA KK (ANTI SALAH KETIK)
+    function autoMatchMasterData(mode) {
+        let nikInput = document.getElementById(mode === 'add' ? 'addNik' : 'editNik').value.trim();
+        let namaInput = document.getElementById(mode === 'add' ? 'addNama' : 'editNama').value.trim().toLowerCase();
+
+        if (!nikInput && namaInput.length < 3) return;
+
+        let allMaster = [...masterPmdData, ...masterDesaData];
+        let found = null;
+
+        // 1. Cari berdasarkan NIK Persis terlebih dahulu
+        if (nikInput) {
+            found = allMaster.find(r => String(r[3]).trim() === nikInput);
+        }
+
+        // 2. Jika NIK tidak ketemu (misal ada salah ketik NIK), Cari berdasarkan Kemiripan Nama
+        if (!found && namaInput.length >= 3) {
+            found = allMaster.find(r => String(r[4] || "").toLowerCase().includes(namaInput));
+        }
+
+        // Jika Data ditemukan di Master PMD / Desa, Otomatis Isikan DP-ID & Detailnya
+        if (found) {
+            if (mode === 'add') {
+                if (found[1]) document.getElementById('addDpId').value = found[1]; // DP-ID
+                if (found[2]) document.getElementById('addNoKk').value = found[2];  // NO KK
+                if (found[5]) document.getElementById('addJk').value = found[5];    // JK
+                if (found[6]) document.getElementById('addTempatLahir').value = found[6]; 
+                if (found[7]) document.getElementById('addTglLahir').value = formatTanggal(found[7]);
+                if (found[9]) document.getElementById('addRt').value = found[9];    // RT/RW
+            } else {
+                if (found[1]) document.getElementById('editDpId').value = found[1];
+            }
+        }
     }
 
     function populateRtFilter() {
