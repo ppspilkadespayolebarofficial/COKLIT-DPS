@@ -523,7 +523,13 @@
             return matchSearch && matchRt && matchKode;
         });
 
-        filteredData.sort((a, b) => a.originalIndex - b.originalIndex);
+        // SORTING: Otomatis mengelompokkan baris berdasarkan nomor KK agar baris yang pisah KK langsung berkumpul bersama NKK baru
+        filteredData.sort((a, b) => {
+            if (a.noKk !== b.noKk) {
+                return a.noKk.localeCompare(b.noKk);
+            }
+            return a.originalIndex - b.originalIndex;
+        });
 
         currentPage = 1;
         updateStats();
@@ -726,35 +732,36 @@
         const item = globalDataPemilih[index];
         item.dpId = document.getElementById('editDpId').value;
         item.nama = document.getElementById('editNama').value;
-        item.noKk = document.getElementById('editNoKk').value;
+        item.nik = document.getElementById('editNik').value;
         item.kode = document.getElementById('editKode').value;
         item.rtRw = document.getElementById('editRt').value;
-        
-        // Status hubungan untuk pemilih yang pisah KK diambil secara manual dari pilihan dropdown form edit
         item.statusHub = document.getElementById('editStatusHub').value; 
         
         let extraInfo = "";
-        let newMemberData = null;
 
+        // Jika kode 7 (Pisah KK), timpa nomor KK lama menjadi nomor KK baru secara permanen
         if (item.kode === "7") {
             let kkBaru = document.getElementById('inputNoKkTujuan')?.value.trim() || "";
-            let namaPasangan = window.selectedNamaPasangan || document.getElementById('cariPasangan')?.value.trim() || "";
-            let nikPasangan = document.getElementById('pasanganNik')?.value.trim() || "";
-            if (kkBaru) item.noKk = kkBaru;
-            extraInfo = ` [Pisah KK ke KK Baru: ${item.noKk}]`;
+            if (kkBaru) {
+                item.noKk = kkBaru; 
+                extraInfo = ` [Pisah KK ke KK Baru: ${kkBaru}]`;
+            }
+        } else {
+            item.noKk = document.getElementById('editNoKk').value;
         }
 
         item.keterangan = document.getElementById('editKeterangan').value + extraInfo;
         modalEditObj.hide();
         window.selectedNamaPasangan = "";
 
-        if (newMemberData) globalDataPemilih.push(newMemberData);
-        
         localStorage.setItem('coklit_cache_data', JSON.stringify(globalDataPemilih));
         filterData();
         
-        fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(item) }).catch(e => console.error(e));
-        if (newMemberData) fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(newMemberData) }).catch(e => console.error(e));
+        fetch(SCRIPT_URL, { 
+            method: "POST", 
+            headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+            body: JSON.stringify(item) 
+        }).catch(e => console.error(e));
     }
 
     function hapusPemilih(originalIndex) {
