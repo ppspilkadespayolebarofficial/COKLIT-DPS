@@ -224,7 +224,7 @@
                 <thead>
                     <tr>
                         <th class="text-center">NO</th>
-                        <th class="text-center">NO</th>
+                        <th class="text-center">DP-ID</th>
                         <th class="text-center">RT/RW</th>
                         <th>NO KK</th>
                         <th>NIK</th>
@@ -300,7 +300,8 @@
                                 <option value="FAMILI LAIN">FAMILI LAIN</option>
                             </select>
                         </div>
-                        <div class="col-md-12"><label class="form-label small fw-bold">RT/RW ASAL</label><input type="text" id="editRt" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">L/P</label><select id="editJk" class="form-select"><option value="L">L</option><option value="P">P</option></select></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">RT/RW</label><input type="text" id="editRt" class="form-control"></div>
                         
                         <div id="dynamicEditContainer" class="col-md-12 row g-3 m-0 p-0"></div>
 
@@ -328,15 +329,15 @@
                 <form id="formTambah">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-danger">NIK (Ketik NIK untuk auto-search)</label>
-                            <input type="text" id="addNik" class="form-control" oninput="autoMatchMasterData('add')">
+                            <label class="form-label small fw-bold text-danger">NIK</label>
+                            <input type="text" id="addNik" class="form-control">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-primary">DP-ID (Otomatis/Manual)</label>
-                            <input type="text" id="addDpId" class="form-control fw-bold" placeholder="Terisi otomatis jika ada di master">
+                            <label class="form-label small fw-bold text-primary">DP-ID</label>
+                            <input type="text" id="addDpId" class="form-control fw-bold" placeholder="Opsional">
                         </div>
                         <div class="col-md-6"><label class="form-label small fw-bold">NO KK</label><input type="text" id="addNoKk" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="addNama" class="form-control" oninput="autoMatchMasterData('add')"></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">NAMA LENGKAP</label><input type="text" id="addNama" class="form-control"></div>
                         <div class="col-md-3"><label class="form-label small fw-bold">L/P</label><select id="addJk" class="form-select"><option value="L">L</option><option value="P">P</option></select></div>
                         <div class="col-md-3"><label class="form-label small fw-bold">RT/RW</label><input type="text" id="addRt" class="form-control"></div>
                         <div class="col-md-6"><label class="form-label small fw-bold">TEMPAT LAHIR</label><input type="text" id="addTempatLahir" class="form-control"></div>
@@ -345,6 +346,7 @@
                             <select id="addStatusHub" class="form-select">
                                 <option value="KEPALA KK">KEPALA KK</option><option value="ISTRI">ISTRI</option>
                                 <option value="ANAK" selected>ANAK</option><option value="ORANG TUA">ORANG TUA</option>
+                                <option value="FAMILI LAIN">FAMILI LAIN</option>
                             </select>
                         </div>
                         <div class="col-md-6"><label class="form-label small fw-bold">KETERANGAN</label><input type="text" id="addKeterangan" class="form-control" placeholder="Otomatis jika kosong"></div>
@@ -364,8 +366,6 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhip9RJdh0bmSZyuUfqXd7I5oiRYFiyy7eJc3drAGhOSVOol37op25hufpikBM_00y_Q/exec";
 
     let globalDataPemilih = [];
-    let masterPmdData = [];
-    let masterDesaData = [];
     let filteredData = [];
     let modalEditObj, modalTambahObj, chartInstance = null;
     let currentPage = 1;
@@ -459,20 +459,19 @@
         })
         .then(function (res) {
             if (!res.ok) throw new Error("HTTP " + res.status);
-            return res.text(); // Ambil sebagai text dulu untuk cegah error parsing jika ada gangguan HTML
+            return res.text();
         })
         .then(function (text) {
-            let data;
+            let raw;
             try {
-                data = JSON.parse(text);
+                raw = JSON.parse(text);
             } catch (e) {
                 throw new Error("Format data dari Apps Script bukan JSON yang valid.");
             }
 
-            masterPmdData = Array.isArray(data.dataPmd) ? data.dataPmd : [];
-            masterDesaData = Array.isArray(data.dataDesa) ? data.dataDesa : [];
-
-            const raw = Array.isArray(data) ? data : (Array.isArray(data.hasilCoklit) ? data.hasilCoklit : []);
+            if (!Array.isArray(raw)) {
+                raw = Array.isArray(raw.hasilCoklit) ? raw.hasilCoklit : [];
+            }
 
             if (raw.length === 0) {
                 globalDataPemilih = [];
@@ -498,12 +497,12 @@
                             noKk: String(r[2] || "").trim(),
                             nik: String(r[3] || "").trim(),
                             nama: String(r[4] || "").trim(),
+                            jk: r[5] || "",
                             tempatLahir: r[6] || "",
                             tglLahir: formatTanggal(r[7]),
                             umur: r[8] || "",
                             rtRw: String(r[9] || "").trim(),
                             statusHub: String(r[10] || "").trim(),
-                            jk: r[5] || "",
                             kode: String(r[11] !== undefined && r[11] !== "" ? r[11] : "0"),
                             keterangan: r[12] || ""
                         };
@@ -696,7 +695,7 @@
             html += `
                 <tr>
                     <td class="text-center fw-bold">${nomorTampil}</td>
-                    <td class="text-center fw-bold">${nomorTampil}</td>
+                    <td class="text-center"><span class="font-monospace text-primary fw-bold">${escapeHtml(item.dpId)}</span></td>
                     <td class="text-center">${escapeHtml(item.rtRw)}</td>
                     <td><span class="font-monospace">${escapeHtml(item.noKk)}</span></td>
                     <td><span class="font-monospace fw-bold">${escapeHtml(item.nik)}</span></td>
@@ -796,6 +795,7 @@
         document.getElementById("editNama").value = item.nama || "";
         document.getElementById("editKode").value = item.kode || "0";
         document.getElementById("editRt").value = item.rtRw || "";
+        document.getElementById("editJk").value = item.jk || "L";
         document.getElementById("editKeterangan").value = item.keterangan || "";
         document.getElementById("editStatusHub").value = item.statusHub ? item.statusHub.toUpperCase() : "KEPALA KK";
 
@@ -813,34 +813,9 @@
 
         if (kode === "7") {
             container.innerHTML = `
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold text-primary">No KK Baru</label>
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold text-primary">No KK Baru (Pisah KK)</label>
                     <input type="text" id="inputNoKkTujuan" class="form-control" placeholder="No KK baru">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold text-primary">Cari Anggota Baru</label>
-                    <input type="text" id="cariPasangan" class="form-control" placeholder="Nama / NIK" onkeyup="filterPasanganList()">
-                    <div id="listPasangan" class="list-group position-absolute shadow-sm" style="z-index:1050;max-height:160px;overflow-y:auto;"></div>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold text-primary">NIK Anggota</label>
-                    <input type="text" id="pasanganNik" class="form-control">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold text-primary">Tempat Lahir</label>
-                    <input type="text" id="pasanganTempatLahir" class="form-control">
-                </div>
-                <div class="col-md-3 mt-2">
-                    <label class="form-label small fw-bold text-primary">Tgl Lahir</label>
-                    <input type="text" id="pasanganTglLahir" class="form-control" placeholder="DD/MM/YYYY">
-                </div>
-                <div class="col-md-3 mt-2">
-                    <label class="form-label small fw-bold text-primary">L/P</label>
-                    <select id="pasanganJk" class="form-select"><option value="L">L</option><option value="P" selected>P</option></select>
-                </div>
-                <div class="col-md-6 mt-2">
-                    <label class="form-label small fw-bold text-primary">Status Hubungan</label>
-                    <select id="pasanganStatusHub" class="form-select"><option value="SUAMI">SUAMI</option><option value="ISTRI" selected>ISTRI</option><option value="ANAK">ANAK</option></select>
                 </div>
             `;
         }
@@ -848,40 +823,11 @@
         if (kode === "5" || kode === "6") {
             container.innerHTML = `
                 <div class="col-md-12">
-                    <label class="form-label small fw-bold text-success">RT Tujuan</label>
+                    <label class="form-label small fw-bold text-success">RT Tujuan Pindah</label>
                     <input type="text" id="editRtTujuan" class="form-control" placeholder="RT tujuan" oninput="document.getElementById('editRt').value = this.value">
                 </div>
             `;
         }
-    }
-
-    function filterPasanganList() {
-        const input = document.getElementById("cariPasangan");
-        const list = document.getElementById("listPasangan");
-        if (!input || !list) return;
-
-        const keyword = input.value.toLowerCase().trim();
-        list.innerHTML = "";
-        if (keyword.length < 2) return;
-
-        globalDataPemilih.filter(function (p) {
-            return String(p.nama || "").toLowerCase().includes(keyword) || String(p.nik || "").includes(keyword);
-        }).slice(0, 8).forEach(function (p) {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "list-group-item list-group-item-action py-2 small";
-            btn.innerHTML = "<b>" + escapeHtml(p.nama) + "</b> - NIK " + escapeHtml(p.nik);
-            btn.onclick = function () {
-                document.getElementById("cariPasangan").value = p.nama;
-                window.selectedNamaPasangan = p.nama;
-                document.getElementById("pasanganNik").value = p.nik;
-                document.getElementById("pasanganTempatLahir").value = p.tempatLahir || "";
-                document.getElementById("pasanganTglLahir").value = p.tglLahir || "";
-                document.getElementById("pasanganJk").value = p.jk || "P";
-                list.innerHTML = "";
-            };
-            list.appendChild(btn);
-        });
     }
 
     function hitungUmurDanKode(tglLahirStr) {
@@ -920,44 +866,26 @@
         item.noKk = document.getElementById("editNoKk").value.trim();
         item.kode = document.getElementById("editKode").value;
         item.rtRw = document.getElementById("editRt").value.trim();
+        item.jk = document.getElementById("editJk").value;
         item.statusHub = document.getElementById("editStatusHub").value;
         item.keterangan = document.getElementById("editKeterangan").value.trim();
 
-        let newMemberData = null;
         if (item.kode === "7") {
-            const kkBaru = document.getElementById("inputNoKkTujuan")?.value.trim() || "";
+            const kkBaru = document.getElementById("inputNoKkTujuan")?.value.trim();
             if (kkBaru) item.noKk = kkBaru;
-            item.statusHub = "KEPALA KK";
-
-            const pasanganNik = document.getElementById("pasanganNik")?.value.trim() || "";
-            const pasanganNama = window.selectedNamaPasangan || document.getElementById("cariPasangan")?.value.trim() || "";
-
-            if (pasanganNik && pasanganNama) {
-                const tgl = document.getElementById("pasanganTglLahir").value;
-                const hitung = hitungUmurDanKode(tgl);
-                newMemberData = {
-                    no: "", dpId: "", noKk: item.noKk, nik: pasanganNik, nama: pasanganNama,
-                    jk: document.getElementById("pasanganJk").value,
-                    tempatLahir: document.getElementById("pasanganTempatLahir").value,
-                    tglLahir: tgl, umur: hitung.umur, rtRw: item.rtRw,
-                    statusHub: document.getElementById("pasanganStatusHub").value,
-                    kode: "0", keterangan: "Anggota Pisah KK Baru"
-                };
-            }
         }
 
         modalEditObj.hide();
         kirimKeAppsScript(item)
-            .then(function () {
-                if (newMemberData) return kirimKeAppsScript(newMemberData);
+            .then(function (res) {
+                return res.json();
             })
             .then(function () {
-                window.selectedNamaPasangan = "";
-                setTimeout(function () { loadFromGoogleSheets(false); }, 800);
+                setTimeout(function () { loadFromGoogleSheets(false); }, 600);
             })
             .catch(function (err) {
                 console.error(err);
-                alert("Data lokal berubah, tetapi pengiriman ke Spreadsheet gagal.");
+                alert("Data lokal diperbarui, namun gagal menyinkronkan ke server Apps Script.");
             });
     }
 
@@ -982,10 +910,13 @@
         const newData = {
             no: "",
             dpId: document.getElementById("addDpId").value.trim(),
-            noKk: noKk, nik: nik, nama: nama,
+            noKk: noKk,
+            nik: nik,
+            nama: nama,
             jk: document.getElementById("addJk").value,
             tempatLahir: document.getElementById("addTempatLahir").value.trim(),
-            tglLahir: tgl, umur: hasil.umur,
+            tglLahir: tgl,
+            umur: hasil.umur,
             rtRw: document.getElementById("addRt").value.trim(),
             statusHub: document.getElementById("addStatusHub").value,
             kode: hasil.kode,
@@ -994,12 +925,15 @@
 
         modalTambahObj.hide();
         kirimKeAppsScript(newData)
+            .then(function (res) {
+                return res.json();
+            })
             .then(function () {
-                setTimeout(function () { loadFromGoogleSheets(false); }, 800);
+                setTimeout(function () { loadFromGoogleSheets(false); }, 600);
             })
             .catch(function (err) {
                 console.error(err);
-                alert("Data gagal dikirim ke Spreadsheet.");
+                alert("Gagal mengirim data baru ke Spreadsheet.");
             });
     }
 
@@ -1021,21 +955,24 @@
         if (!confirm("Yakin ingin menghapus " + item.nama + "?")) return;
 
         kirimKeAppsScript({ action: "delete", nik: item.nik })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function () {
-                setTimeout(function () { loadFromGoogleSheets(false); }, 800);
+                setTimeout(function () { loadFromGoogleSheets(false); }, 600);
             })
             .catch(function (err) {
                 console.error(err);
-                alert("Gagal menghapus data.");
+                alert("Gagal menghapus data dari server.");
             });
     }
 
     function exportToExcel() {
-        const data = [["NO", "NO", "RT/RW", "NO KK", "NIK", "NAMA LENGKAP", "TEMPAT LAHIR", "TANGGAL LAHIR", "UMUR", "HKJ", "L/P", "YHIU", "RT", "STATUS", "KET"]];
+        const data = [["NO", "DP-ID", "RT/RW", "NO KK", "NIK", "NAMA LENGKAP", "L/P", "TEMPAT LAHIR", "TANGGAL LAHIR", "UMUR", "HKJ", "YHIU", "RT", "STATUS", "KET"]];
         filteredData.forEach(function (item, index) {
             data.push([
-                index + 1, index + 1, item.rtRw, item.noKk, item.nik, item.nama,
-                item.tempatLahir, item.tglLahir, item.umur, "", item.jk, "",
+                index + 1, item.dpId, item.rtRw, item.noKk, item.nik, item.nama,
+                item.jk, item.tempatLahir, item.tglLahir, item.umur, "", "",
                 ambilNomorRt(item.rtRw) === 999999 ? "" : ambilNomorRt(item.rtRw),
                 item.statusHub, item.keterangan
             ]);
@@ -1043,8 +980,8 @@
 
         const ws = XLSX.utils.aoa_to_sheet(data);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "data kk");
-        XLSX.writeFile(wb, "Data_KK_Coklit.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "Hasil Coklit");
+        XLSX.writeFile(wb, "Data_Coklit_DPS.xlsx");
     }
 </script>
 </body>
