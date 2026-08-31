@@ -550,18 +550,21 @@
         }
 
         async function muatDataDariGoogleDrive() {
-            if (WEB_APP_URL.includes("MASUKKAN_URL")) {
-                console.warn("URL Web App Google Sheets belum dipasang!");
-                return;
-            }
-            try {
-                let response = await fetch(WEB_APP_URL);
-                let result = await response.json();
-                databasePilkades = result;
-                renderSemuaTampilan();
-            } catch (error) {
-                console.error("Gagal memuat data:", error);
-            }
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: "GET",
+      redirect: "follow" // TARUH INI SUPAYA TIDAK KENA CORS REDIRECT
+    });
+    const data = await response.json();
+    
+    // Simpan ke database lokal di JS
+    databasePilkades = data;
+    
+    // Panggil fungsi untuk menampilkan data ke tabel
+    tampilkanData(); 
+  } catch (error) {
+    console.error("Gagal memuat data:", error);
+  }
         }
 
         async function simpanKeGoogleDrive(tabName, dataArray) {
