@@ -9,7 +9,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --kpu-primary: #580c1f;
@@ -101,10 +101,18 @@
             background: linear-gradient(135deg, #6b0f24 0%, #350511 100%);
             color: white;
             border-radius: 16px;
-            padding: 28px 32px;
+            padding: 32px 36px;
             box-shadow: 0 10px 25px rgba(88, 12, 31, 0.15);
             margin-bottom: 24px;
             border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Judul utama diperbesar dan dipertegas */
+        .portal-header h2 {
+            font-size: 2.1rem !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .card-custom {
@@ -200,6 +208,22 @@
             animation: fadeIn 0.3s ease-in-out;
         }
 
+        /* Styling Widget Waktu Realtime Baru agar Seimbang di Bawah Tombol */
+        .realtime-clock-box-bottom {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fef08a;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -229,14 +253,14 @@
             <div class="py-2" id="menuList">
                 <div class="menu-category">Menu Utama</div>
                 <a class="nav-link" onclick="loadSheetData('INPUT SUARA', this)"><i class="fas fa-chart-line"></i>Live Real-Count</a>
-                <a class="nav-link active" onclick="loadSheetData('PROFIL CALON KADES', this)"><i class="fas fa-user-tie"></i>Profil Calon Kades</a>
+                <a class="nav-link" onclick="loadSheetData('PROFIL CALON KADES', this)"><i class="fas fa-user-tie"></i>Profil Calon Kades</a>
 
                 <div class="menu-category">Data Pemilih</div>
                 <div class="sub-menu">
-                    <a class="nav-link" onclick="loadSheetData('DPT AWAL KPU', this)"><i class="fas fa-users"></i>1. DPT Awal KPU</a>
-                    <a class="nav-link" onclick="loadSheetData('DPS (SEMENTARA)', this)"><i class="fas fa-user-clock"></i>2. DPS (Sementara)</a>
-                    <a class="nav-link" onclick="loadSheetData('DPTAM (TAMBAHAN)', this)"><i class="fas fa-user-plus"></i>3. DPTAM (Tambahan)</a>
-                    <a class="nav-link" onclick="loadSheetData('DPT (TETAP)', this)"><i class="fas fa-address-book"></i>4. DPT (Tetap)</a>
+                    <a class="nav-link active" onclick="loadSheetData('DPT AWAL KPU', this)"><i class="fas fa-users"></i>DPT Awal KPU</a>
+                    <a class="nav-link" onclick="loadSheetData('DPS (SEMENTARA)', this)"><i class="fas fa-user-clock"></i>DPS (Sementara)</a>
+                    <a class="nav-link" onclick="loadSheetData('DPTAM (TAMBAHAN)', this)"><i class="fas fa-user-plus"></i>DPTAM (Tambahan)</a>
+                    <a class="nav-link" onclick="loadSheetData('DPT (TETAP)', this)"><i class="fas fa-address-book"></i>DPT (Tetap)</a>
                 </div>
 
                 <div class="menu-category">Panitia & Pengawas</div>
@@ -251,25 +275,41 @@
 
         <!-- Area Konten Utama -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            <div class="portal-header d-flex justify-content-between align-items-center flex-wrap no-print">
-                <div>
-                    <span class="badge bg-warning text-dark mb-2 px-2 py-1 fw-bold shadow-sm" style="font-size: 0.7rem;">PORTAL PUBLIKASI RESMI PILKADES</span>
-                    <h2 class="fw-bold mb-1 fs-3">PEMILIHAN KEPALA DESA PAYO LEBAR</h2>
-                    <p class="text-light opacity-85 mb-0 fw-medium" style="font-size: 0.9rem;">
-                        <i class="fas fa-map-marker-alt text-warning me-1"></i> Kecamatan Singkut &bull; Kabupaten Sarolangun &bull; Tahun 2026
-                    </p>
-                </div>
-                <div class="mt-3 mt-md-0 d-flex gap-2 align-items-center flex-wrap">
-                    <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="toggleChartSection()">
-                        <i class="fas fa-chart-pie me-1" id="chartToggleIcon"></i> <span id="chartToggleText">Tampilkan Grafik Rekap</span>
-                    </button>
-                    <button class="btn btn-light btn-sm px-3 fw-bold text-danger shadow-sm" onclick="refreshData()">
-                        <i class="fas fa-sync-alt me-1"></i> Refresh Cache
-                    </button>
-                    <div id="authArea">
-                        <button class="btn btn-outline-light btn-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">
-                            <i class="fas fa-lock me-1"></i> Login Admin
+            <!-- Header Portal dengan Layout Seimbang -->
+            <div class="portal-header no-print">
+                <div class="row align-items-center">
+                    <!-- Sisi Kiri: Badge & Judul Diperbesar & Dipertegas -->
+                    <div class="col-lg-7 mb-3 mb-lg-0">
+                        <span class="badge bg-warning text-dark mb-2 px-2 py-1 fw-bold shadow-sm" style="font-size: 0.75rem;">PORTAL PUBLIKASI RESMI PILKADES</span>
+                        <h2 class="text-white mb-2">PEMILIHAN KEPALA DESA PAYO LEBAR</h2>
+                        <p class="text-light opacity-85 mb-0 fw-medium" style="font-size: 0.95rem;">
+                            <i class="fas fa-map-marker-alt text-warning me-1"></i> Kecamatan Singkut &bull; Kabupaten Sarolangun &bull; Tahun 2026
+                        </p>
+                    </div>
+                    
+                    <!-- Sisi Kanan: Tombol Aksi -->
+                    <div class="col-lg-5 text-lg-end d-flex justify-content-lg-end align-items-center gap-2 flex-wrap">
+                        <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="toggleChartSection()">
+                            <i class="fas fa-chart-pie me-1" id="chartToggleIcon"></i> <span id="chartToggleText">Tampilkan Grafik Rekap</span>
                         </button>
+                        <button class="btn btn-light btn-sm px-3 fw-bold text-danger shadow-sm" onclick="refreshData()">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh Cache
+                        </button>
+                        <div id="authArea">
+                            <button class="btn btn-outline-light btn-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                <i class="fas fa-lock me-1"></i> Login Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Baris Bawah Header: Widget Waktu Realtime (Seimbang di Bawah Tombol / Samping Kiri Bawah) -->
+                <div class="row mt-4 pt-3 border-top border-light border-opacity-10 align-items-center">
+                    <div class="col-12">
+                        <div class="realtime-clock-box-bottom">
+                            <i class="fas fa-clock text-warning"></i>
+                            <span id="realtimeClockDisplay">Memuat waktu...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -277,7 +317,7 @@
             <!-- Panel Grafik Rekapitulasi Langsung -->
             <div class="card card-custom p-3 mb-3 d-none chart-section-box no-print" id="directChartSection">
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
-                    <h5 class="fw-bold text-danger mb-0 fs-6"><i class="fas fa-chart-bar me-2"></i> Grafik & Rekapitulasi Jumlah: <span id="directChartTitle">PROFIL CALON KADES</span></h5>
+                    <h5 class="fw-bold text-danger mb-0 fs-6"><i class="fas fa-chart-bar me-2"></i> Grafik & Rekapitulasi Jumlah: <span id="directChartTitle">DPT AWAL KPU</span></h5>
                     
                     <div class="d-flex align-items-center gap-2">
                         <label class="form-label fw-bold text-secondary small mb-0">Kelompokkan Data Berdasarkan:</label>
@@ -296,19 +336,16 @@
                 </div>
             </div>
 
-            <!-- Panel Filter Langsung (NKK/NIK/NAMA, KODE COKLIT, RT) & Tombol Admin -->
+            <!-- Panel Filter Langsung & Tombol Admin -->
             <div class="d-flex align-items-center justify-content-between mb-3 px-1 flex-wrap gap-2 no-print">
                 <div>
-                    <h4 class="fw-bold text-uppercase fs-5 mb-1" id="currentTitle" style="color: var(--kpu-primary);">PROFIL CALON KADES</h4>
-                    <span id="accessNotice" class="text-muted small">
-                        <i class="fas fa-eye text-primary me-1"></i> Mode Publik (Read-Only)
-                    </span>
+                    <h4 class="fw-bold text-uppercase fs-5 mb-0" id="currentTitle" style="color: var(--kpu-primary);">DPT AWAL KPU</h4>
                 </div>
                 
                 <div class="d-flex gap-2 align-items-center flex-wrap">
                     <!-- Menu Filter Langsung Sejajar -->
                     <div class="d-flex gap-2 align-items-center flex-wrap">
-                        <!-- 1. Cari NKK / NIK / Nama -->
+                        <!-- 1. Cari NKK / NIK / Nama / Apapun -->
                         <div class="input-group input-group-sm shadow-sm" style="width: 220px;">
                             <span class="input-group-text bg-light text-secondary"><i class="fas fa-search"></i></span>
                             <input type="text" id="filterKeyword" class="form-control" placeholder="Cari NKK / NIK / Nama..." oninput="applyFilters()">
@@ -361,9 +398,17 @@
                     </table>
                 </div>
                 
-                <!-- Navigasi Paginasi Halaman -->
-                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top no-print" id="paginationContainer">
-                    <small class="text-muted" id="pageInfo">Menampilkan data...</small>
+                <!-- Navigasi Paginasi Halaman & Pilihan Baris -->
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top no-print flex-wrap gap-2" id="paginationContainer">
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted" id="pageInfo">Menampilkan data...</small>
+                        <select id="rowsPerPageSelect" class="form-select form-select-sm fw-semibold" style="width: 110px;" onchange="changeRowsPerPage()">
+                            <option value="50">50 baris</option>
+                            <option value="100">100 baris</option>
+                            <option value="500">500 baris</option>
+                            <option value="1000">1000 baris</option>
+                        </select>
+                    </div>
                     <nav>
                         <ul class="pagination pagination-sm mb-0" id="paginationList"></ul>
                     </nav>
@@ -406,13 +451,13 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    let activeSheet = 'PROFIL CALON KADES';
+    let activeSheet = 'DPT AWAL KPU';
     let currentRawData = [];
     let filteredData = [];
     let myChart = null;
     let isAdmin = false; 
     let currentPage = 1;
-    const rowsPerPage = 50; 
+    let rowsPerPage = 50; 
     
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbybbKth1VoP8OFAb4EpqxoApkNDuHcHdYE9fm1c1mOD7kYRTy_S1f2PaztEHsIGl7AM/exec';
 
@@ -430,6 +475,28 @@
         "P": "xxxx"
     };
 
+    // Fungsi Jam Realtime & Format Tanggal Bergaris Miring
+    function updateRealtimeClock() {
+        const now = new Date();
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        
+        let dayName = days[now.getDay()];
+        let day = String(now.getDate()).padStart(2, '0');
+        let month = String(now.getMonth() + 1).padStart(2, '0');
+        let year = now.getFullYear();
+        
+        let hours = String(now.getHours()).padStart(2, '0');
+        let minutes = String(now.getMinutes()).padStart(2, '0');
+        let seconds = String(now.getSeconds()).padStart(2, '0');
+        
+        let clockString = `${dayName}, ${day}/${month}/${year} — ${hours}:${minutes}:${seconds} WIB`;
+        const clockElement = document.getElementById('realtimeClockDisplay');
+        if (clockElement) {
+            clockElement.innerText = clockString;
+        }
+    }
+
     function formatDate(val) {
         if (val === null || val === undefined || val === "") return "";
         let strVal = String(val);
@@ -440,7 +507,7 @@
                     let day = String(dateObj.getDate()).padStart(2, '0');
                     let month = String(dateObj.getMonth() + 1).padStart(2, '0');
                     let year = dateObj.getFullYear();
-                    return `${day}-${month}-${year}`;
+                    return `${day}/${month}/${year}`;
                 }
             } catch (e) {
                 return strVal;
@@ -465,7 +532,6 @@
         document.getElementById('currentTitle').innerText = sheetName;
         document.getElementById('directChartTitle').innerText = sheetName;
         
-        // Reset nilai filter saat ganti sheet
         document.getElementById('filterKeyword').value = '';
         document.getElementById('filterCoklit').value = '';
         document.getElementById('filterRt').value = '';
@@ -513,7 +579,6 @@
             });
     }
 
-    // Mengisi pilihan RT otomatis dari data kolom yang mengandung kata 'RT'
     function populateRtDropdown() {
         const rtSelect = document.getElementById('filterRt');
         rtSelect.innerHTML = '<option value="">-- Semua RT --</option>';
@@ -546,7 +611,6 @@
         });
     }
 
-    // Fungsi gabungan untuk menyaring berdasarkan Keyword, Coklit, dan RT secara bersamaan
     function applyFilters() {
         if (!currentRawData || currentRawData.length <= 1) return;
 
@@ -557,32 +621,25 @@
         const selectedCoklit = document.getElementById('filterCoklit').value;
         const selectedRt = document.getElementById('filterRt').value;
 
-        // Cari indeks kolom terkait secara otomatis
-        let nkkIdx = headers.findIndex(h => String(h).toUpperCase().includes('NKK'));
-        let nikIdx = headers.findIndex(h => String(h).toUpperCase().includes('NIK'));
-        let namaIdx = headers.findIndex(h => String(h).toUpperCase().includes('NAMA'));
-        let coklitIdx = headers.findIndex(h => String(h).toUpperCase().includes('COKLIT') || String(h).toUpperCase().includes('KODE'));
+        let coklitIdx = headers.findIndex(h => {
+            let hUp = String(h).toUpperCase();
+            return hUp.includes('COKLIT') || hUp.includes('KODE');
+        });
+        
         let rtIdx = headers.findIndex(h => String(h).toUpperCase().includes('RT'));
 
         const matchedRows = rows.filter(row => {
-            // 1. Filter Keyword (Mencari di NKK, NIK, Nama atau semua kolom jika tidak spesifik)
             let matchKeyword = true;
             if (keyword !== "") {
-                let valNkk = nkkIdx !== -1 ? String(row[nkkIdx] || '').toLowerCase() : '';
-                let valNik = nikIdx !== -1 ? String(row[nikIdx] || '').toLowerCase() : '';
-                let valNama = namaIdx !== -1 ? String(row[namaIdx] || '').toLowerCase() : '';
-                
-                matchKeyword = valNkk.includes(keyword) || valNik.includes(keyword) || valNama.includes(keyword);
+                matchKeyword = row.some(cell => String(cell || '').toLowerCase().includes(keyword));
             }
 
-            // 2. Filter Kode Coklit
             let matchCoklit = true;
             if (selectedCoklit !== "" && coklitIdx !== -1) {
                 let cellCoklit = String(row[coklitIdx] || '').trim();
                 matchCoklit = (cellCoklit === selectedCoklit);
             }
 
-            // 3. Filter RT
             let matchRt = true;
             if (selectedRt !== "" && rtIdx !== -1) {
                 let cellRt = String(row[rtIdx] || '').trim();
@@ -613,6 +670,13 @@
         if (!document.getElementById('directChartSection').classList.contains('d-none')) {
             generateChart();
         }
+    }
+
+    function changeRowsPerPage() {
+        const select = document.getElementById('rowsPerPageSelect');
+        rowsPerPage = parseInt(select.value);
+        currentPage = 1;
+        renderTablePage();
     }
 
     function renderTablePage() {
@@ -763,6 +827,22 @@
         const labels = sortedKeys;
         const values = sortedKeys.map(k => counts[k]);
 
+        const colorPalette = [
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(46, 204, 113, 0.8)',
+            'rgba(231, 76, 60, 0.8)',
+            'rgba(52, 152, 219, 0.8)',
+            'rgba(155, 89, 182, 0.8)'
+        ];
+        
+        const backgroundColors = labels.map((_, i) => colorPalette[i % colorPalette.length]);
+        const borderColors = backgroundColors.map(color => color.replace('0.8', '1'));
+
         document.getElementById('chartLegendDescription').innerHTML = 
             `Menampilkan rekapitulasi jumlah berdasarkan kolom <b>"${colName}"</b> dari total <b>${rows.length} data</b> tersaring pada sheet <u>${activeSheet}</u>.`;
 
@@ -776,8 +856,8 @@
                 datasets: [{
                     label: `Jumlah Total (${colName})`,
                     data: values,
-                    backgroundColor: 'rgba(153, 27, 50, 0.8)',
-                    borderColor: 'rgba(153, 27, 50, 1)',
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
                     borderWidth: 1,
                     borderRadius: 6
                 }]
@@ -786,7 +866,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
-                    legend: { display: true },
+                    legend: { display: false },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
@@ -832,22 +912,19 @@
         isAdmin = false;
         updateAuthUI();
         renderTablePage();
-        showToast("Berhasil Logout. Kembali ke Mode Publik.", "bg-secondary");
+        showToast("Berhasil Logout.", "bg-secondary");
     }
 
     function updateAuthUI() {
         const authArea = document.getElementById('authArea');
-        const accessNotice = document.getElementById('accessNotice');
         const adminActionButtons = document.getElementById('adminActionButtons');
 
         if (isAdmin) {
             authArea.innerHTML = `<button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="processLogout()"><i class="fas fa-sign-out-alt me-1"></i> Logout Admin</button>`;
-            accessNotice.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> Mode Admin Aktif: Edit & Ekstrak Terbuka`;
             adminActionButtons.classList.remove('d-none');
             adminActionButtons.classList.add('d-flex');
         } else {
             authArea.innerHTML = `<button class="btn btn-outline-light btn-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fas fa-lock me-1"></i> Login Admin</button>`;
-            accessNotice.innerHTML = `<i class="fas fa-eye text-primary me-1"></i> Mode Publik (Read-Only)`;
             adminActionButtons.classList.remove('d-flex');
             adminActionButtons.classList.add('d-none');
         }
@@ -915,7 +992,9 @@
     }
 
     window.onload = function() {
-        loadSheetData('PROFIL CALON KADES', null);
+        loadSheetData('DPT AWAL KPU', null);
+        updateRealtimeClock();
+        setInterval(updateRealtimeClock, 1000);
     };
 </script>
 </body>
