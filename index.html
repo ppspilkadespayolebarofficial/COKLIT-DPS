@@ -97,22 +97,37 @@
             background: #ffffff;
         }
 
-        .table th {
-            background-color: #fafafa;
+        .sheet-table {
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .sheet-table th, .sheet-table td {
+            border: 1px solid #dee2e6 !important;
+            vertical-align: middle;
+        }
+
+        .sheet-table th {
+            background-color: #f8f9fa !important;
             color: #495057;
             font-weight: 600;
-            border-bottom: 2px solid #dee2e6;
-            padding: 14px 16px;
+            text-align: center;
+            padding: 12px 10px;
         }
 
-        .table td {
-            padding: 12px 16px;
-            vertical-align: middle;
-            color: #212529;
-            border-bottom: 1px solid #f1f3f5;
+        .row-index {
+            background-color: #f1f3f5;
+            color: #6c757d;
+            text-align: center;
+            font-weight: 600;
+            width: 50px;
+            user-select: none;
         }
 
-        /* Efek sel aktif jika mode admin */
+        .sheet-table td {
+            padding: 10px 12px;
+        }
+
         .editable-cell:hover {
             background-color: #fff5f5;
             outline: 1.5px dashed #8b0000;
@@ -130,8 +145,31 @@
 
         .chart-container {
             position: relative;
-            height: 320px;
+            height: 350px;
             width: 100%;
+        }
+
+        /* Pengaturan Cetak Khusus Folio Lanskap (F4 Landscape: 330mm x 210mm) */
+        @media print {
+            @page {
+                size: 330mm 210mm landscape;
+                margin: 10mm;
+            }
+            body * {
+                visibility: hidden;
+            }
+            #printableArea, #printableArea * {
+                visibility: visible;
+            }
+            #printableArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -140,7 +178,7 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar Menu -->
-        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar p-0">
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar p-0 no-print">
             <div class="brand-box">
                 <i class="fas fa-landmark fa-2x text-warning mb-2"></i>
                 <h5 class="text-white fw-bold mb-0 fs-6">SISTEM PILKADES</h5>
@@ -172,7 +210,7 @@
 
         <!-- Area Konten Utama -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            <div class="portal-header d-flex justify-content-between align-items-center flex-wrap">
+            <div class="portal-header d-flex justify-content-between align-items-center flex-wrap no-print">
                 <div>
                     <span class="badge bg-warning text-dark mb-2 px-2 py-1 fw-bold" style="font-size: 0.7rem;">PORTAL PUBLIKASI RESMI PILKADES</span>
                     <h2 class="fw-bold mb-1 fs-3">PEMILIHAN KEPALA DESA PAYO LEBAR</h2>
@@ -180,14 +218,13 @@
                         <i class="fas fa-map-marker-alt text-warning me-1"></i> Kecamatan Singkut &bull; Kabupaten Sarolangun &bull; Tahun 2026
                     </p>
                 </div>
-                <div class="mt-3 mt-md-0 d-flex gap-2 align-items-center">
+                <div class="mt-3 mt-md-0 d-flex gap-2 align-items-center flex-wrap">
                     <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" data-bs-toggle="modal" data-bs-target="#chartModal" onclick="generateChart()">
-                        <i class="fas fa-chart-bar me-1"></i> Grafik Data
+                        <i class="fas fa-chart-bar me-1"></i> Grafik & Keterangan
                     </button>
                     <button class="btn btn-light btn-sm px-3 fw-bold text-danger shadow-sm" onclick="refreshData()">
                         <i class="fas fa-sync-alt me-1"></i> Refresh
                     </button>
-                    <!-- Tombol Status Login / Login Admin -->
                     <div id="authArea">
                         <button class="btn btn-outline-light btn-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">
                             <i class="fas fa-lock me-1"></i> Login Admin
@@ -196,16 +233,42 @@
                 </div>
             </div>
 
-            <div class="d-flex align-items-center justify-content-between mb-3 px-2">
-                <h4 class="fw-bold text-uppercase fs-5 mb-0" id="currentTitle" style="color: #65000b;">PROFIL CALON KADES</h4>
-                <span id="accessNotice" class="badge bg-white text-dark border px-3 py-2 fw-normal shadow-sm">
-                    <i class="fas fa-eye text-primary me-1"></i> Mode Publik: Anda bertindak sebagai penglihat data (Read-Only)
-                </span>
+            <!-- Panel Filter & Tombol Khusus Admin (Cetak & Ekstrak Excel) -->
+            <div class="d-flex align-items-center justify-content-between mb-3 px-2 flex-wrap gap-2 no-print">
+                <div>
+                    <h4 class="fw-bold text-uppercase fs-5 mb-1" id="currentTitle" style="color: #65000b;">PROFIL CALON KADES</h4>
+                    <span id="accessNotice" class="text-muted small">
+                        <i class="fas fa-eye text-primary me-1"></i> Mode Publik (Read-Only)
+                    </span>
+                </div>
+                
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <!-- Kotak Pencarian / Filter Berdasarkan RT, Kode Coklit, Nama, dll -->
+                    <div class="input-group" style="width: 280px;">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="tableFilter" class="form-control border-start-0 ps-0" placeholder="Cari (RT, Coklit, Nama...)" onkeyup="filterTable()">
+                    </div>
+
+                    <!-- Tombol Tambahan Khusus Admin (Akan otomatis muncul saat login) -->
+                    <div id="adminActionButtons" class="d-none gap-2">
+                        <button class="btn btn-success btn-sm fw-bold px-3 shadow-sm" onclick="exportToExcel()" title="Ekstrak data terfilter ke Excel">
+                            <i class="fas fa-file-excel me-1"></i> Ekstrak Excel
+                        </button>
+                        <button class="btn btn-dark btn-sm fw-bold px-3 shadow-sm" onclick="printFolioLandscape()" title="Cetak F4 Lanskap">
+                            <i class="fas fa-print me-1"></i> Cetak Folio Lanskap
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div class="card card-custom p-4">
+            <!-- Area yang akan dicetak (Printable Area) -->
+            <div class="card card-custom p-3" id="printableArea">
+                <div class="text-center d-none" id="printHeader">
+                    <h4 class="fw-bold text-uppercase mb-1">PEMILIHAN KEPALA DESA PAYO LEBAR 2026</h4>
+                    <p class="text-muted small mb-3">Laporan Dokumen Resmi - <span id="printSheetName"></span></p>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle" id="dataTable">
+                    <table class="table sheet-table align-middle" id="dataTable">
                         <tbody>
                             <tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Memuat database server...</p></td></tr>
                         </tbody>
@@ -235,17 +298,23 @@
     </div>
 </div>
 
-<!-- Modal Grafik Statistik -->
+<!-- Modal Grafik Statistik & Keterangan Kode -->
 <div class="modal fade" id="chartModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header text-white" style="background: var(--kpu-red-dark);">
-                <h5 class="modal-title fw-bold fs-6"><i class="fas fa-chart-line me-2"></i> Grafik Statistik: <span id="modalChartTitle">PROFIL CALON KADES</span></h5>
+                <h5 class="modal-title fw-bold fs-6"><i class="fas fa-chart-line me-2"></i> Grafik & Keterangan: <span id="modalChartTitle">PROFIL CALON KADES</span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <div class="chart-container">
+                <div class="chart-container mb-4">
                     <canvas id="sheetChart"></canvas>
+                </div>
+                <div class="alert alert-light border p-3 rounded-3">
+                    <h6 class="fw-bold text-danger mb-2"><i class="fas fa-info-circle me-1"></i> Keterangan & Indikator Kategori:</h6>
+                    <p class="small text-muted mb-0" id="chartLegendDescription">
+                        Grafik di atas memvisualisasikan data kuantitatif dari sheet aktif. Gunakan filter pada tabel utama untuk mempersempit kriteria pencarian berdasarkan RT atau kode Coklit tertentu.
+                    </p>
                 </div>
             </div>
         </div>
@@ -269,13 +338,14 @@
     let activeSheet = 'PROFIL CALON KADES';
     let currentRawData = [];
     let myChart = null;
-    let isAdmin = false; // Status hak akses (Default: Publik)
+    let isAdmin = false; 
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzrYFB9sXumZzGFyxLTGQaZ7vCv5whO-9x5aZnNcqrvHPQa0mZFTQX86AdkyexgR9g/exec';
 
     function loadSheetData(sheetName, element) {
         activeSheet = sheetName;
         document.getElementById('currentTitle').innerText = sheetName;
         document.getElementById('modalChartTitle').innerText = sheetName;
+        document.getElementById('tableFilter').value = '';
         
         if (element) {
             document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
@@ -306,17 +376,18 @@
             return;
         }
 
-        let headerHtml = '<thead><tr>';
+        let headerHtml = '<thead><tr><th class="row-index">#</th>';
         data[0].forEach((col) => {
             headerHtml += `<th>${col}</th>`;
         });
         headerHtml += '</tr></thead>';
 
-        let bodyHtml = '<tbody>';
+        let bodyHtml = '<tbody id="tableBody">';
         for (let i = 1; i < data.length; i++) {
             bodyHtml += `<tr>`;
+            bodyHtml += `<td class="row-index">${i + 1}</td>`;
+            
             data[i].forEach((cell, j) => {
-                // Jika Admin, sel aktif bisa diedit. Jika Publik, atribut contenteditable dimatikan (false).
                 if (isAdmin) {
                     bodyHtml += `<td contenteditable="true" class="editable-cell" onblur="updateData(${i + 1}, ${j}, this)">${cell}</td>`;
                 } else {
@@ -330,6 +401,23 @@
         table.innerHTML = headerHtml + bodyHtml;
     }
 
+    // Filter Universal (Mencakup RT, Kode Coklit, NIK, Nama, dll.)
+    function filterTable() {
+        let input = document.getElementById('tableFilter').value.toLowerCase();
+        let tbody = document.getElementById('tableBody');
+        if (!tbody) return;
+        let trs = tbody.getElementsByTagName('tr');
+
+        for (let i = 0; i < trs.length; i++) {
+            let tdText = trs[i].innerText.toLowerCase();
+            if (tdText.includes(input)) {
+                trs[i].style.display = "";
+            } else {
+                trs[i].style.display = "none";
+            }
+        }
+    }
+
     function processLogin() {
         const pass = document.getElementById('adminPassword').value;
         fetch(`${WEB_APP_URL}?action=login&pass=${encodeURIComponent(pass)}`)
@@ -337,18 +425,14 @@
             .then(res => {
                 if(res.status === 'success') {
                     isAdmin = true;
-                    // Tutup modal
                     const modalEl = document.getElementById('loginModal');
                     const modal = bootstrap.Modal.getInstance(modalEl);
                     modal.hide();
+                    document.getElementById('adminPassword').value = '';
                     
-                    // Ubah UI indikator akses
-                    document.getElementById('authArea').innerHTML = '<span class="badge bg-success px-3 py-2"><i class="fas fa-user-shield me-1"></i> Admin Aktif</span>';
-                    document.getElementById('accessNotice').innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Mode Admin: Anda dapat mengedit data secara langsung (Two-Way Sync)';
-                    
-                    // Muat ulang tabel agar fitur edit aktif
+                    updateAuthUI();
                     loadSheetData(activeSheet, null);
-                    showToast("Login Berhasil! Mode Edit Aktif.", "bg-success");
+                    showToast("Login Berhasil! Fitur Admin Aktif.", "bg-success");
                 } else {
                     alert("Password salah! Silakan coba lagi.");
                 }
@@ -356,13 +440,46 @@
             .catch(err => alert("Gagal melakukan verifikasi login."));
     }
 
+    function processLogout() {
+        isAdmin = false;
+        updateAuthUI();
+        loadSheetData(activeSheet, null);
+        showToast("Berhasil Logout. Kembali ke Mode Publik.", "bg-secondary");
+    }
+
+    function updateAuthUI() {
+        const authArea = document.getElementById('authArea');
+        const accessNotice = document.getElementById('accessNotice');
+        const adminActionButtons = document.getElementById('adminActionButtons');
+
+        if (isAdmin) {
+            authArea.innerHTML = `
+                <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="processLogout()">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout Admin
+                </button>
+            `;
+            accessNotice.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> Mode Admin Aktif: Edit, Cetak & Ekstrak Excel Terbuka`;
+            adminActionButtons.classList.remove('d-none');
+            adminActionButtons.classList.add('d-flex');
+        } else {
+            authArea.innerHTML = `
+                <button class="btn btn-outline-light btn-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">
+                    <i class="fas fa-lock me-1"></i> Login Admin
+                </button>
+            `;
+            accessNotice.innerHTML = `<i class="fas fa-eye text-primary me-1"></i> Mode Publik (Read-Only)`;
+            adminActionButtons.classList.remove('d-flex');
+            adminActionButtons.classList.add('d-none');
+        }
+    }
+
     function updateData(rowIdx, colIdx, cellElement) {
-        if (!isAdmin) return; // Keamanan tambahan
+        if (!isAdmin) return;
 
         const row = cellElement.parentNode;
         let rowValues = [];
-        for (let cell of row.cells) {
-            rowValues.push(cell.innerText);
+        for (let k = 1; k < row.cells.length; k++) {
+            rowValues.push(row.cells[k].innerText);
         }
 
         const payload = {
@@ -386,6 +503,34 @@
         .catch(error => {
             showToast("Terjadi kesalahan jaringan", "bg-danger");
         });
+    }
+
+    // Fungsi Cetak Format Folio Lanskap (F4 Landscape)
+    function printFolioLandscape() {
+        document.getElementById('printSheetName').innerText = activeSheet;
+        document.getElementById('printHeader').classList.remove('d-none');
+        window.print();
+        document.getElementById('printHeader').classList.add('d-none');
+    }
+
+    // Fungsi Ekstrak Data Terfilter ke Excel (.xls)
+    function exportToExcel() {
+        let table = document.getElementById('dataTable');
+        let html = table.outerHTML;
+        
+        // Buat file Blob berformat Excel HTML
+        let blob = new Blob(['\ufeff' + html], {
+            type: 'application/vnd.ms-excel'
+        });
+        
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = `Data_${activeSheet.replace(/\s+/g, '_')}_Pilkades2026.xls`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("Data berhasil diekstrak ke Excel!", "bg-success");
     }
 
     function showToast(msg, bgClass) {
@@ -418,6 +563,10 @@
 
         const labels = rows.map(r => r[labelIdx]);
         const values = rows.map(r => parseFloat(r[valueIdx]) || 0);
+
+        // Keterangan dinamis untuk kotak informasi grafik
+        document.getElementById('chartLegendDescription').innerHTML = 
+            `Grafik menampilkan perbandingan parameter <b>"${headers[labelIdx]}"</b> terhadap <b>"${headers[valueIdx]}"</b> dari total <b>${rows.length} baris data</b> pada sheet <u>${activeSheet}</u>.`;
 
         const ctx = document.getElementById('sheetChart').getContext('2d');
         
