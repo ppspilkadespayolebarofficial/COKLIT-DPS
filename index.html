@@ -97,6 +97,7 @@
             background: #ffffff;
         }
 
+        /* Kontainer Tabel dengan Scroll Kinerja Tinggi */
         .table-scroll-container {
             max-height: 600px;
             overflow-y: auto;
@@ -109,6 +110,7 @@
             margin-bottom: 0;
         }
 
+        /* Sticky Header agar tetap terlihat saat di-scroll ke bawah */
         .sheet-table th {
             position: sticky;
             top: 0;
@@ -143,6 +145,15 @@
             background-color: #fff5f5;
             outline: 1.5px dashed #8b0000;
             cursor: text;
+        }
+
+        #statusToast {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 1050;
+            display: none;
+            border-radius: 8px;
         }
 
         .chart-container {
@@ -182,7 +193,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar Menu Sesuai Urutan Spreadsheet -->
+        <!-- Sidebar Menu -->
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar p-0 no-print">
             <div class="brand-box">
                 <i class="fas fa-landmark fa-2x text-warning mb-2"></i>
@@ -191,17 +202,25 @@
             </div>
             
             <div class="py-2" id="menuList">
-                <div class="menu-category">Navigasi Data</div>
-                <a class="nav-link active" onclick="loadSheetData('PROFIL CALON KADES', this)"><i class="fas fa-user-tie"></i>PROFIL CALON KADES</a>
-                <a class="nav-link" onclick="loadSheetData('DPT AWAL KPU', this)"><i class="fas fa-users"></i>DPT AWAL KPU</a>
-                <a class="nav-link" onclick="loadSheetData('DPS (SEMENTARA)', this)"><i class="fas fa-user-clock"></i>DPS (SEMENTARA)</a>
-                <a class="nav-link" onclick="loadSheetData('DPTAM (TAMBAHAN)', this)"><i class="fas fa-user-plus"></i>DPTAM (TAMBAHAN)</a>
-                <a class="nav-link" onclick="loadSheetData('DPT (TETAP)', this)"><i class="fas fa-address-book"></i>DPT (TETAP)</a>
-                <a class="nav-link" onclick="loadSheetData('PPS (PANITIA DESA)', this)"><i class="fas fa-id-badge"></i>PPS (PANITIA DESA)</a>
-                <a class="nav-link" onclick="loadSheetData('PENGAWAS BPD', this)"><i class="fas fa-shield-alt"></i>PENGAWAS BPD</a>
-                <a class="nav-link" onclick="loadSheetData('KPPS TPS 01', this)"><i class="fas fa-vote-yea"></i>KPPS TPS 01</a>
-                <a class="nav-link" onclick="loadSheetData('KPPS TPS 02', this)"><i class="fas fa-vote-yea"></i>KPPS TPS 02</a>
-                <a class="nav-link" onclick="loadSheetData('INPUT SUARA', this)"><i class="fas fa-chart-line"></i>INPUT SUARA</a>
+                <div class="menu-category">Menu Utama</div>
+                <a class="nav-link" onclick="loadSheetData('INPUT SUARA', this)"><i class="fas fa-chart-line"></i>Live Real-Count</a>
+                <a class="nav-link active" onclick="loadSheetData('PROFIL CALON KADES', this)"><i class="fas fa-user-tie"></i>Profil Calon Kades</a>
+
+                <div class="menu-category">Data Pemilih</div>
+                <div class="sub-menu">
+                    <a class="nav-link" onclick="loadSheetData('DPT AWAL KPU', this)"><i class="fas fa-users"></i>1. DPT Awal KPU</a>
+                    <a class="nav-link" onclick="loadSheetData('DPS (SEMENTARA)', this)"><i class="fas fa-user-clock"></i>2. DPS (Sementara)</a>
+                    <a class="nav-link" onclick="loadSheetData('DPTAM (TAMBAHAN)', this)"><i class="fas fa-user-plus"></i>3. DPTAM (Tambahan)</a>
+                    <a class="nav-link" onclick="loadSheetData('DPT (TETAP)', this)"><i class="fas fa-address-book"></i>4. DPT (Tetap)</a>
+                </div>
+
+                <div class="menu-category">Panitia & Pengawas</div>
+                <div class="sub-menu">
+                    <a class="nav-link" onclick="loadSheetData('PPS (PANITIA DESA)', this)"><i class="fas fa-id-badge"></i>PPS (Panitia Desa)</a>
+                    <a class="nav-link" onclick="loadSheetData('PENGAWAS BPD', this)"><i class="fas fa-shield-alt"></i>Pengawas BPD</a>
+                    <a class="nav-link" onclick="loadSheetData('KPPS TPS 01', this)"><i class="fas fa-vote-yea"></i>KPPS TPS 01</a>
+                    <a class="nav-link" onclick="loadSheetData('KPPS TPS 02', this)"><i class="fas fa-vote-yea"></i>KPPS TPS 02</a>
+                </div>
             </div>
         </nav>
 
@@ -240,6 +259,7 @@
                 </div>
                 
                 <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <!-- Filter Cepat dengan Debounce agar tidak lag -->
                     <div class="input-group" style="width: 280px;">
                         <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                         <input type="text" id="tableFilter" class="form-control border-start-0 ps-0" placeholder="Cari data..." oninput="debouncedFilter()">
@@ -256,7 +276,7 @@
                 </div>
             </div>
 
-            <!-- Printable Area -->
+            <!-- Printable Area dengan Scroll Performa Tinggi -->
             <div class="card card-custom p-3" id="printableArea">
                 <div class="text-center d-none" id="printHeader">
                     <h4 class="fw-bold text-uppercase mb-1">PEMILIHAN KEPALA DESA PAYO LEBAR 2026</h4>
@@ -293,7 +313,7 @@
     </div>
 </div>
 
-<!-- Modal Grafik Statistik -->
+<!-- Modal Grafik Statistik & Keterangan Kode -->
 <div class="modal fade" id="chartModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
@@ -308,7 +328,7 @@
                 <div class="alert alert-light border p-3 rounded-3">
                     <h6 class="fw-bold text-danger mb-2"><i class="fas fa-info-circle me-1"></i> Keterangan & Indikator Kategori:</h6>
                     <p class="small text-muted mb-0" id="chartLegendDescription">
-                        Grafik memvisualisasikan data kuantitatif dari sheet aktif.
+                        Grafik di atas memvisualisasikan data kuantitatif dari sheet aktif.
                     </p>
                 </div>
             </div>
@@ -317,7 +337,7 @@
 </div>
 
 <!-- Toast Notifikasi Status -->
-<div id="statusToast" class="toast align-items-center text-white bg-success border-0 p-2 shadow" role="alert" style="position: fixed; bottom: 25px; right: 25px; z-index: 1050; display: none;">
+<div id="statusToast" class="toast align-items-center text-white bg-success border-0 p-2 shadow" role="alert">
     <div class="d-flex">
         <div class="toast-body fw-medium" id="toastMessage">
             <i class="fas fa-check-circle me-2"></i> Berhasil.
@@ -336,7 +356,8 @@
     let isAdmin = false; 
     let searchTimeout = null;
     
-    const TARGET_URL = 'https://script.google.com/macros/s/AKfycbybbKth1VoP8OFAb4EpqxoApkNDuHcHdYE9fm1c1mOD7kYRTy_S1f2PaztEHsIGl7AM/exec';
+    // URL Web App Google Apps Script Anda yang sudah terhubung
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbybbKth1VoP8OFAb4EpqxoApkNDuHcHdYE9fm1c1mOD7kYRTy_S1f2PaztEHsIGl7AM/exec';
 
     function loadSheetData(sheetName, element) {
         activeSheet = sheetName;
@@ -352,7 +373,7 @@
         const table = document.getElementById('dataTable');
         table.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Sinkronisasi data sheet...</p></td></tr>';
 
-        fetch(`${TARGET_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${new Date().getTime()}`)
+        fetch(`${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${new Date().getTime()}`)
             .then(response => response.json())
             .then(data => {
                 currentRawData = data;
@@ -423,7 +444,7 @@
 
     function processLogin() {
         const pass = document.getElementById('adminPassword').value;
-        fetch(`${TARGET_URL}?action=login&pass=${encodeURIComponent(pass)}`)
+        fetch(`${WEB_APP_URL}?action=login&pass=${encodeURIComponent(pass)}`)
             .then(res => res.json())
             .then(res => {
                 if(res.status === 'success') {
@@ -491,7 +512,7 @@
             values: rowValues
         };
 
-        fetch(TARGET_URL, {
+        fetch(WEB_APP_URL, {
             method: 'POST',
             body: JSON.stringify(payload)
         })
