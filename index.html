@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Resmi - Pemilihan Kepala Desa Payo Lebar 2026</title>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -165,7 +162,6 @@
             text-align: left !important;
         }
 
-        /* Warna Merah Otomatis untuk Status TMS (Meninggal, Ganda, TNI, Polri, Pindah Luar) */
         .tms-row {
             background-color: #fde8e8 !important;
         }
@@ -248,7 +244,6 @@
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar Menu -->
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar p-0 no-print">
             <div class="brand-box">
                 <i class="fas fa-landmark fa-2x text-warning mb-2"></i>
@@ -279,9 +274,7 @@
             </div>
         </nav>
 
-        <!-- Area Konten Utama -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            <!-- Header Portal -->
             <div class="portal-header no-print">
                 <div class="row align-items-center">
                     <div class="col-lg-7 mb-3 mb-lg-0">
@@ -292,8 +285,8 @@
                         </p>
                     </div>
                     
-                    <div class="col-lg-5 text-lg-end d-flex justify-content-lg-end align-items-center gap-2 flex-wrap">
-                        <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="toggleChartSection()">
+                    <div class="col-lg-5 text-lg-end d-flex justify-content-lg-end align-items-center gap-2 flex-wrap" id="headerActionButtonsContainer">
+                        <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" id="toggleChartBtn" onclick="toggleChartSection()">
                             <i class="fas fa-chart-pie me-1" id="chartToggleIcon"></i> <span id="chartToggleText">Tampilkan Grafik Rekap</span>
                         </button>
                         <button class="btn btn-light btn-sm px-3 fw-bold text-danger shadow-sm" onclick="refreshData()">
@@ -317,7 +310,6 @@
                 </div>
             </div>
 
-            <!-- Panel Grafik Rekapitulasi Langsung -->
             <div class="card card-custom p-3 mb-3 d-none chart-section-box no-print" id="directChartSection">
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
                     <h5 class="fw-bold text-danger mb-0 fs-6"><i class="fas fa-chart-bar me-2"></i> Grafik & Rekapitulasi Jumlah: <span id="directChartTitle">DPT AWAL KPU</span></h5>
@@ -338,20 +330,18 @@
                 </div>
             </div>
 
-            <!-- Panel Filter & Tombol Aksi Khusus Admin -->
-            <div class="d-flex align-items-center justify-content-between mb-3 px-1 flex-wrap gap-2 no-print">
+            <div class="d-flex align-items-center justify-content-between mb-3 px-1 flex-wrap gap-2 no-print" id="filterAndActionContainer">
                 <div>
                     <h4 class="fw-bold text-uppercase fs-5 mb-0" id="currentTitle" style="color: var(--kpu-primary);">DPT AWAL KPU</h4>
                 </div>
                 
                 <div class="d-flex gap-2 align-items-center flex-wrap">
-                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <div class="d-flex gap-2 align-items-center flex-wrap" id="filterControlsBox">
                         <div class="input-group input-group-sm shadow-sm" style="width: 200px;">
                             <span class="input-group-text bg-light text-secondary"><i class="fas fa-search"></i></span>
                             <input type="text" id="filterKeyword" class="form-control" placeholder="Cari NKK / NIK / Nama..." oninput="applyFilters()">
                         </div>
 
-                        <!-- Dropdown Filter Kode Coklit Lengkap 0 sampai P -->
                         <select id="filterCoklit" class="form-select form-select-sm fw-semibold shadow-sm" style="width: 175px;" onchange="applyFilters()">
                             <option value="">-- Semua Coklit --</option>
                             <option value="0">0 - Aktif</option>
@@ -374,7 +364,6 @@
                         <button class="btn btn-outline-secondary btn-sm shadow-sm" type="button" onclick="resetFilter()" title="Reset Semua Filter"><i class="fas fa-redo"></i></button>
                     </div>
 
-                    <!-- Tombol Fitur Khusus Admin (Akan Muncul Setelah Login) -->
                     <div id="adminActionButtons" class="d-none gap-2 flex-wrap">
                         <button class="btn btn-primary btn-sm fw-bold px-3 shadow-sm" onclick="openCoklitAdminModal()">
                             <i class="fas fa-tasks me-1"></i> Panel Aksi Coklit & Sub-Menu
@@ -389,7 +378,6 @@
                 </div>
             </div>
 
-            <!-- Printable Area -->
             <div class="card card-custom p-3" id="printableArea">
                 <div class="text-center d-none" id="printHeader">
                     <h4 class="fw-bold text-uppercase mb-1">PEMILIHAN KEPALA DESA PAYO LEBAR 2026</h4>
@@ -422,7 +410,6 @@
     </div>
 </div>
 
-<!-- Modal Aksi Khusus Coklit Lengkap dengan Sub-Menu (Kode 5, 6, 7 dll) -->
 <div class="modal fade" id="adminCoklitModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
@@ -459,7 +446,6 @@
                         <span class="text-muted small">Belum ada pemilih yang dipilih. Ketik nama/NIK di atas.</span>
                     </div>
 
-                    <!-- Sub-Menu Dinamis Kode 5: Pindah Domisili Luar Desa -->
                     <div id="panelPindahLuar" class="border-top pt-3 d-none">
                         <h6 class="fw-bold text-danger mb-3"><i class="fas fa-external-link-alt me-1"></i> Detail Pindah Domisili Luar Desa</h6>
                         <div class="row g-3">
@@ -470,7 +456,6 @@
                         </div>
                     </div>
 
-                    <!-- Sub-Menu Dinamis Kode 6: Pindah Domisili Dalam Desa -->
                     <div id="panelPindahDalam" class="border-top pt-3 d-none">
                         <h6 class="fw-bold text-danger mb-3"><i class="fas fa-exchange-alt me-1"></i> Detail Pindah Domisili Dalam Desa</h6>
                         <div class="row g-3">
@@ -494,7 +479,6 @@
                         </div>
                     </div>
 
-                    <!-- Sub-Menu Dinamis Kode 7: Pisah KK (NKK Baru & Biodata Lengkap) -->
                     <div id="panelPisahKK" class="border-top pt-3 d-none">
                         <h6 class="fw-bold text-danger mb-3"><i class="fas fa-house-user me-1"></i> Form Pengisian Pisah KK (NKK Baru & Anggota Keluarga Lengkap)</h6>
                         <div class="row g-3">
@@ -535,7 +519,6 @@
     </div>
 </div>
 
-<!-- Modal Login Admin -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
@@ -554,7 +537,6 @@
     </div>
 </div>
 
-<!-- Toast Notifikasi Status -->
 <div id="statusToast" class="toast align-items-center text-white bg-success border-0 p-2 shadow" role="alert">
     <div class="d-flex">
         <div class="toast-body fw-medium" id="toastMessage">
@@ -564,7 +546,6 @@
     </div>
 </div>
 
-<!-- Bootstrap JS & Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -579,7 +560,6 @@
     
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbybbKth1VoP8OFAb4EpqxoApkNDuHcHdYE9fm1c1mOD7kYRTy_S1f2PaztEHsIGl7AM/exec';
 
-    // Daftar lengkap kode coklit dari 0 sampai P sesuai permintaan
     const coklitMap = {
         "0": "Aktif",
         "1": "Meninggal",
@@ -594,8 +574,15 @@
         "P": "xxxx"
     };
 
-    // Daftar kode yang masuk kategori TMS (Tidak Memenuhi Syarat / Merah Otomatis)
     const tmsCodes = ["1", "2", "3", "4", "5"];
+
+    // Daftar sheet yang dikategorikan sebagai panitia/pengawas (tanpa filter dan grafik)
+    const committeeSheets = [
+        'PPS (PANITIA DESA)',
+        'PENGAWAS BPD',
+        'KPPS TPS 01',
+        'KPPS TPS 02'
+    ];
 
     function updateRealtimeClock() {
         const now = new Date();
@@ -646,6 +633,26 @@
         return sVal;
     }
 
+    // Fungsi untuk menyensor NKK dan NIK secara visual (menambahkan XXX) tanpa mengubah data asli
+    function maskSensitiveData(colName, val) {
+        if (val === null || val === undefined || val === "") return "";
+        let cName = String(colName).toUpperCase();
+        let sVal = String(val).trim();
+
+        // Cek jika kolom mengandung NKK atau NIK
+        if (cName.includes('NKK') || cName.includes('NO KK') || cName.includes('NOMOR KARTU KELUARGA')) {
+            if (sVal.length > 6) {
+                // Contoh sensor: tampilkan 6 digit awal/akhir atau ganti tengahnya dengan XXX
+                return sVal.substring(0, 6) + 'XXXXXX' + sVal.substring(sVal.length - 4);
+            }
+        } else if (cName.includes('NIK') || cName.includes('NO KTP') || cName.includes('NOMOR INDUK KEPENDUDUKAN')) {
+            if (sVal.length > 6) {
+                return sVal.substring(0, 6) + 'XXXXXX' + sVal.substring(sVal.length - 4);
+            }
+        }
+        return sVal;
+    }
+
     function calculateAutoAge() {
         const tglLhrVal = document.getElementById('newTglLahirInput').value;
         if (!tglLhrVal) return;
@@ -676,6 +683,21 @@
             element.classList.add('active');
         }
 
+        // Cek apakah sheet saat ini termasuk dalam kategori panitia/pengawas (tanpa filter & grafik)
+        const isCommittee = committeeSheets.includes(sheetName);
+        const toggleChartBtn = document.getElementById('toggleChartBtn');
+        const filterControlsBox = document.getElementById('filterControlsBox');
+        const directChartSection = document.getElementById('directChartSection');
+
+        if (isCommittee) {
+            if (toggleChartBtn) toggleChartBtn.classList.add('d-none');
+            if (filterControlsBox) filterControlsBox.classList.add('d-none');
+            if (directChartSection) directChartSection.classList.add('d-none');
+        } else {
+            if (toggleChartBtn) toggleChartBtn.classList.remove('d-none');
+            if (filterControlsBox) filterControlsBox.classList.remove('d-none');
+        }
+
         const table = document.getElementById('dataTable');
         
         const cachedData = sessionStorage.getItem('cache_' + sheetName);
@@ -686,7 +708,7 @@
             renderTablePage();
             populateChartDropdown();
             populateRtDropdown();
-            if (!document.getElementById('directChartSection').classList.contains('d-none')) {
+            if (!isCommittee && !document.getElementById('directChartSection').classList.contains('d-none')) {
                 generateChart();
             }
             return;
@@ -704,7 +726,7 @@
                 renderTablePage();
                 populateChartDropdown();
                 populateRtDropdown();
-                if (!document.getElementById('directChartSection').classList.contains('d-none')) {
+                if (!isCommittee && !document.getElementById('directChartSection').classList.contains('d-none')) {
                     generateChart();
                 }
             })
@@ -715,6 +737,7 @@
     }
 
     function populateRtDropdown() {
+        if (committeeSheets.includes(activeSheet)) return;
         const rtSelect = document.getElementById('filterRt');
         rtSelect.innerHTML = '<option value="">-- Semua RT --</option>';
         if (!currentRawData || currentRawData.length <= 1) return;
@@ -747,6 +770,7 @@
     }
 
     function applyFilters() {
+        if (committeeSheets.includes(activeSheet)) return;
         if (!currentRawData || currentRawData.length <= 1) return;
 
         const headers = currentRawData[0];
@@ -853,7 +877,6 @@
             paginatedRows.forEach((row, idx) => {
                 const absoluteIndex = startIdx + idx + 1;
                 
-                // Cek apakah kode coklit bernilai TMS (1, 2, 3, 4, 5) untuk menandai baris warna merah otomatis
                 let rowCoklitVal = coklitColIdx !== -1 ? String(row[coklitColIdx] || '').trim() : '';
                 let isTms = tmsCodes.includes(rowCoklitVal);
                 let rowClass = isTms ? 'tms-row' : '';
@@ -894,6 +917,8 @@
                     } else {
                         let displayCell = formatDate(cell);
                         displayCell = formatCoklitCode(headers[j], displayCell);
+                        // Terapkan sensor NKK dan NIK khusus tampilan tabel
+                        displayCell = maskSensitiveData(headers[j], displayCell);
 
                         if (isAdmin) {
                             bodyHtml += `<td contenteditable="true" class="editable-cell ${alignClass}" onblur="updateData(${absoluteIndex + 1}, ${j}, this)">${displayCell}</td>`;
@@ -1120,6 +1145,7 @@
     }
 
     function populateChartDropdown() {
+        if (committeeSheets.includes(activeSheet)) return;
         const select = document.getElementById('chartColumnSelect');
         select.innerHTML = '';
         if (!currentRawData || currentRawData.length === 0) return;
@@ -1138,6 +1164,7 @@
     }
 
     function toggleChartSection() {
+        if (committeeSheets.includes(activeSheet)) return;
         const section = document.getElementById('directChartSection');
         const btnText = document.getElementById('chartToggleText');
         const btnIcon = document.getElementById('chartToggleIcon');
@@ -1156,6 +1183,7 @@
     }
 
     function generateChart() {
+        if (committeeSheets.includes(activeSheet)) return;
         if (!filteredData || filteredData.length <= 1) return;
 
         const headers = filteredData[0];
@@ -1184,11 +1212,10 @@
         const labels = sortedKeys;
         const values = sortedKeys.map(k => counts[k]);
 
-        // Berikan warna khusus merah untuk bar kategori TMS di grafik
         const backgroundColors = labels.map(label => {
             let sLabel = String(label);
             if (sLabel.startsWith('1 -') || sLabel.startsWith('2 -') || sLabel.startsWith('3 -') || sLabel.startsWith('4 -') || sLabel.startsWith('5 -')) {
-                return 'rgba(220, 38, 38, 0.8)'; // Merah TMS
+                return 'rgba(220, 38, 38, 0.8)';
             }
             return 'rgba(54, 162, 235, 0.8)';
         });
