@@ -12,49 +12,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --kpu-red-dark: #65000b;
-            --kpu-red: #8b0000;
-            --kpu-red-gradient: linear-gradient(135deg, #8b0000 0%, #4a0004 100%);
+            --kpu-primary: #580c1f;
+            --kpu-secondary: #8b1531;
+            --kpu-accent: #f59e0b;
+            --kpu-bg: #f8fafc;
+            --kpu-gradient: linear-gradient(145deg, #580c1f 0%, #350511 100%);
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
+            background-color: var(--kpu-bg);
+            color: #1e293b;
             overflow-x: hidden;
         }
 
         .sidebar {
             min-height: 100vh;
-            background: var(--kpu-red-gradient);
+            background: var(--kpu-gradient);
             color: #fff;
-            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .sidebar .brand-box {
-            padding: 22px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 24px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.15);
         }
 
         .sidebar .menu-category {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #ff9999;
-            padding: 12px 20px 4px 20px;
+            letter-spacing: 1.2px;
+            color: #fbbf24;
+            padding: 14px 20px 4px 20px;
             font-weight: 700;
         }
 
         .sidebar .nav-link {
-            color: #f8d7da;
-            padding: 10px 18px;
-            margin: 3px 12px;
-            border-radius: 6px;
+            color: #f1f5f9;
+            padding: 10px 16px;
+            margin: 4px 12px;
+            border-radius: 8px;
             font-weight: 500;
-            font-size: 0.9rem;
-            transition: all 0.2s ease-in-out;
+            font-size: 0.88rem;
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             cursor: pointer;
@@ -63,87 +69,115 @@
         .sidebar .nav-link i {
             margin-right: 10px;
             font-size: 1rem;
+            color: #cbd5e1;
         }
 
         .sidebar .nav-link:hover {
             color: #fff;
             background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
+        }
+
+        .sidebar .nav-link:hover i {
+            color: #fbbf24;
         }
 
         .sidebar .nav-link.active {
             color: #fff;
-            background: #a71d2a;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background: #991b32;
+            box-shadow: 0 4px 12px rgba(153, 27, 50, 0.4);
             font-weight: 600;
         }
 
+        .sidebar .nav-link.active i {
+            color: #fbbf24;
+        }
+
         .sidebar .sub-menu {
-            padding-left: 15px;
+            padding-left: 12px;
         }
 
         .portal-header {
-            background: linear-gradient(135deg, #5c0006 0%, #2b0002 100%);
+            background: linear-gradient(135deg, #6b0f24 0%, #350511 100%);
             color: white;
-            border-radius: 12px;
-            padding: 25px 30px;
-            box-shadow: 0 4px 15px rgba(139, 0, 0, 0.2);
-            margin-bottom: 25px;
+            border-radius: 16px;
+            padding: 28px 32px;
+            box-shadow: 0 10px 25px rgba(88, 12, 31, 0.15);
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .card-custom {
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
             background: #ffffff;
+            border: 1px solid #e2e8f0;
         }
 
-        /* Kontainer Tabel dengan Scroll Kinerja Tinggi */
         .table-scroll-container {
-            max-height: 600px;
+            width: 100%;
+            max-height: 52vh;
             overflow-y: auto;
+            overflow-x: auto;
             position: relative;
         }
 
         .sheet-table {
-            font-size: 0.9rem;
-            white-space: nowrap;
+            width: 100% !important;
+            font-size: 0.85rem;
             margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
-        /* Sticky Header agar tetap terlihat saat di-scroll ke bawah */
         .sheet-table th {
             position: sticky;
             top: 0;
-            background-color: #f8f9fa !important;
-            color: #495057;
-            font-weight: 600;
+            background-color: #f1f5f9 !important;
+            color: #334155;
+            font-weight: 700 !important;
             text-align: center;
             padding: 12px 10px;
+            border-bottom: 2px solid #cbd5e1 !important;
+            border-top: 1px solid #e2e8f0 !important;
+            white-space: nowrap;
             z-index: 10;
-            border-bottom: 2px solid #dee2e6 !important;
         }
 
         .sheet-table td {
-            border: 1px solid #dee2e6 !important;
+            border: 1px solid #e2e8f0 !important;
             vertical-align: middle;
-            padding: 10px 12px;
+            padding: 9px 10px;
+            text-align: center;
+            color: #334155;
+        }
+
+        .sheet-table td.align-left, 
+        .sheet-table th.align-left {
+            text-align: left !important;
         }
 
         .row-index {
-            background-color: #f1f3f5;
-            color: #6c757d;
+            background-color: #f8fafc;
+            color: #64748b;
             text-align: center;
             font-weight: 600;
-            width: 50px;
-            user-select: none;
+            width: 45px;
+            white-space: nowrap;
             position: sticky;
             left: 0;
             z-index: 5;
         }
 
+        .sheet-table th.row-index {
+            z-index: 15;
+            background-color: #f1f5f9 !important;
+        }
+
         .editable-cell:hover {
-            background-color: #fff5f5;
-            outline: 1.5px dashed #8b0000;
+            background-color: #fff1f2;
+            outline: 1.5px dashed #991b32;
             cursor: text;
         }
 
@@ -153,39 +187,30 @@
             right: 25px;
             z-index: 1050;
             display: none;
-            border-radius: 8px;
+            border-radius: 10px;
         }
 
         .chart-container {
             position: relative;
-            height: 350px;
+            height: 280px;
             width: 100%;
         }
 
+        .chart-section-box {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media print {
-            @page {
-                size: 330mm 210mm landscape;
-                margin: 10mm;
-            }
-            body * {
-                visibility: hidden;
-            }
-            #printableArea, #printableArea * {
-                visibility: visible;
-            }
-            #printableArea {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .table-scroll-container {
-                max-height: none !important;
-                overflow: visible !important;
-            }
+            body * { visibility: hidden; }
+            #printableArea, #printableArea * { visibility: visible; }
+            #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+            .table-scroll-container { max-height: none !important; overflow: visible !important; }
         }
     </style>
 </head>
@@ -228,18 +253,18 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
             <div class="portal-header d-flex justify-content-between align-items-center flex-wrap no-print">
                 <div>
-                    <span class="badge bg-warning text-dark mb-2 px-2 py-1 fw-bold" style="font-size: 0.7rem;">PORTAL PUBLIKASI RESMI PILKADES</span>
+                    <span class="badge bg-warning text-dark mb-2 px-2 py-1 fw-bold shadow-sm" style="font-size: 0.7rem;">PORTAL PUBLIKASI RESMI PILKADES</span>
                     <h2 class="fw-bold mb-1 fs-3">PEMILIHAN KEPALA DESA PAYO LEBAR</h2>
                     <p class="text-light opacity-85 mb-0 fw-medium" style="font-size: 0.9rem;">
                         <i class="fas fa-map-marker-alt text-warning me-1"></i> Kecamatan Singkut &bull; Kabupaten Sarolangun &bull; Tahun 2026
                     </p>
                 </div>
                 <div class="mt-3 mt-md-0 d-flex gap-2 align-items-center flex-wrap">
-                    <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" data-bs-toggle="modal" data-bs-target="#chartModal" onclick="generateChart()">
-                        <i class="fas fa-chart-bar me-1"></i> Grafik & Keterangan
+                    <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="toggleChartSection()">
+                        <i class="fas fa-chart-pie me-1" id="chartToggleIcon"></i> <span id="chartToggleText">Tampilkan Grafik Rekap</span>
                     </button>
                     <button class="btn btn-light btn-sm px-3 fw-bold text-danger shadow-sm" onclick="refreshData()">
-                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                        <i class="fas fa-sync-alt me-1"></i> Refresh Cache
                     </button>
                     <div id="authArea">
                         <button class="btn btn-outline-light btn-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">
@@ -249,20 +274,66 @@
                 </div>
             </div>
 
-            <!-- Panel Filter & Tombol Admin -->
-            <div class="d-flex align-items-center justify-content-between mb-3 px-2 flex-wrap gap-2 no-print">
+            <!-- Panel Grafik Rekapitulasi Langsung -->
+            <div class="card card-custom p-3 mb-3 d-none chart-section-box no-print" id="directChartSection">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
+                    <h5 class="fw-bold text-danger mb-0 fs-6"><i class="fas fa-chart-bar me-2"></i> Grafik & Rekapitulasi Jumlah: <span id="directChartTitle">PROFIL CALON KADES</span></h5>
+                    
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label fw-bold text-secondary small mb-0">Kelompokkan Data Berdasarkan:</label>
+                        <select id="chartColumnSelect" class="form-select form-select-sm fw-semibold" style="width: 200px;" onchange="generateChart()">
+                            <!-- Diisi dinamis -->
+                        </select>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="toggleChartSection()" title="Tutup Grafik"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+
+                <div class="chart-container mb-2">
+                    <canvas id="sheetChart"></canvas>
+                </div>
+                <div class="small text-muted text-center" id="chartLegendDescription">
+                    Grafik menghitung jumlah rekapitulasi data otomatis berdasarkan filter aktif.
+                </div>
+            </div>
+
+            <!-- Panel Filter Langsung (NKK/NIK/NAMA, KODE COKLIT, RT) & Tombol Admin -->
+            <div class="d-flex align-items-center justify-content-between mb-3 px-1 flex-wrap gap-2 no-print">
                 <div>
-                    <h4 class="fw-bold text-uppercase fs-5 mb-1" id="currentTitle" style="color: #65000b;">PROFIL CALON KADES</h4>
+                    <h4 class="fw-bold text-uppercase fs-5 mb-1" id="currentTitle" style="color: var(--kpu-primary);">PROFIL CALON KADES</h4>
                     <span id="accessNotice" class="text-muted small">
                         <i class="fas fa-eye text-primary me-1"></i> Mode Publik (Read-Only)
                     </span>
                 </div>
                 
                 <div class="d-flex gap-2 align-items-center flex-wrap">
-                    <!-- Filter Cepat dengan Debounce agar tidak lag -->
-                    <div class="input-group" style="width: 280px;">
-                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" id="tableFilter" class="form-control border-start-0 ps-0" placeholder="Cari data..." oninput="debouncedFilter()">
+                    <!-- Menu Filter Langsung Sejajar -->
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                        <!-- 1. Cari NKK / NIK / Nama -->
+                        <div class="input-group input-group-sm shadow-sm" style="width: 220px;">
+                            <span class="input-group-text bg-light text-secondary"><i class="fas fa-search"></i></span>
+                            <input type="text" id="filterKeyword" class="form-control" placeholder="Cari NKK / NIK / Nama..." oninput="applyFilters()">
+                        </div>
+
+                        <!-- 2. Dropdown Kode Coklit -->
+                        <select id="filterCoklit" class="form-select form-select-sm fw-semibold shadow-sm" style="width: 170px;" onchange="applyFilters()">
+                            <option value="">-- Semua Coklit --</option>
+                            <option value="0">0 - Aktif</option>
+                            <option value="1">1 - Meninggal</option>
+                            <option value="2">2 - Ganda</option>
+                            <option value="3">3 - TNI</option>
+                            <option value="4">4 - Polisi</option>
+                            <option value="5">5 - Pindah (Luar)</option>
+                            <option value="6">6 - Pindah (Dalam)</option>
+                            <option value="7">7 - Pisah KK</option>
+                        </select>
+
+                        <!-- 3. Dropdown RT -->
+                        <select id="filterRt" class="form-select form-select-sm fw-semibold shadow-sm" style="width: 130px;" onchange="applyFilters()">
+                            <option value="">-- Semua RT --</option>
+                        </select>
+
+                        <!-- Tombol Reset Filter -->
+                        <button class="btn btn-outline-secondary btn-sm shadow-sm" type="button" onclick="resetFilter()" title="Reset Semua Filter"><i class="fas fa-redo"></i></button>
                     </div>
 
                     <div id="adminActionButtons" class="d-none gap-2">
@@ -270,13 +341,13 @@
                             <i class="fas fa-file-excel me-1"></i> Ekstrak Excel
                         </button>
                         <button class="btn btn-dark btn-sm fw-bold px-3 shadow-sm" onclick="printFolioLandscape()">
-                            <i class="fas fa-print me-1"></i> Cetak Folio Lanskap
+                            <i class="fas fa-print me-1"></i> Cetak Lanskap
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Printable Area dengan Scroll Performa Tinggi -->
+            <!-- Printable Area dengan Sticky Header -->
             <div class="card card-custom p-3" id="printableArea">
                 <div class="text-center d-none" id="printHeader">
                     <h4 class="fw-bold text-uppercase mb-1">PEMILIHAN KEPALA DESA PAYO LEBAR 2026</h4>
@@ -289,6 +360,14 @@
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Navigasi Paginasi Halaman -->
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top no-print" id="paginationContainer">
+                    <small class="text-muted" id="pageInfo">Menampilkan data...</small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0" id="paginationList"></ul>
+                    </nav>
+                </div>
             </div>
         </main>
     </div>
@@ -298,7 +377,7 @@
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header text-white" style="background: var(--kpu-red-dark);">
+            <div class="modal-header text-white" style="background: var(--kpu-primary);">
                 <h5 class="modal-title fw-bold fs-6"><i class="fas fa-lock me-2"></i> Login Panitia / Admin</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -307,30 +386,7 @@
                     <label class="form-label fw-semibold fs-7">Password Admin</label>
                     <input type="password" id="adminPassword" class="form-control" placeholder="Masukkan password...">
                 </div>
-                <button type="button" class="btn btn-danger w-100 fw-bold" onclick="processLogin()">Masuk sebagai Admin</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Grafik Statistik & Keterangan Kode -->
-<div class="modal fade" id="chartModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header text-white" style="background: var(--kpu-red-dark);">
-                <h5 class="modal-title fw-bold fs-6"><i class="fas fa-chart-line me-2"></i> Grafik & Keterangan: <span id="modalChartTitle">PROFIL CALON KADES</span></h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="chart-container mb-4">
-                    <canvas id="sheetChart"></canvas>
-                </div>
-                <div class="alert alert-light border p-3 rounded-3">
-                    <h6 class="fw-bold text-danger mb-2"><i class="fas fa-info-circle me-1"></i> Keterangan & Indikator Kategori:</h6>
-                    <p class="small text-muted mb-0" id="chartLegendDescription">
-                        Grafik di atas memvisualisasikan data kuantitatif dari sheet aktif.
-                    </p>
-                </div>
+                <button type="button" class="btn btn-danger w-100 fw-bold" style="background: var(--kpu-secondary);" onclick="processLogin()">Masuk sebagai Admin</button>
             </div>
         </div>
     </div>
@@ -352,18 +408,67 @@
 <script>
     let activeSheet = 'PROFIL CALON KADES';
     let currentRawData = [];
+    let filteredData = [];
     let myChart = null;
     let isAdmin = false; 
-    let searchTimeout = null;
+    let currentPage = 1;
+    const rowsPerPage = 50; 
     
-    // URL Web App Google Apps Script Anda yang sudah terhubung
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbybbKth1VoP8OFAb4EpqxoApkNDuHcHdYE9fm1c1mOD7kYRTy_S1f2PaztEHsIGl7AM/exec';
 
-    function loadSheetData(sheetName, element) {
+    const coklitMap = {
+        "0": "Aktif",
+        "1": "Meninggal",
+        "2": "Ganda",
+        "3": "TNI",
+        "4": "Polisi",
+        "5": "Pindah domisili (Luar Desa)",
+        "6": "Pindah Domisili (Dalam Desa)",
+        "7": "Pisah KK",
+        "U": "Ubah",
+        "B": "Baru",
+        "P": "xxxx"
+    };
+
+    function formatDate(val) {
+        if (val === null || val === undefined || val === "") return "";
+        let strVal = String(val);
+        if (strVal.match(/^\d{4}-\d{2}-\d{2}T/)) {
+            try {
+                let dateObj = new Date(strVal);
+                if (!isNaN(dateObj.getTime())) {
+                    let day = String(dateObj.getDate()).padStart(2, '0');
+                    let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    let year = dateObj.getFullYear();
+                    return `${day}-${month}-${year}`;
+                }
+            } catch (e) {
+                return strVal;
+            }
+        }
+        return strVal;
+    }
+
+    function formatCoklitCode(colName, val) {
+        if (val === null || val === undefined || val === "") return "";
+        let cName = String(colName).toUpperCase();
+        let sVal = String(val).trim();
+        
+        if ((cName.includes('KODE') || cName.includes('STATUS') || cName.includes('COKLIT')) && coklitMap.hasOwnProperty(sVal)) {
+            return `${sVal} - ${coklitMap[sVal]}`;
+        }
+        return sVal;
+    }
+
+    function loadSheetData(sheetName, element, forceRefresh = false) {
         activeSheet = sheetName;
         document.getElementById('currentTitle').innerText = sheetName;
-        document.getElementById('modalChartTitle').innerText = sheetName;
-        document.getElementById('tableFilter').value = '';
+        document.getElementById('directChartTitle').innerText = sheetName;
+        
+        // Reset nilai filter saat ganti sheet
+        document.getElementById('filterKeyword').value = '';
+        document.getElementById('filterCoklit').value = '';
+        document.getElementById('filterRt').value = '';
         
         if (element) {
             document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
@@ -371,75 +476,334 @@
         }
 
         const table = document.getElementById('dataTable');
+        
+        const cachedData = sessionStorage.getItem('cache_' + sheetName);
+        if (cachedData && !forceRefresh) {
+            currentRawData = JSON.parse(cachedData);
+            filteredData = currentRawData;
+            currentPage = 1;
+            renderTablePage();
+            populateChartDropdown();
+            populateRtDropdown();
+            if (!document.getElementById('directChartSection').classList.contains('d-none')) {
+                generateChart();
+            }
+            return;
+        }
+
         table.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Sinkronisasi data sheet...</p></td></tr>';
 
         fetch(`${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${new Date().getTime()}`)
             .then(response => response.json())
             .then(data => {
                 currentRawData = data;
-                renderTable(data);
+                filteredData = data;
+                sessionStorage.setItem('cache_' + sheetName, JSON.stringify(data));
+                currentPage = 1;
+                renderTablePage();
+                populateChartDropdown();
+                populateRtDropdown();
+                if (!document.getElementById('directChartSection').classList.contains('d-none')) {
+                    generateChart();
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
-                table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Periksa kembali koneksi atau nama sheet.</td></tr>';
+                table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Periksa kembali koneksi internet Anda.</td></tr>';
             });
     }
 
-    function renderTable(data) {
-        const table = document.getElementById('dataTable');
-        table.innerHTML = '';
+    // Mengisi pilihan RT otomatis dari data kolom yang mengandung kata 'RT'
+    function populateRtDropdown() {
+        const rtSelect = document.getElementById('filterRt');
+        rtSelect.innerHTML = '<option value="">-- Semua RT --</option>';
+        if (!currentRawData || currentRawData.length <= 1) return;
+
+        const headers = currentRawData[0];
+        const rows = currentRawData.slice(1);
         
-        if (!data || data.length === 0) {
+        let rtColIdx = headers.findIndex(h => String(h).toUpperCase().includes('RT'));
+        if (rtColIdx === -1) return;
+
+        let rtSet = new Set();
+        rows.forEach(row => {
+            let val = row[rtColIdx];
+            if (val !== null && val !== undefined && String(val).trim() !== '') {
+                rtSet.add(String(val).trim());
+            }
+        });
+
+        let sortedRt = Array.from(rtSet).sort((a, b) => {
+            let numA = parseInt(a), numB = parseInt(b);
+            return (isNaN(numA) || isNaN(numB)) ? a.localeCompare(b) : numA - numB;
+        });
+
+        sortedRt.forEach(rt => {
+            let opt = document.createElement('option');
+            opt.value = rt;
+            opt.text = `RT ${rt}`;
+            rtSelect.appendChild(opt);
+        });
+    }
+
+    // Fungsi gabungan untuk menyaring berdasarkan Keyword, Coklit, dan RT secara bersamaan
+    function applyFilters() {
+        if (!currentRawData || currentRawData.length <= 1) return;
+
+        const headers = currentRawData[0];
+        const rows = currentRawData.slice(1);
+
+        const keyword = document.getElementById('filterKeyword').value.toLowerCase().trim();
+        const selectedCoklit = document.getElementById('filterCoklit').value;
+        const selectedRt = document.getElementById('filterRt').value;
+
+        // Cari indeks kolom terkait secara otomatis
+        let nkkIdx = headers.findIndex(h => String(h).toUpperCase().includes('NKK'));
+        let nikIdx = headers.findIndex(h => String(h).toUpperCase().includes('NIK'));
+        let namaIdx = headers.findIndex(h => String(h).toUpperCase().includes('NAMA'));
+        let coklitIdx = headers.findIndex(h => String(h).toUpperCase().includes('COKLIT') || String(h).toUpperCase().includes('KODE'));
+        let rtIdx = headers.findIndex(h => String(h).toUpperCase().includes('RT'));
+
+        const matchedRows = rows.filter(row => {
+            // 1. Filter Keyword (Mencari di NKK, NIK, Nama atau semua kolom jika tidak spesifik)
+            let matchKeyword = true;
+            if (keyword !== "") {
+                let valNkk = nkkIdx !== -1 ? String(row[nkkIdx] || '').toLowerCase() : '';
+                let valNik = nikIdx !== -1 ? String(row[nikIdx] || '').toLowerCase() : '';
+                let valNama = namaIdx !== -1 ? String(row[namaIdx] || '').toLowerCase() : '';
+                
+                matchKeyword = valNkk.includes(keyword) || valNik.includes(keyword) || valNama.includes(keyword);
+            }
+
+            // 2. Filter Kode Coklit
+            let matchCoklit = true;
+            if (selectedCoklit !== "" && coklitIdx !== -1) {
+                let cellCoklit = String(row[coklitIdx] || '').trim();
+                matchCoklit = (cellCoklit === selectedCoklit);
+            }
+
+            // 3. Filter RT
+            let matchRt = true;
+            if (selectedRt !== "" && rtIdx !== -1) {
+                let cellRt = String(row[rtIdx] || '').trim();
+                matchRt = (cellRt === selectedRt);
+            }
+
+            return matchKeyword && matchCoklit && matchRt;
+        });
+
+        filteredData = [headers, ...matchedRows];
+        currentPage = 1;
+        renderTablePage();
+
+        if (!document.getElementById('directChartSection').classList.contains('d-none')) {
+            generateChart();
+        }
+    }
+
+    function resetFilter() {
+        document.getElementById('filterKeyword').value = '';
+        document.getElementById('filterCoklit').value = '';
+        document.getElementById('filterRt').value = '';
+        
+        filteredData = currentRawData;
+        currentPage = 1;
+        renderTablePage();
+
+        if (!document.getElementById('directChartSection').classList.contains('d-none')) {
+            generateChart();
+        }
+    }
+
+    function renderTablePage() {
+        const table = document.getElementById('dataTable');
+        if (!currentRawData || currentRawData.length === 0) {
             table.innerHTML = '<tr><td colspan="100" class="text-center py-4 text-muted">Belum ada data tersedia pada sheet ini.</td></tr>';
+            document.getElementById('paginationList').innerHTML = '';
+            document.getElementById('pageInfo').innerText = 'Tidak ada data';
             return;
         }
 
+        const headers = currentRawData[0];
+        const rows = filteredData.slice(1);
+        
+        const totalPages = Math.ceil(rows.length / rowsPerPage) || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const endIdx = startIdx + rowsPerPage;
+        const paginatedRows = rows.slice(startIdx, endIdx);
+
         let headerHtml = '<thead><tr><th class="row-index">#</th>';
-        data[0].forEach((col) => {
-            headerHtml += `<th>${col}</th>`;
+        headers.forEach((col) => {
+            let colNameUpper = String(col).toUpperCase();
+            let isLeftCol = colNameUpper.includes('NAMA') || colNameUpper.includes('ALAMAT') || colNameUpper.includes('DUSUN') || colNameUpper.includes('KETERANGAN');
+            headerHtml += `<th class="${isLeftCol ? 'align-left' : ''}">${col}</th>`;
         });
         headerHtml += '</tr></thead>';
 
         let bodyHtml = '<tbody id="tableBody">';
-        for (let i = 1; i < data.length; i++) {
-            bodyHtml += `<tr>`;
-            bodyHtml += `<td class="row-index">${i + 1}</td>`;
-            
-            data[i].forEach((cell, j) => {
-                if (isAdmin) {
-                    bodyHtml += `<td contenteditable="true" class="editable-cell" onblur="updateData(${i + 1}, ${j}, this)">${cell}</td>`;
-                } else {
-                    bodyHtml += `<td>${cell}</td>`;
-                }
+        if (paginatedRows.length === 0) {
+            bodyHtml += `<tr><td colspan="${headers.length + 1}" class="text-center py-4 text-muted">Data yang dicari tidak ditemukan.</td></tr>`;
+        } else {
+            paginatedRows.forEach((row, idx) => {
+                const absoluteIndex = startIdx + idx + 1;
+                bodyHtml += `<tr>`;
+                bodyHtml += `<td class="row-index">${absoluteIndex}</td>`;
+                
+                row.forEach((cell, j) => {
+                    let displayCell = formatDate(cell);
+                    displayCell = formatCoklitCode(headers[j], displayCell);
+
+                    let colNameUpper = String(headers[j]).toUpperCase();
+                    let isLeftCol = colNameUpper.includes('NAMA') || colNameUpper.includes('ALAMAT') || colNameUpper.includes('DUSUN') || colNameUpper.includes('KETERANGAN');
+                    let alignClass = isLeftCol ? 'align-left' : '';
+
+                    if (isAdmin) {
+                        bodyHtml += `<td contenteditable="true" class="editable-cell ${alignClass}" onblur="updateData(${absoluteIndex + 1}, ${j}, this)">${displayCell}</td>`;
+                    } else {
+                        bodyHtml += `<td class="${alignClass}">${displayCell}</td>`;
+                    }
+                });
+                bodyHtml += `</tr>`;
             });
-            bodyHtml += `</tr>`;
         }
         bodyHtml += '</tbody>';
 
         table.innerHTML = headerHtml + bodyHtml;
+        document.getElementById('pageInfo').innerText = `Menampilkan ${rows.length > 0 ? startIdx + 1 : 0} - ${Math.min(endIdx, rows.length)} dari ${rows.length} data`;
+        renderPaginationControls(totalPages);
     }
 
-    function debouncedFilter() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            filterTable();
-        }, 250);
-    }
+    function renderPaginationControls(totalPages) {
+        const pagList = document.getElementById('paginationList');
+        let html = '';
 
-    function filterTable() {
-        let input = document.getElementById('tableFilter').value.toLowerCase();
-        let tbody = document.getElementById('tableBody');
-        if (!tbody) return;
-        let trs = tbody.getElementsByTagName('tr');
-
-        for (let i = 0; i < trs.length; i++) {
-            let tdText = trs[i].innerText.toLowerCase();
-            if (tdText.includes(input)) {
-                trs[i].style.display = "";
-            } else {
-                trs[i].style.display = "none";
-            }
+        html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Sebelumnya</a></li>`;
+        
+        let startP = Math.max(1, currentPage - 2);
+        let endP = Math.min(totalPages, startP + 4);
+        
+        for (let p = startP; p <= endP; p++) {
+            html += `<li class="page-item ${p === currentPage ? 'active' : ''}"><a class="page-link" href="#" onclick="changePage(${p}); return false;">${p}</a></li>`;
         }
+
+        html += `<li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Selanjutnya</a></li>`;
+        pagList.innerHTML = html;
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        renderTablePage();
+        document.querySelector('.table-scroll-container').scrollTop = 0;
+    }
+
+    function populateChartDropdown() {
+        const select = document.getElementById('chartColumnSelect');
+        select.innerHTML = '';
+        if (!currentRawData || currentRawData.length === 0) return;
+
+        const headers = currentRawData[0];
+        headers.forEach((header, index) => {
+            let opt = document.createElement('option');
+            opt.value = index;
+            opt.text = header;
+            let hUpper = header.toUpperCase();
+            if (hUpper.includes('RT') || hUpper.includes('KODE') || hUpper.includes('STATUS') || hUpper.includes('L/P') || hUpper.includes('KAWIN')) {
+                opt.selected = true;
+            }
+            select.appendChild(opt);
+        });
+    }
+
+    function toggleChartSection() {
+        const section = document.getElementById('directChartSection');
+        const btnText = document.getElementById('chartToggleText');
+        const btnIcon = document.getElementById('chartToggleIcon');
+
+        if (section.classList.contains('d-none')) {
+            section.classList.remove('d-none');
+            btnText.innerText = "Tutup Grafik";
+            btnIcon.className = "fas fa-chart-pie me-1";
+            populateChartDropdown();
+            generateChart();
+        } else {
+            section.classList.add('d-none');
+            btnText.innerText = "Tampilkan Grafik Rekap";
+            btnIcon.className = "fas fa-chart-pie me-1";
+        }
+    }
+
+    function generateChart() {
+        if (!filteredData || filteredData.length <= 1) return;
+
+        const headers = filteredData[0];
+        const rows = filteredData.slice(1);
+        const colIndex = parseInt(document.getElementById('chartColumnSelect').value) || 0;
+        const colName = headers[colIndex];
+
+        let counts = {};
+        rows.forEach(row => {
+            let val = row[colIndex];
+            val = formatCoklitCode(colName, val);
+            if (val === "" || val === null || val === undefined) val = "(Kosong)";
+            
+            counts[val] = (counts[val] || 0) + 1;
+        });
+
+        let sortedKeys = Object.keys(counts).sort((a, b) => {
+            let numA = parseInt(a), numB = parseInt(b);
+            return (isNaN(numA) || isNaN(numB)) ? counts[b] - counts[a] : numA - numB;
+        });
+
+        if (sortedKeys.length > 25) {
+            sortedKeys = sortedKeys.slice(0, 25);
+        }
+
+        const labels = sortedKeys;
+        const values = sortedKeys.map(k => counts[k]);
+
+        document.getElementById('chartLegendDescription').innerHTML = 
+            `Menampilkan rekapitulasi jumlah berdasarkan kolom <b>"${colName}"</b> dari total <b>${rows.length} data</b> tersaring pada sheet <u>${activeSheet}</u>.`;
+
+        const ctx = document.getElementById('sheetChart').getContext('2d');
+        if (myChart) { myChart.destroy(); }
+
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: `Jumlah Total (${colName})`,
+                    data: values,
+                    backgroundColor: 'rgba(153, 27, 50, 0.8)',
+                    borderColor: 'rgba(153, 27, 50, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: true },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let total = rows.length;
+                                let val = context.raw;
+                                let percentage = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                                return ` Jumlah: ${val} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                scales: { 
+                    y: { beginAtZero: true, title: { display: true, text: 'Jumlah (Frekuensi)' } },
+                    x: { title: { display: true, text: colName } }
+                }
+            }
+        });
     }
 
     function processLogin() {
@@ -455,7 +819,7 @@
                     document.getElementById('adminPassword').value = '';
                     
                     updateAuthUI();
-                    loadSheetData(activeSheet, null);
+                    renderTablePage();
                     showToast("Login Berhasil! Fitur Admin Aktif.", "bg-success");
                 } else {
                     alert("Password salah! Silakan coba lagi.");
@@ -467,7 +831,7 @@
     function processLogout() {
         isAdmin = false;
         updateAuthUI();
-        loadSheetData(activeSheet, null);
+        renderTablePage();
         showToast("Berhasil Logout. Kembali ke Mode Publik.", "bg-secondary");
     }
 
@@ -477,20 +841,12 @@
         const adminActionButtons = document.getElementById('adminActionButtons');
 
         if (isAdmin) {
-            authArea.innerHTML = `
-                <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="processLogout()">
-                    <i class="fas fa-sign-out-alt me-1"></i> Logout Admin
-                </button>
-            `;
-            accessNotice.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> Mode Admin Aktif: Edit, Cetak & Ekstrak Excel Terbuka`;
+            authArea.innerHTML = `<button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="processLogout()"><i class="fas fa-sign-out-alt me-1"></i> Logout Admin</button>`;
+            accessNotice.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> Mode Admin Aktif: Edit & Ekstrak Terbuka`;
             adminActionButtons.classList.remove('d-none');
             adminActionButtons.classList.add('d-flex');
         } else {
-            authArea.innerHTML = `
-                <button class="btn btn-outline-light btn-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">
-                    <i class="fas fa-lock me-1"></i> Login Admin
-                </button>
-            `;
+            authArea.innerHTML = `<button class="btn btn-outline-light btn-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fas fa-lock me-1"></i> Login Admin</button>`;
             accessNotice.innerHTML = `<i class="fas fa-eye text-primary me-1"></i> Mode Publik (Read-Only)`;
             adminActionButtons.classList.remove('d-flex');
             adminActionButtons.classList.add('d-none');
@@ -503,14 +859,11 @@
         const row = cellElement.parentNode;
         let rowValues = [];
         for (let k = 1; k < row.cells.length; k++) {
-            rowValues.push(row.cells[k].innerText);
+            let val = row.cells[k].innerText.split(' - ')[0];
+            rowValues.push(val);
         }
 
-        const payload = {
-            sheet: activeSheet,
-            row: rowIdx,
-            values: rowValues
-        };
+        const payload = { sheet: activeSheet, row: rowIdx, values: rowValues };
 
         fetch(WEB_APP_URL, {
             method: 'POST',
@@ -519,13 +872,11 @@
         .then(response => response.json())
         .then(result => {
             if(result.status === 'success') {
-                showToast("Perubahan berhasil disinkronkan ke Spreadsheet", "bg-success");
+                sessionStorage.removeItem('cache_' + activeSheet);
+                showToast("Perubahan berhasil disinkronkan", "bg-success");
             } else {
                 showToast("Gagal menyimpan data", "bg-danger");
             }
-        })
-        .catch(error => {
-            showToast("Terjadi kesalahan jaringan", "bg-danger");
         });
     }
 
@@ -554,62 +905,13 @@
         const toastEl = document.getElementById('statusToast');
         toastEl.className = `toast align-items-center text-white ${bgClass} border-0 p-2 show`;
         document.getElementById('toastMessage').innerHTML = `<i class="fas fa-info-circle me-2"></i> ${msg}`;
-        setTimeout(() => {
-            toastEl.classList.remove('show');
-        }, 2500);
-    }
-
-    function generateChart() {
-        if (!currentRawData || currentRawData.length <= 1) {
-            alert("Data tidak mencukupi untuk dibuat grafik.");
-            return;
-        }
-
-        const headers = currentRawData[0];
-        const rows = currentRawData.slice(1);
-        let labelIdx = 0;
-        let valueIdx = 1;
-
-        for (let j = 0; j < headers.length; j++) {
-            if (!isNaN(rows[0][j]) && rows[0][j] !== "") {
-                valueIdx = j;
-                break;
-            }
-        }
-
-        const labels = rows.map(r => r[labelIdx]);
-        const values = rows.map(r => parseFloat(r[valueIdx]) || 0);
-
-        document.getElementById('chartLegendDescription').innerHTML = 
-            `Grafik menampilkan perbandingan parameter <b>"${headers[labelIdx]}"</b> terhadap <b>"${headers[valueIdx]}"</b> dari total <b>${rows.length} baris data</b> pada sheet <u>${activeSheet}</u>.`;
-
-        const ctx = document.getElementById('sheetChart').getContext('2d');
-        if (myChart) { myChart.destroy(); }
-
-        myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: headers[valueIdx] || 'Nilai Data',
-                    data: values,
-                    backgroundColor: 'rgba(139, 0, 0, 0.75)',
-                    borderColor: 'rgba(139, 0, 0, 1)',
-                    borderWidth: 1,
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: true } },
-                scales: { y: { beginAtZero: true } }
-            }
-        });
+        setTimeout(() => { toastEl.classList.remove('show'); }, 2500);
     }
 
     function refreshData() {
-        loadSheetData(activeSheet, null);
+        sessionStorage.removeItem('cache_' + activeSheet);
+        loadSheetData(activeSheet, null, true);
+        showToast("Cache dibersihkan, data diperbarui!", "bg-success");
     }
 
     window.onload = function() {
