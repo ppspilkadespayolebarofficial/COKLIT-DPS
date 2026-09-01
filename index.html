@@ -97,22 +97,36 @@
             background: #ffffff;
         }
 
+        /* Kontainer Tabel dengan Scroll Kinerja Tinggi */
+        .table-scroll-container {
+            max-height: 600px;
+            overflow-y: auto;
+            position: relative;
+        }
+
         .sheet-table {
             font-size: 0.9rem;
             white-space: nowrap;
+            margin-bottom: 0;
         }
 
-        .sheet-table th, .sheet-table td {
-            border: 1px solid #dee2e6 !important;
-            vertical-align: middle;
-        }
-
+        /* Sticky Header agar tetap terlihat saat di-scroll ke bawah */
         .sheet-table th {
+            position: sticky;
+            top: 0;
             background-color: #f8f9fa !important;
             color: #495057;
             font-weight: 600;
             text-align: center;
             padding: 12px 10px;
+            z-index: 10;
+            border-bottom: 2px solid #dee2e6 !important;
+        }
+
+        .sheet-table td {
+            border: 1px solid #dee2e6 !important;
+            vertical-align: middle;
+            padding: 10px 12px;
         }
 
         .row-index {
@@ -122,10 +136,9 @@
             font-weight: 600;
             width: 50px;
             user-select: none;
-        }
-
-        .sheet-table td {
-            padding: 10px 12px;
+            position: sticky;
+            left: 0;
+            z-index: 5;
         }
 
         .editable-cell:hover {
@@ -149,7 +162,6 @@
             width: 100%;
         }
 
-        /* Pengaturan Cetak Khusus Folio Lanskap (F4 Landscape: 330mm x 210mm) */
         @media print {
             @page {
                 size: 330mm 210mm landscape;
@@ -169,6 +181,10 @@
             }
             .no-print {
                 display: none !important;
+            }
+            .table-scroll-container {
+                max-height: none !important;
+                overflow: visible !important;
             }
         }
     </style>
@@ -233,7 +249,7 @@
                 </div>
             </div>
 
-            <!-- Panel Filter & Tombol Khusus Admin (Cetak & Ekstrak Excel) -->
+            <!-- Panel Filter & Tombol Admin -->
             <div class="d-flex align-items-center justify-content-between mb-3 px-2 flex-wrap gap-2 no-print">
                 <div>
                     <h4 class="fw-bold text-uppercase fs-5 mb-1" id="currentTitle" style="color: #65000b;">PROFIL CALON KADES</h4>
@@ -243,31 +259,30 @@
                 </div>
                 
                 <div class="d-flex gap-2 align-items-center flex-wrap">
-                    <!-- Kotak Pencarian / Filter Berdasarkan RT, Kode Coklit, Nama, dll -->
+                    <!-- Filter Cepat dengan Debounce agar tidak lag -->
                     <div class="input-group" style="width: 280px;">
                         <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" id="tableFilter" class="form-control border-start-0 ps-0" placeholder="Cari (RT, Coklit, Nama...)" onkeyup="filterTable()">
+                        <input type="text" id="tableFilter" class="form-control border-start-0 ps-0" placeholder="Cari (RT, Coklit, Nama...)" oninput="debouncedFilter()">
                     </div>
 
-                    <!-- Tombol Tambahan Khusus Admin (Akan otomatis muncul saat login) -->
                     <div id="adminActionButtons" class="d-none gap-2">
-                        <button class="btn btn-success btn-sm fw-bold px-3 shadow-sm" onclick="exportToExcel()" title="Ekstrak data terfilter ke Excel">
+                        <button class="btn btn-success btn-sm fw-bold px-3 shadow-sm" onclick="exportToExcel()">
                             <i class="fas fa-file-excel me-1"></i> Ekstrak Excel
                         </button>
-                        <button class="btn btn-dark btn-sm fw-bold px-3 shadow-sm" onclick="printFolioLandscape()" title="Cetak F4 Lanskap">
+                        <button class="btn btn-dark btn-sm fw-bold px-3 shadow-sm" onclick="printFolioLandscape()">
                             <i class="fas fa-print me-1"></i> Cetak Folio Lanskap
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Area yang akan dicetak (Printable Area) -->
+            <!-- Printable Area dengan Scroll Performa Tinggi -->
             <div class="card card-custom p-3" id="printableArea">
                 <div class="text-center d-none" id="printHeader">
                     <h4 class="fw-bold text-uppercase mb-1">PEMILIHAN KEPALA DESA PAYO LEBAR 2026</h4>
                     <p class="text-muted small mb-3">Laporan Dokumen Resmi - <span id="printSheetName"></span></p>
                 </div>
-                <div class="table-responsive">
+                <div class="table-scroll-container">
                     <table class="table sheet-table align-middle" id="dataTable">
                         <tbody>
                             <tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Memuat database server...</p></td></tr>
@@ -339,6 +354,7 @@
     let currentRawData = [];
     let myChart = null;
     let isAdmin = false; 
+    let searchTimeout = null;
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzrYFB9sXumZzGFyxLTGQaZ7vCv5whO-9x5aZnNcqrvHPQa0mZFTQX86AdkyexgR9g/exec';
 
     function loadSheetData(sheetName, element) {
@@ -383,6 +399,7 @@
         headerHtml += '</tr></thead>';
 
         let bodyHtml = '<tbody id="tableBody">';
+        // Batasi render awal atau render menggunakan fragmen string secara efisien
         for (let i = 1; i < data.length; i++) {
             bodyHtml += `<tr>`;
             bodyHtml += `<td class="row-index">${i + 1}</td>`;
@@ -401,7 +418,14 @@
         table.innerHTML = headerHtml + bodyHtml;
     }
 
-    // Filter Universal (Mencakup RT, Kode Coklit, NIK, Nama, dll.)
+    // Fungsi Debounced Filter (Mencegah lag macet-macet saat mengetik cepat)
+    function debouncedFilter() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterTable();
+        }, 250); // Eksekusi pencarian 250ms setelah berhenti mengetik
+    }
+
     function filterTable() {
         let input = document.getElementById('tableFilter').value.toLowerCase();
         let tbody = document.getElementById('tableBody');
@@ -505,7 +529,6 @@
         });
     }
 
-    // Fungsi Cetak Format Folio Lanskap (F4 Landscape)
     function printFolioLandscape() {
         document.getElementById('printSheetName').innerText = activeSheet;
         document.getElementById('printHeader').classList.remove('d-none');
@@ -513,12 +536,10 @@
         document.getElementById('printHeader').classList.add('d-none');
     }
 
-    // Fungsi Ekstrak Data Terfilter ke Excel (.xls)
     function exportToExcel() {
         let table = document.getElementById('dataTable');
         let html = table.outerHTML;
         
-        // Buat file Blob berformat Excel HTML
         let blob = new Blob(['\ufeff' + html], {
             type: 'application/vnd.ms-excel'
         });
@@ -564,7 +585,6 @@
         const labels = rows.map(r => r[labelIdx]);
         const values = rows.map(r => parseFloat(r[valueIdx]) || 0);
 
-        // Keterangan dinamis untuk kotak informasi grafik
         document.getElementById('chartLegendDescription').innerHTML = 
             `Grafik menampilkan perbandingan parameter <b>"${headers[labelIdx]}"</b> terhadap <b>"${headers[valueIdx]}"</b> dari total <b>${rows.length} baris data</b> pada sheet <u>${activeSheet}</u>.`;
 
