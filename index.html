@@ -652,7 +652,9 @@
         return sVal;
     }
 
+    // Fungsi Sensor Otomatis: Publik tersensor XXX, Admin tampil utuh
     function maskSensitiveData(colName, val) {
+        if (isAdmin) return val; // Jika admin login, tampilkan data asli tanpa sensor
         if (val === null || val === undefined || val === "") return "";
         let cName = String(colName).toUpperCase();
         let sVal = String(val).trim();
