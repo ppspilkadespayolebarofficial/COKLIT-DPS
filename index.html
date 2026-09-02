@@ -413,6 +413,7 @@
                             <option value="100">100 baris</option>
                             <option value="500">500 baris</option>
                             <option value="1000">1000 baris</option>
+                            <option value="5000">5000 baris</option>
                         </select>
                     </div>
                     <nav>
@@ -451,9 +452,9 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-3 position-relative">
                         <label class="form-label fw-bold text-secondary small">Cari Pemilih Asal (Berdasarkan NIK / Nama):</label>
-                        <input type="text" id="searchPemilihAsal" class="form-control" placeholder="Ketik NIK atau Nama pemilih..." oninput="searchPemilihDatabase()">
+                        <input type="text" id="searchPemilihAsal" class="form-control" placeholder="Ketik NIK atau Nama pemilih..." autocomplete="off" oninput="searchPemilihDatabase()">
                         <div id="searchResultBox" class="list-group position-absolute shadow-sm w-100 mt-1" style="z-index: 1000; max-height: 150px; overflow-y: auto;"></div>
                     </div>
 
@@ -576,6 +577,7 @@
     let rowsPerPage = 50; 
     let selectedTargetRowIndex = null;
     
+    // URL Web App Google Apps Script
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbybbKth1VoP8OFAb4EpqxoApkNDuHcHdYE9fm1c1mOD7kYRTy_S1f2PaztEHsIGl7AM/exec';
 
     const coklitMap = {
@@ -745,7 +747,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Periksa kembali koneksi internet Anda.</td></tr>';
+                table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Periksa kembali koneksi internet Anda atau pastikan Web App sudah ter-deploy dengan benar.</td></tr>';
             });
     }
 
