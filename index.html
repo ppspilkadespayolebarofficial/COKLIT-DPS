@@ -184,6 +184,10 @@
             color: #9b1c1c !important;
         }
 
+        .border-top-family td {
+            border-top: 3px solid #94a3b8 !important;
+        }
+
         .row-index {
             background-color: #f8fafc;
             color: #64748b;
@@ -212,8 +216,12 @@
 
         .chart-container {
             position: relative;
-            height: 270px;
+            height: 250px;
             width: 100%;
+        }
+
+        .chart-section-box {
+            animation: fadeIn 0.3s ease-in-out;
         }
 
         .realtime-clock-box-bottom {
@@ -228,6 +236,11 @@
             align-items: center;
             gap: 10px;
             backdrop-filter: blur(5px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media print {
@@ -253,12 +266,12 @@
             
             <div class="py-2" id="menuList">
                 <div class="menu-category">Menu Utama</div>
-                <a class="nav-link active" onclick="loadSheetData('INPUT SUARA', this)"><i class="fas fa-chart-line"></i>Live Real-Count</a>
+                <a class="nav-link" onclick="loadSheetData('INPUT SUARA', this)"><i class="fas fa-chart-line"></i>Live Real-Count</a>
                 <a class="nav-link" onclick="loadSheetData('PROFIL CALON KADES', this)"><i class="fas fa-user-tie"></i>Profil Calon Kades</a>
 
                 <div class="menu-category">Data Pemilih</div>
                 <div class="sub-menu">
-                    <a class="nav-link" onclick="loadSheetData('DPT AWAL KPU', this)"><i class="fas fa-users"></i>DPT Awal KPU</a>
+                    <a class="nav-link active" onclick="loadSheetData('DPT AWAL KPU', this)"><i class="fas fa-users"></i>DPT Awal KPU</a>
                     <a class="nav-link" onclick="loadSheetData('DPS (SEMENTARA)', this)"><i class="fas fa-user-clock"></i>DPS (Semua)</a>
                     <a class="nav-link" onclick="loadSheetData('DPTAM (TAMBAHAN)', this)"><i class="fas fa-user-plus"></i>DPTAM (Tambahan)</a>
                     <a class="nav-link" onclick="loadSheetData('DPT (TETAP)', this)"><i class="fas fa-address-book"></i>DPT (Tetap)</a>
@@ -288,7 +301,10 @@
                     </div>
                     
                     <div class="col-lg-5 text-lg-end d-flex justify-content-lg-end align-items-center gap-2 flex-wrap" id="headerActionButtonsContainer">
-                        <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="refreshData()">
+                        <button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" id="toggleChartBtn" onclick="toggleChartSection()">
+                            <i class="fas fa-chart-pie me-1" id="chartToggleIcon"></i> <span id="chartToggleText">Tampilkan Akumulasi & Grafik</span>
+                        </button>
+                        <button class="btn btn-light btn-sm px-3 fw-bold text-danger shadow-sm" onclick="refreshData()">
                             <i class="fas fa-sync-alt me-1"></i> Refresh Cache
                         </button>
                         <div id="authArea">
@@ -309,51 +325,56 @@
                 </div>
             </div>
 
-            <!-- Panel Khusus Real-Count (Hanya Tampil di Menu INPUT SUARA) -->
-            <div id="realCountDashboardPanel" class="no-print">
-                <!-- Kotak Statistik Utama Real-Count -->
-                <div class="row g-3 mb-4">
+            <!-- Panel Akumulasi & Grafik Terpisah Sesuai Kode Coklit -->
+            <div class="card card-custom p-4 mb-3 d-none chart-section-box no-print" id="directChartSection">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
+                    <h5 class="fw-bold text-danger mb-0 fs-6"><i class="fas fa-chart-bar me-2"></i> Akumulasi Data & Grafik Coklit: <span id="directChartTitle">DPT AWAL KPU</span></h5>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="toggleChartSection()" title="Tutup Grafik"><i class="fas fa-times"></i></button>
+                </div>
+
+                <!-- Kotak Akumulasi Ringkasan Data (MS, TMS, dll) -->
+                <div class="row g-3 mb-4" id="summaryAccumulationCards">
                     <div class="col-md-3">
                         <div class="stat-card bg-primary">
-                            <div class="small fw-semibold text-white-50 uppercase">Progres TPS Masuk</div>
-                            <h3 class="fw-bold mb-0" id="rcTpsProgress">0 / 0 TPS</h3>
+                            <div class="small fw-semibold text-white-50 uppercase">Total Pemilih</div>
+                            <h3 class="fw-bold mb-0" id="accTotalCount">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card bg-success">
-                            <div class="small fw-semibold text-white-50 uppercase">Total Suara Sah</div>
-                            <h3 class="fw-bold mb-0" id="rcTotalSuaraSah">0</h3>
+                            <div class="small fw-semibold text-white-50 uppercase">Memenuhi Syarat (MS - Aktif)</div>
+                            <h3 class="fw-bold mb-0" id="accMsCount">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card bg-danger">
-                            <div class="small fw-semibold text-white-50 uppercase">Suara Tidak Sah</div>
-                            <h3 class="fw-bold mb-0" id="rcTotalSuaraTidakSah">0</h3>
+                            <div class="small fw-semibold text-white-50 uppercase">Tidak Memenuhi Syarat (TMS)</div>
+                            <h3 class="fw-bold mb-0" id="accTmsCount">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card bg-warning text-dark">
-                            <div class="small fw-semibold text-dark opacity-75 uppercase">Total Suara Masuk</div>
-                            <h3 class="fw-bold mb-0" id="rcTotalSuaraMasuk">0</h3>
+                            <div class="small fw-semibold text-dark opacity-75 uppercase">Ubah / Baru / Pindah / Lainnya</div>
+                            <h3 class="fw-bold mb-0" id="accOtherCount">0</h3>
                         </div>
                     </div>
                 </div>
 
-                <!-- Grafik Persentase Calon & Perbandingan TPS -->
-                <div class="row g-4 mb-4">
+                <!-- Grafik Terpisah (2 Kolom Chart: MS & TMS vs Detail Coklit Lainnya) -->
+                <div class="row g-4">
                     <div class="col-lg-6">
-                        <div class="card card-custom p-4 h-100">
-                            <h5 class="fw-bold text-danger mb-3 fs-6"><i class="fas fa-chart-pie me-2"></i> Diagram Persentase Perolehan Suara Calon Kades</h5>
+                        <div class="p-3 border rounded-3 bg-light">
+                            <h6 class="fw-bold text-center mb-3 text-secondary">Proporsi Status Utama (MS vs TMS)</h6>
                             <div class="chart-container">
-                                <canvas id="candidatePercentageChart"></canvas>
+                                <canvas id="msTmsChart"></canvas>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div class="card card-custom p-4 h-100">
-                            <h5 class="fw-bold text-danger mb-3 fs-6"><i class="fas fa-chart-bar me-2"></i> Perbandingan Suara Sah per TPS</h5>
+                        <div class="p-3 border rounded-3 bg-light">
+                            <h6 class="fw-bold text-center mb-3 text-secondary">Rincian Lengkap per Kode Coklit</h6>
                             <div class="chart-container">
-                                <canvas id="tpsComparisonChart"></canvas>
+                                <canvas id="detailedCoklitChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -363,25 +384,35 @@
             <!-- Panel Filter & Tombol Aksi Khusus Admin -->
             <div class="d-flex align-items-center justify-content-between mb-3 px-1 flex-wrap gap-2 no-print" id="filterAndActionContainer">
                 <div>
-                    <h4 class="fw-bold text-uppercase fs-5 mb-0" id="currentTitle" style="color: var(--kpu-primary);">LIVE REAL-COUNT</h4>
+                    <h4 class="fw-bold text-uppercase fs-5 mb-0" id="currentTitle" style="color: var(--kpu-primary);">DPT AWAL KPU</h4>
                 </div>
                 
                 <div class="d-flex gap-2 align-items-center flex-wrap">
                     <div class="d-flex gap-2 align-items-center flex-wrap" id="filterControlsBox">
-                        <div class="input-group input-group-sm shadow-sm" style="width: 220px;" id="searchBoxContainer">
+                        <div class="input-group input-group-sm shadow-sm" style="width: 200px;">
                             <span class="input-group-text bg-light text-secondary"><i class="fas fa-search"></i></span>
-                            <input type="text" id="filterKeyword" class="form-control" placeholder="Cari data..." oninput="applyFilters()">
+                            <input type="text" id="filterKeyword" class="form-control" placeholder="Cari NKK / NIK / Nama..." oninput="applyFilters()">
                         </div>
 
-                        <select id="filterCoklit" class="form-select form-select-sm fw-semibold shadow-sm d-none" style="width: 175px;" onchange="applyFilters()">
+                        <select id="filterCoklit" class="form-select form-select-sm fw-semibold shadow-sm" style="width: 175px;" onchange="applyFilters()">
                             <option value="">-- Semua Coklit --</option>
+                            <option value="0">0 - Aktif (MS)</option>
+                            <option value="1">1 - Meninggal (TMS)</option>
+                            <option value="2">2 - Ganda (TMS)</option>
+                            <option value="3">3 - TNI (TMS)</option>
+                            <option value="4">4 - Polisi (TMS)</option>
+                            <option value="5">5 - Pindah Luar Desa (TMS)</option>
+                            <option value="6">6 - Pindah Dalam Desa</option>
+                            <option value="7">7 - Pisah KK</option>
+                            <option value="U">U - Ubah</option>
+                            <option value="B">B - Baru</option>
                         </select>
 
-                        <select id="filterRt" class="form-select form-select-sm fw-semibold shadow-sm d-none" style="width: 140px;" onchange="applyFilters()">
-                            <option value="">-- Semua RT --</option>
+                        <select id="filterRt" class="form-select form-select-sm fw-semibold shadow-sm" style="width: 140px;" onchange="applyFilters()">
+                            <option value="">-- Semua RT (1-36) --</option>
                         </select>
 
-                        <button class="btn btn-outline-secondary btn-sm shadow-sm" type="button" onclick="resetFilter()" title="Reset Filter"><i class="fas fa-redo"></i></button>
+                        <button class="btn btn-outline-secondary btn-sm shadow-sm" type="button" onclick="resetFilter()" title="Reset Semua Filter"><i class="fas fa-redo"></i></button>
                     </div>
 
                     <!-- Tombol Fitur Khusus Admin -->
@@ -417,6 +448,7 @@
                             <option value="50">50 baris</option>
                             <option value="100">100 baris</option>
                             <option value="500">500 baris</option>
+                            <option value="1000">1000 baris</option>
                             <option value="5000" selected>5000 baris</option>
                         </select>
                     </div>
@@ -429,21 +461,89 @@
     </div>
 </div>
 
-<!-- Modal Edit Baris Input Suara / Data Pemilih -->
+<!-- Modal Edit & Tambah Data Coklit Langsung per Baris -->
 <div class="modal fade" id="adminRowEditModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header text-white" style="background: var(--kpu-primary);">
-                <h5 class="modal-title fw-bold fs-6"><i class="fas fa-edit me-2"></i> Edit Data Baris Sheet</h5>
+                <h5 class="modal-title fw-bold fs-6"><i class="fas fa-user-edit me-2"></i> Edit Data & Aksi Coklit Pemilih</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <form id="formRowEditAction" onsubmit="event.preventDefault(); executeRowEditAction();">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small">Status / Kode Coklit:</label>
+                        <select id="rowEditCoklitType" class="form-select fw-semibold" onchange="toggleRowEditFields()">
+                            <option value="0">0 - Aktif (MS)</option>
+                            <option value="1">1 - Meninggal (TMS)</option>
+                            <option value="2">2 - Ganda (TMS)</option>
+                            <option value="3">3 - TNI (TMS)</option>
+                            <option value="4">4 - Polisi (TMS)</option>
+                            <option value="5">5 - Pindah domisili Luar Desa (TMS)</option>
+                            <option value="6">6 - Pindah Domisili Dalam Desa (Pindah RT 1 s.d 36)</option>
+                            <option value="7">7 - Pisah KK (Buat NKK & Anggota Keluarga Baru)</option>
+                            <option value="U">U - Ubah</option>
+                            <option value="B">B - Baru</option>
+                        </select>
+                    </div>
+
                     <div class="p-3 bg-light rounded-3 mb-3 border" id="selectedRowTargetInfo"></div>
-                    <div class="border-top pt-3">
-                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-pencil-alt me-1"></i> Sesuaikan Nilai Kolom</h6>
+
+                    <div id="panelRowUbah" class="border-top pt-3 d-none">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-edit me-1"></i> Form Edit Kolom Data Pemilih</h6>
                         <div id="dynamicRowEditFieldsContainer" class="row g-3"></div>
                     </div>
+
+                    <div id="panelRowPindahLuar" class="border-top pt-3 d-none">
+                        <h6 class="fw-bold text-danger mb-3"><i class="fas fa-external-link-alt me-1"></i> Detail Pindah Domisili Luar Desa</h6>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold">Keterangan Tujuan Pindah:</label>
+                                <input type="text" id="targetRowPindahLuarInput" class="form-control form-control-sm" placeholder="Contoh: Pindah ke Kota Jambi...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="panelRowPindahDalam" class="border-top pt-3 d-none">
+                        <h6 class="fw-bold text-danger mb-3"><i class="fas fa-exchange-alt me-1"></i> Pindah Domisili Dalam Desa (Pilih RT 1 s.d 36)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Pindah Ke RT Tujuan (1 - 36):</label>
+                                <select id="targetRowRtSelect" class="form-select form-select-sm"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="panelRowPisahKK" class="border-top pt-3 d-none">
+                        <h6 class="fw-bold text-danger mb-3"><i class="fas fa-house-user me-1"></i> Form Pisah KK</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Nomor Kartu Keluarga (NKK) Baru:</label>
+                                <input type="text" id="rowNewNkkInput" class="form-control form-control-sm" placeholder="16 digit NKK baru...">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">NIK Anggota Keluarga Baru:</label>
+                                <input type="text" id="rowNewNikInput" class="form-control form-control-sm" placeholder="NIK baru...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Nama Lengkap:</label>
+                                <input type="text" id="rowNewNamaInput" class="form-control form-control-sm" placeholder="Nama lengkap...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Tempat Lahir:</label>
+                                <input type="text" id="rowNewTempatLahirInput" class="form-control form-control-sm" placeholder="Kota kelahiran...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Tanggal Lahir:</label>
+                                <input type="date" id="rowNewTglLahirInput" class="form-control form-control-sm" onchange="calculateRowAutoAge()">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Usia (Otomatis):</label>
+                                <input type="text" id="rowCalculatedAgeOutput" class="form-control form-control-sm bg-white" readonly placeholder="Otomatis...">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mt-4 text-end">
                         <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-danger btn-sm px-4 fw-bold" id="btnSubmitRowEdit">Simpan Perubahan</button>
@@ -489,11 +589,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    let activeSheet = 'INPUT SUARA';
+    let activeSheet = 'DPT AWAL KPU';
     let currentRawData = [];
     let filteredData = [];
-    let candidatePieChartInstance = null;
-    let tpsBarChartInstance = null;
+    let msTmsChartInstance = null;
+    let detailChartInstance = null;
     let isAdmin = false; 
     let currentPage = 1;
     let rowsPerPage = 5000; 
@@ -501,6 +601,21 @@
     let editingTargetRowData = null;
     
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzqLHfzqRu5g5znrLsCdxDU3FpwKywaO9ds2UuoRhsm3zChuKyRy-7-XybQ8kYdzELfvg/exec';
+
+    const coklitMap = {
+        "0": "Aktif (MS)",
+        "1": "Meninggal (TMS)",
+        "2": "Ganda (TMS)",
+        "3": "TNI (TMS)",
+        "4": "Polisi (TMS)",
+        "5": "Pindah Luar Desa (TMS)",
+        "6": "Pindah Dalam Desa",
+        "7": "Pisah KK",
+        "U": "Ubah",
+        "B": "Baru"
+    };
+
+    const tmsCodes = ["1", "2", "3", "4", "5"];
     const committeeSheets = ['PPS (PANITIA DESA)', 'PENGAWAS BPD', 'KPPS TPS 01', 'KPPS TPS 02'];
 
     function updateRealtimeClock() {
@@ -520,27 +635,85 @@
         if (clockElement) clockElement.innerText = clockString;
     }
 
+    function formatDate(val) {
+        if (val === null || val === undefined || val === "") return "";
+        let strVal = String(val);
+        if (strVal.match(/^\d{4}-\d{2}-\d{2}T/)) {
+            try {
+                let dateObj = new Date(strVal);
+                if (!isNaN(dateObj.getTime())) {
+                    let day = String(dateObj.getDate()).padStart(2, '0');
+                    let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    let year = dateObj.getFullYear();
+                    return `${day}/${month}/${year}`;
+                }
+            } catch (e) { return strVal; }
+        }
+        return strVal;
+    }
+
+    function formatCoklitCode(colName, val) {
+        if (val === null || val === undefined || val === "") return "";
+        let cName = String(colName).toUpperCase();
+        let sVal = String(val).trim();
+        
+        if ((cName.includes('KODE') || cName.includes('STATUS') || cName.includes('COKLIT')) && coklitMap.hasOwnProperty(sVal)) {
+            return `${sVal} - ${coklitMap[sVal]}`;
+        }
+        return sVal;
+    }
+
+    function maskSensitiveData(colName, val) {
+        if (isAdmin) return val; 
+        if (val === null || val === undefined || val === "") return "";
+        let cName = String(colName).toUpperCase();
+        let sVal = String(val).trim();
+
+        if (cName.includes('NKK') || cName.includes('NO KK') || cName.includes('NOMOR KARTU KELUARGA')) {
+            if (sVal.length > 6) return sVal.substring(0, 6) + 'XXXXXX' + sVal.substring(sVal.length - 4);
+        } else if (cName.includes('NIK') || cName.includes('NO KTP') || cName.includes('NOMOR INDUK KEPENDUDUKAN')) {
+            if (sVal.length > 6) return sVal.substring(0, 6) + 'XXXXXX' + sVal.substring(sVal.length - 4);
+        }
+        return sVal;
+    }
+
+    function calculateRowAutoAge() {
+        const tglLhrVal = document.getElementById('rowNewTglLahirInput').value;
+        if (!tglLhrVal) return;
+        let birthDate = new Date(tglLhrVal);
+        let targetDate = new Date('2026-10-29');
+        let age = targetDate.getFullYear() - birthDate.getFullYear();
+        let m = targetDate.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && targetDate.getDate() < birthDate.getDate())) age--;
+        document.getElementById('rowCalculatedAgeOutput').value = age >= 0 ? `${age} Tahun` : '0 Tahun';
+    }
+
     function loadSheetData(sheetName, element, forceRefresh = false) {
         activeSheet = sheetName;
         document.getElementById('currentTitle').innerText = sheetName;
+        document.getElementById('directChartTitle').innerText = sheetName;
         
         document.getElementById('filterKeyword').value = '';
+        document.getElementById('filterCoklit').value = '';
+        document.getElementById('filterRt').value = '';
         
         if (element) {
             document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
         }
 
-        const isRealCount = (sheetName === 'INPUT SUARA');
-        const realCountPanel = document.getElementById('realCountDashboardPanel');
-        const searchBoxContainer = document.getElementById('searchBoxContainer');
+        const isCommittee = committeeSheets.includes(sheetName);
+        const toggleChartBtn = document.getElementById('toggleChartBtn');
+        const filterControlsBox = document.getElementById('filterControlsBox');
+        const directChartSection = document.getElementById('directChartSection');
 
-        if (isRealCount) {
-            realCountPanel.classList.remove('d-none');
-            searchBoxContainer.classList.add('d-none');
+        if (isCommittee) {
+            if (toggleChartBtn) toggleChartBtn.classList.add('d-none');
+            if (filterControlsBox) filterControlsBox.classList.add('d-none');
+            if (directChartSection) directChartSection.classList.add('d-none');
         } else {
-            realCountPanel.classList.add('d-none');
-            searchBoxContainer.classList.remove('d-none');
+            if (toggleChartBtn) toggleChartBtn.classList.remove('d-none');
+            if (filterControlsBox) filterControlsBox.classList.remove('d-none');
         }
 
         const table = document.getElementById('dataTable');
@@ -550,7 +723,11 @@
             filteredData = currentRawData;
             currentPage = 1;
             renderTablePage();
-            if (isRealCount) generateRealCountChartsAndStats();
+            populateRtDropdown();
+            populateRowRtSelect();
+            if (!isCommittee && !document.getElementById('directChartSection').classList.contains('d-none')) {
+                generateSeparateChartsAndAccumulation();
+            }
             return;
         }
 
@@ -564,7 +741,11 @@
                 sessionStorage.setItem('cache_' + sheetName, JSON.stringify(data));
                 currentPage = 1;
                 renderTablePage();
-                if (isRealCount) generateRealCountChartsAndStats();
+                populateRtDropdown();
+                populateRowRtSelect();
+                if (!isCommittee && !document.getElementById('directChartSection').classList.contains('d-none')) {
+                    generateSeparateChartsAndAccumulation();
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -572,29 +753,92 @@
             });
     }
 
+    function populateRtDropdown() {
+        if (committeeSheets.includes(activeSheet)) return;
+        const rtSelect = document.getElementById('filterRt');
+        rtSelect.innerHTML = '<option value="">-- Semua RT (1-36) --</option>';
+        for (let i = 1; i <= 36; i++) {
+            let opt = document.createElement('option');
+            opt.value = String(i);
+            opt.text = `RT ${String(i).padStart(2, '0')}`;
+            rtSelect.appendChild(opt);
+        }
+    }
+
+    function populateRowRtSelect() {
+        const rtSelect = document.getElementById('targetRowRtSelect');
+        rtSelect.innerHTML = '';
+        for (let i = 1; i <= 36; i++) {
+            let opt = document.createElement('option');
+            opt.value = String(i);
+            opt.text = `RT ${String(i).padStart(2, '0')}`;
+            rtSelect.appendChild(opt);
+        }
+    }
+
     function applyFilters() {
-        if (activeSheet === 'INPUT SUARA') return;
+        if (committeeSheets.includes(activeSheet)) return;
         if (!currentRawData || currentRawData.length <= 1) return;
 
         const headers = currentRawData[0];
         const rows = currentRawData.slice(1);
+
         const keyword = document.getElementById('filterKeyword').value.toLowerCase().trim();
+        const selectedCoklit = document.getElementById('filterCoklit').value;
+        const selectedRt = document.getElementById('filterRt').value;
+
+        let coklitIdx = headers.findIndex(h => {
+            let hUp = String(h).toUpperCase();
+            return hUp.includes('KODE COKLIT') || hUp.includes('COKLIT');
+        });
+        let rtIdx = headers.findIndex(h => String(h).toUpperCase().includes('RT'));
+        let nkkIdx = headers.findIndex(h => {
+            let hUp = String(h).toUpperCase();
+            return hUp.includes('NKK') || hUp.includes('NO KK');
+        });
 
         const matchedRows = rows.filter(row => {
-            if (keyword === "") return true;
-            return row.some(cell => String(cell || '').toLowerCase().includes(keyword));
+            let matchKeyword = true;
+            if (keyword !== "") matchKeyword = row.some(cell => String(cell || '').toLowerCase().includes(keyword));
+
+            let matchCoklit = true;
+            if (selectedCoklit !== "" && coklitIdx !== -1) {
+                let cellCoklit = String(row[coklitIdx] || '').trim();
+                matchCoklit = (cellCoklit === selectedCoklit);
+            }
+
+            let matchRt = true;
+            if (selectedRt !== "" && rtIdx !== -1) {
+                let cellRt = String(row[rtIdx] || '').trim();
+                matchRt = (cellRt === selectedRt);
+            }
+
+            return matchKeyword && matchCoklit && matchRt;
         });
+
+        if (selectedRt !== "" && nkkIdx !== -1) {
+            matchedRows.sort((a, b) => String(a[nkkIdx] || '').trim().localeCompare(String(b[nkkIdx] || '').trim()));
+        }
 
         filteredData = [headers, ...matchedRows];
         currentPage = 1;
         renderTablePage();
+
+        if (!document.getElementById('directChartSection').classList.contains('d-none')) {
+            generateSeparateChartsAndAccumulation();
+        }
     }
 
     function resetFilter() {
         document.getElementById('filterKeyword').value = '';
+        document.getElementById('filterCoklit').value = '';
+        document.getElementById('filterRt').value = '';
         filteredData = currentRawData;
         currentPage = 1;
         renderTablePage();
+        if (!document.getElementById('directChartSection').classList.contains('d-none')) {
+            generateSeparateChartsAndAccumulation();
+        }
     }
 
     function changeRowsPerPage() {
@@ -621,13 +865,20 @@
         const endIdx = startIdx + rowsPerPage;
         const paginatedRows = rows.slice(startIdx, endIdx);
 
+        let coklitColIdx = headers.findIndex(h => {
+            let hUp = String(h).toUpperCase();
+            return hUp.includes('KODE COKLIT') || hUp.includes('COKLIT');
+        });
+        let nkkIdx = headers.findIndex(h => {
+            let hUp = String(h).toUpperCase();
+            return hUp.includes('NKK') || hUp.includes('NO KK');
+        });
+
         let headerHtml = '<thead><tr><th class="row-index">#</th>';
         if (isAdmin) headerHtml += '<th class="no-print text-center" style="width: 90px;">AKSI</th>';
-        
         headers.forEach((col) => {
-            let colName = String(col);
-            let isLeft = colName.toUpperCase().includes('NAMA') || colName.toUpperCase().includes('ALAMAT');
-            headerHtml += `<th class="${isLeft ? 'align-left' : ''}">${colName}</th>`;
+            let isLeftCol = String(col).toUpperCase().includes('NAMA') || String(col).toUpperCase().includes('ALAMAT') || String(col).toUpperCase().includes('DUSUN') || String(col).toUpperCase().includes('KETERANGAN');
+            headerHtml += `<th class="${isLeftCol ? 'align-left' : ''}">${col}</th>`;
         });
         headerHtml += '</tr></thead>';
 
@@ -638,8 +889,19 @@
             paginatedRows.forEach((row, idx) => {
                 const absoluteIndex = startIdx + idx + 1;
                 let originalRowIndex = currentRawData.findIndex(r => r === row);
+                let rowCoklitVal = coklitColIdx !== -1 ? String(row[coklitColIdx] || '').trim() : '';
+                let isTms = tmsCodes.includes(rowCoklitVal);
+                let rowClass = isTms ? 'tms-row' : '';
 
-                bodyHtml += `<tr>`;
+                let isNewFamily = false;
+                if (nkkIdx !== -1 && idx > 0) {
+                    let prevNkk = String(paginatedRows[idx - 1][nkkIdx] || '').trim();
+                    let currNkk = String(row[nkkIdx] || '').trim();
+                    if (prevNkk !== currNkk && prevNkk !== "" && currNkk !== "") isNewFamily = true;
+                }
+                if (isNewFamily) rowClass += ' border-top-family';
+
+                bodyHtml += `<tr class="${rowClass}">`;
                 bodyHtml += `<td class="row-index">${absoluteIndex}</td>`;
                 
                 if (isAdmin) {
@@ -651,8 +913,9 @@
 
                 row.forEach((cell, j) => {
                     let colNameUpper = String(headers[j]).toUpperCase();
-                    let isLeft = colNameUpper.includes('NAMA') || colNameUpper.includes('ALAMAT');
-                    bodyHtml += `<td class="${isLeft ? 'align-left' : ''}">${cell !== null && cell !== undefined ? cell : ''}</td>`;
+                    let isLeftCol = colNameUpper.includes('NAMA') || colNameUpper.includes('ALAMAT') || colNameUpper.includes('DUSUN') || colNameUpper.includes('KETERANGAN');
+                    let displayCell = maskSensitiveData(headers[j], formatCoklitCode(headers[j], formatDate(cell)));
+                    bodyHtml += `<td class="${isLeftCol ? 'align-left' : ''}">${displayCell}</td>`;
                 });
                 bodyHtml += `</tr>`;
             });
@@ -688,32 +951,69 @@
         let rowData = currentRawData[originalRowIndex];
         editingTargetRowData = rowData;
 
+        let headers = currentRawData[0];
+        let coklitColIdx = headers.findIndex(h => {
+            let hUp = String(h).toUpperCase();
+            return hUp.includes('KODE COKLIT') || hUp.includes('COKLIT');
+        });
+
+        let currentCoklit = coklitColIdx !== -1 ? String(rowData[coklitColIdx] || '0').trim() : '0';
+        document.getElementById('rowEditCoklitType').value = coklitMap.hasOwnProperty(currentCoklit) ? currentCoklit : '0';
+
         document.getElementById('selectedRowTargetInfo').innerHTML = `
-            <div class="small fw-bold text-success"><i class="fas fa-id-card me-1"></i> Baris Sheet #${originalRowIndex + 1} Terpilih</div>
+            <div class="small fw-bold text-success"><i class="fas fa-id-card me-1"></i> Baris Sheet #${originalRowIndex + 1} Terpilih:</div>
+            <div class="small text-dark">Nama: <b>${rowData[2] || '-'}</b> | NIK: <b>${rowData[1] || '-'}</b> | NKK: <b>${rowData[0] || '-'}</b></div>
         `;
 
+        toggleRowEditFields();
+        buildDynamicRowEditFields();
+        new bootstrap.Modal(document.getElementById('adminRowEditModal')).show();
+    }
+
+    function toggleRowEditFields() {
+        const val = document.getElementById('rowEditCoklitType').value;
+        document.getElementById('panelRowUbah').classList.toggle('d-none', val !== 'U');
+        document.getElementById('panelRowPindahLuar').classList.toggle('d-none', val !== '5');
+        document.getElementById('panelRowPindahDalam').classList.toggle('d-none', val !== '6');
+        document.getElementById('panelRowPisahKK').classList.toggle('d-none', val !== '7');
+    }
+
+    function buildDynamicRowEditFields() {
         const container = document.getElementById('dynamicRowEditFieldsContainer');
         container.innerHTML = '';
         currentRawData[0].forEach((header, idx) => {
             let colName = String(header);
-            let val = rowData[idx] || '';
+            let val = editingTargetRowData ? (editingTargetRowData[idx] || '') : '';
             let colDiv = document.createElement('div');
             colDiv.className = 'col-md-6';
             colDiv.innerHTML = `<label class="form-label small fw-bold">${colName}:</label><input type="text" class="form-control form-control-sm dynamic-row-edit-input" data-col-index="${idx}" value="${val}">`;
             container.appendChild(colDiv);
         });
-
-        new bootstrap.Modal(document.getElementById('adminRowEditModal')).show();
     }
 
     function executeRowEditAction() {
         if (!isAdmin) return;
-        let updatedValues = [...editingTargetRowData];
-        document.querySelectorAll('.dynamic-row-edit-input').forEach(input => {
-            updatedValues[parseInt(input.getAttribute('data-col-index'))] = input.value;
-        });
+        const coklitType = document.getElementById('rowEditCoklitType').value;
+        let payload = { sheet: activeSheet, actionType: coklitType, rowIndex: editingTargetRowIndex + 1 };
 
-        let payload = { sheet: activeSheet, actionType: 'U', rowIndex: editingTargetRowIndex + 1, values: updatedValues };
+        if (coklitType === 'U') {
+            let updatedValues = [...editingTargetRowData];
+            document.querySelectorAll('.dynamic-row-edit-input').forEach(input => {
+                updatedValues[parseInt(input.getAttribute('data-col-index'))] = input.value;
+            });
+            payload.values = updatedValues;
+        } else if (coklitType === '5') {
+            payload.targetPindahLuar = document.getElementById('targetRowPindahLuarInput').value;
+        } else if (coklitType === '6') {
+            payload.targetRt = document.getElementById('targetRowRtSelect').value;
+        } else if (coklitType === '7') {
+            payload.newNkk = document.getElementById('rowNewNkkInput').value;
+            payload.newNik = document.getElementById('rowNewNikInput').value;
+            payload.newNama = document.getElementById('rowNewNamaInput').value;
+            payload.newTempatLahir = document.getElementById('rowNewTempatLahirInput').value;
+            payload.newTglLahir = document.getElementById('rowNewTglLahirInput').value;
+            payload.newUsia = document.getElementById('rowCalculatedAgeOutput').value;
+        }
 
         const submitBtn = document.getElementById('btnSubmitRowEdit');
         submitBtn.disabled = true;
@@ -730,7 +1030,7 @@
                 loadSheetData(activeSheet, null, true);
                 showToast("Perubahan baris berhasil disimpan!", "bg-success");
             } else {
-                showToast("Gagal menyimpan.", "bg-danger");
+                showToast("Gagal menyimpan: " + (result.message || 'Error'), "bg-danger");
             }
         }).catch(() => {
             submitBtn.disabled = false;
@@ -751,94 +1051,81 @@
         });
     }
 
-    function generateRealCountChartsAndStats() {
-        if (activeSheet !== 'INPUT SUARA') return;
-        if (!currentRawData || currentRawData.length <= 1) return;
+    function toggleChartSection() {
+        if (committeeSheets.includes(activeSheet)) return;
+        const section = document.getElementById('directChartSection');
+        const btnText = document.getElementById('chartToggleText');
+        if (section.classList.contains('d-none')) {
+            section.classList.remove('d-none');
+            btnText.innerText = "Tutup Grafik";
+            generateSeparateChartsAndAccumulation();
+        } else {
+            section.classList.add('d-none');
+            btnText.innerText = "Tampilkan Akumulasi & Grafik";
+        }
+    }
 
-        const headers = currentRawData[0];
-        const rows = currentRawData.slice(1);
+    function generateSeparateChartsAndAccumulation() {
+        if (committeeSheets.includes(activeSheet)) return;
+        if (!filteredData || filteredData.length <= 1) return;
 
-        // Cari indeks kolom calon, suara sah, dan suara tidak sah
-        let candidateCols = [];
-        let suaraSahIdx = -1;
-        let suaraTidakSahIdx = -1;
-        let statusIdx = -1;
+        const headers = filteredData[0];
+        const rows = filteredData.slice(1);
+        let coklitIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
 
-        headers.forEach((h, idx) => {
-            let hUp = String(h).toUpperCase();
-            if (hUp.includes('NOMOR URUT') || hUp.includes('CALON') || hUp.includes('NAMA')) {
-                candidateCols.push({ index: idx, name: h });
-            }
-            if (hUp.includes('SUARA SAH') && !hUp.includes('TIDAK')) suaraSahIdx = idx;
-            if (hUp.includes('TIDAK SAH')) suaraTidakSahIdx = idx;
-            if (hUp.includes('STATUS')) statusIdx = idx;
-        });
+        let total = rows.length;
+        let countMs = 0;
+        let countTms = 0;
+        let countOther = 0;
+        let detailedCounts = {};
 
-        let totalTps = rows.length;
-        let tpsMasuk = 0;
-        let totalSah = 0;
-        let totalTidakSah = 0;
-        let candidateTotals = {};
-
-        candidateCols.forEach(c => candidateTotals[c.name] = 0);
+        Object.keys(coklitMap).forEach(k => detailedCounts[k] = 0);
 
         rows.forEach(row => {
-            let isMasuk = false;
-            candidateCols.forEach(c => {
-                let val = parseInt(row[c.index]) || 0;
-                candidateTotals[c.name] += val;
-                if (val > 0) isMasuk = true;
-            });
+            let val = coklitIdx !== -1 ? String(row[coklitIdx] || '0').trim() : '0';
+            if (val === '0') countMs++;
+            else if (tmsCodes.includes(val)) countTms++;
+            else countOther++;
 
-            if (statusIdx !== -1 && String(row[statusIdx]).toUpperCase().includes('SELESAI')) {
-                isMasuk = true;
-            }
-
-            if (isMasuk) tpsMasuk++;
-
-            if (suaraSahIdx !== -1) totalSah += parseInt(row[suaraSahIdx]) || 0;
-            if (suaraTidakSahIdx !== -1) totalTidakSah += parseInt(row[suaraTidakSahIdx]) || 0;
+            if (detailedCounts.hasOwnProperty(val)) detailedCounts[val]++;
+            else detailedCounts[val] = (detailedCounts[val] || 0) + 1;
         });
 
-        // Update Kartu Statistik
-        document.getElementById('rcTpsProgress').innerText = `${tpsMasuk} / ${totalTps} TPS`;
-        document.getElementById('rcTotalSuaraSah').innerText = totalSah.toLocaleString('id-ID');
-        document.getElementById('rcTotalSuaraTidakSah').innerText = totalTidakSah.toLocaleString('id-ID');
-        document.getElementById('rcTotalSuaraMasuk').innerText = (totalSah + totalTidakSah).toLocaleString('id-ID');
+        // Set akumulasi angka pada kartu ringkasan
+        document.getElementById('accTotalCount').innerText = total;
+        document.getElementById('accMsCount').innerText = countMs;
+        document.getElementById('accTmsCount').innerText = countTms;
+        document.getElementById('accOtherCount').innerText = countOther;
 
-        // Grafik 1: Persentase Perolehan Suara Calon (Donut Chart)
-        let candidateNames = Object.keys(candidateTotals);
-        let candidateVotes = Object.values(candidateTotals);
-        const colorPalette = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'];
-
-        const ctxPie = document.getElementById('candidatePercentageChart').getContext('2d');
-        if (candidatePieChartInstance) candidatePieChartInstance.destroy();
-        candidatePieChartInstance = new Chart(ctxPie, {
+        // 1. Grafik MS vs TMS (Pie Chart)
+        const ctxMsTms = document.getElementById('msTmsChart').getContext('2d');
+        if (msTmsChartInstance) msTmsChartInstance.destroy();
+        msTmsChartInstance = new Chart(ctxMsTms, {
             type: 'doughnut',
             data: {
-                labels: candidateNames,
+                labels: ['Memenuhi Syarat (MS / Aktif)', 'Tidak Memenuhi Syarat (TMS)', 'Lainnya (Ubah/Baru/Pindah)'],
                 datasets: [{
-                    data: candidateVotes,
-                    backgroundColor: colorPalette.slice(0, candidateNames.length),
+                    data: [countMs, countTms, countOther],
+                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
                     borderWidth: 2, borderColor: '#ffffff'
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
         });
 
-        // Grafik 2: Perbandingan Suara Sah per TPS (Bar Chart)
-        let tpsLabels = rows.map(r => String(r[0] || 'TPS'));
-        let tpsDatasetValues = rows.map(r => suaraSahIdx !== -1 ? (parseInt(r[suaraSahIdx]) || 0) : 0);
+        // 2. Grafik Detail Sesuai Kode Coklit (Bar Chart terpisah)
+        let detailLabels = Object.keys(detailedCounts).map(k => `${k} - ${coklitMap[k] || 'Lainnya'}`);
+        let detailValues = Object.values(detailedCounts);
 
-        const ctxBar = document.getElementById('tpsComparisonChart').getContext('2d');
-        if (tpsBarChartInstance) tpsBarChartInstance.destroy();
-        tpsBarChartInstance = new Chart(ctxBar, {
+        const ctxDetail = document.getElementById('detailedCoklitChart').getContext('2d');
+        if (detailChartInstance) detailChartInstance.destroy();
+        detailChartInstance = new Chart(ctxDetail, {
             type: 'bar',
             data: {
-                labels: tpsLabels,
+                labels: detailLabels,
                 datasets: [{
-                    label: 'Suara Sah per TPS',
-                    data: tpsDatasetValues,
+                    label: 'Jumlah Pemilih',
+                    data: detailValues,
                     backgroundColor: '#8b1531',
                     borderRadius: 6
                 }]
@@ -861,7 +1148,7 @@
                     document.getElementById('adminPassword').value = '';
                     updateAuthUI();
                     renderTablePage();
-                    showToast("Login Berhasil! Tombol Edit aktif.", "bg-success");
+                    showToast("Login Berhasil! Tombol Edit & Hapus aktif.", "bg-success");
                 } else { alert("Password salah!"); }
             });
     }
@@ -920,7 +1207,7 @@
     }
 
     window.onload = function() {
-        loadSheetData('INPUT SUARA', null);
+        loadSheetData('DPT AWAL KPU', null);
         updateRealtimeClock();
         setInterval(updateRealtimeClock, 1000);
     };
