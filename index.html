@@ -216,7 +216,7 @@
 
         .chart-container {
             position: relative;
-            height: 250px;
+            height: 280px;
             width: 100%;
         }
 
@@ -236,6 +236,19 @@
             align-items: center;
             gap: 10px;
             backdrop-filter: blur(5px);
+        }
+
+        /* Styling Khusus Profil Calon Kades & Realcount */
+        .candidate-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .candidate-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
         }
 
         @keyframes fadeIn {
@@ -325,45 +338,45 @@
                 </div>
             </div>
 
-            <!-- Panel Akumulasi & Grafik Terpisah Sesuai Kode Coklit -->
+            <!-- Panel Akumulasi & Grafik Terpisah -->
             <div class="card card-custom p-4 mb-3 d-none chart-section-box no-print" id="directChartSection">
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
-                    <h5 class="fw-bold text-danger mb-0 fs-6"><i class="fas fa-chart-bar me-2"></i> Akumulasi Data & Grafik Coklit: <span id="directChartTitle">DPT AWAL KPU</span></h5>
+                    <h5 class="fw-bold text-danger mb-0 fs-6"><i class="fas fa-chart-bar me-2"></i> Akumulasi Data & Grafik: <span id="directChartTitle">DPT AWAL KPU</span></h5>
                     <button class="btn btn-outline-secondary btn-sm" onclick="toggleChartSection()" title="Tutup Grafik"><i class="fas fa-times"></i></button>
                 </div>
 
-                <!-- Kotak Akumulasi Ringkasan Data (MS, TMS, dll) -->
+                <!-- Kotak Akumulasi Ringkasan Data -->
                 <div class="row g-3 mb-4" id="summaryAccumulationCards">
                     <div class="col-md-3">
                         <div class="stat-card bg-primary">
-                            <div class="small fw-semibold text-white-50 uppercase">Total Pemilih</div>
+                            <div class="small fw-semibold text-white-50 text-uppercase">Total Pemilih</div>
                             <h3 class="fw-bold mb-0" id="accTotalCount">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card bg-success">
-                            <div class="small fw-semibold text-white-50 uppercase">Memenuhi Syarat (MS - Aktif)</div>
+                            <div class="small fw-semibold text-white-50 text-uppercase">Memenuhi Syarat (MS - Aktif)</div>
                             <h3 class="fw-bold mb-0" id="accMsCount">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card bg-danger">
-                            <div class="small fw-semibold text-white-50 uppercase">Tidak Memenuhi Syarat (TMS)</div>
+                            <div class="small fw-semibold text-white-50 text-uppercase">Tidak Memenuhi Syarat (TMS)</div>
                             <h3 class="fw-bold mb-0" id="accTmsCount">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card bg-warning text-dark">
-                            <div class="small fw-semibold text-dark opacity-75 uppercase">Ubah / Baru / Pindah / Lainnya</div>
+                            <div class="small fw-semibold text-dark opacity-75 text-uppercase">Ubah / Baru / Pindah / Lainnya</div>
                             <h3 class="fw-bold mb-0" id="accOtherCount">0</h3>
                         </div>
                     </div>
                 </div>
 
-                <!-- Grafik Terpisah (2 Kolom Chart: MS & TMS vs Detail Coklit Lainnya) -->
+                <!-- Grafik Terpisah -->
                 <div class="row g-4">
                     <div class="col-lg-6">
-                        <div class="p-3 border rounded-3 bg-light">
+                        <div class="p-3 border rounded-3 bg-light shadow-sm">
                             <h6 class="fw-bold text-center mb-3 text-secondary">Proporsi Status Utama (MS vs TMS)</h6>
                             <div class="chart-container">
                                 <canvas id="msTmsChart"></canvas>
@@ -371,7 +384,7 @@
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div class="p-3 border rounded-3 bg-light">
+                        <div class="p-3 border rounded-3 bg-light shadow-sm">
                             <h6 class="fw-bold text-center mb-3 text-secondary">Rincian Lengkap per Kode Coklit</h6>
                             <div class="chart-container">
                                 <canvas id="detailedCoklitChart"></canvas>
@@ -427,19 +440,24 @@
                 </div>
             </div>
 
-            <!-- Printable Area -->
+            <!-- Printable Area (Tabel & Tampilan Khusus Profil Calon/Realcount) -->
             <div class="card card-custom p-3" id="printableArea">
                 <div class="text-center d-none" id="printHeader">
                     <h4 class="fw-bold text-uppercase mb-1">PEMILIHAN KEPALA DESA PAYO LEBAR 2026</h4>
                     <p class="text-muted small mb-3">Laporan Dokumen Resmi - <span id="printSheetName"></span></p>
                 </div>
-                <div class="table-scroll-container">
+                
+                <!-- Container Tabel Dinamis -->
+                <div class="table-scroll-container" id="tableScrollContainer">
                     <table class="table sheet-table align-middle" id="dataTable">
                         <tbody>
                             <tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Memuat database server...</p></td></tr>
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Container Khusus Tampilan Visual Calon Kades & Realcount (Disesuaikan) -->
+                <div id="customVisualContainer" class="d-none p-3"></div>
                 
                 <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top no-print flex-wrap gap-2" id="paginationContainer">
                     <div class="d-flex align-items-center gap-2">
@@ -515,7 +533,7 @@
                     </div>
 
                     <div id="panelRowPisahKK" class="border-top pt-3 d-none">
-                        <h6 class="fw-bold text-danger mb-3"><i class="fas fa-house-user me-1"></i> Form Pisah KK</h6>
+                        <h6 class="fw-bold text-danger mb-3"><i class="fas fa-house-user me-1"></i> Form Pisah KK (Usia terhitung s.d 29 Okt 2026)</h6>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Nomor Kartu Keluarga (NKK) Baru:</label>
@@ -538,7 +556,7 @@
                                 <input type="date" id="rowNewTglLahirInput" class="form-control form-control-sm" onchange="calculateRowAutoAge()">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label small fw-bold">Usia (Otomatis):</label>
+                                <label class="form-label small fw-bold">Usia (Otomatis per 29 Okt 2026):</label>
                                 <input type="text" id="rowCalculatedAgeOutput" class="form-control form-control-sm bg-white" readonly placeholder="Otomatis...">
                             </div>
                         </div>
@@ -594,6 +612,7 @@
     let filteredData = [];
     let msTmsChartInstance = null;
     let detailChartInstance = null;
+    let realcountChartInstance = null;
     let isAdmin = false; 
     let currentPage = 1;
     let rowsPerPage = 5000; 
@@ -617,6 +636,7 @@
 
     const tmsCodes = ["1", "2", "3", "4", "5"];
     const committeeSheets = ['PPS (PANITIA DESA)', 'PENGAWAS BPD', 'KPPS TPS 01', 'KPPS TPS 02'];
+    const visualSheets = ['INPUT SUARA', 'PROFIL CALON KADES'];
 
     function updateRealtimeClock() {
         const now = new Date();
@@ -635,17 +655,17 @@
         if (clockElement) clockElement.innerText = clockString;
     }
 
+    // Format Tanggal diubah otomatis menjadi dd/bb/thn (dd/mm/yyyy)
     function formatDate(val) {
         if (val === null || val === undefined || val === "") return "";
-        let strVal = String(val);
-        if (strVal.match(/^\d{4}-\d{2}-\d{2}T/)) {
+        let strVal = String(val).trim();
+        
+        // Deteksi format ISO YYYY-MM-DD atau sejenisnya
+        if (strVal.match(/^\d{4}-\d{2}-\d{2}/)) {
             try {
-                let dateObj = new Date(strVal);
-                if (!isNaN(dateObj.getTime())) {
-                    let day = String(dateObj.getDate()).padStart(2, '0');
-                    let month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    let year = dateObj.getFullYear();
-                    return `${day}/${month}/${year}`;
+                let parts = strVal.split('T')[0].split('-');
+                if (parts.length === 3) {
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
                 }
             } catch (e) { return strVal; }
         }
@@ -677,15 +697,16 @@
         return sVal;
     }
 
+    // Perhitungan usia otomatis terhitung sampai 29 Oktober 2026
     function calculateRowAutoAge() {
         const tglLhrVal = document.getElementById('rowNewTglLahirInput').value;
         if (!tglLhrVal) return;
         let birthDate = new Date(tglLhrVal);
-        let targetDate = new Date('2026-10-29');
+        let targetDate = new Date('2026-10-29'); // Target s.d 29 Oktober 2026
         let age = targetDate.getFullYear() - birthDate.getFullYear();
         let m = targetDate.getMonth() - birthDate.getMonth();
         if (m < 0 || (m === 0 && targetDate.getDate() < birthDate.getDate())) age--;
-        document.getElementById('rowCalculatedAgeOutput').value = age >= 0 ? `${age} Tahun` : '0 Tahun';
+        document.getElementById('rowCalculatedAgeOutput').value = age >= 0 ? `${age} Tahun (s.d 29 Okt 2026)` : '0 Tahun';
     }
 
     function loadSheetData(sheetName, element, forceRefresh = false) {
@@ -703,11 +724,15 @@
         }
 
         const isCommittee = committeeSheets.includes(sheetName);
+        const isVisual = visualSheets.includes(sheetName);
         const toggleChartBtn = document.getElementById('toggleChartBtn');
         const filterControlsBox = document.getElementById('filterControlsBox');
         const directChartSection = document.getElementById('directChartSection');
+        const tableScrollContainer = document.getElementById('tableScrollContainer');
+        const customVisualContainer = document.getElementById('customVisualContainer');
+        const paginationContainer = document.getElementById('paginationContainer');
 
-        if (isCommittee) {
+        if (isCommittee || isVisual) {
             if (toggleChartBtn) toggleChartBtn.classList.add('d-none');
             if (filterControlsBox) filterControlsBox.classList.add('d-none');
             if (directChartSection) directChartSection.classList.add('d-none');
@@ -716,22 +741,42 @@
             if (filterControlsBox) filterControlsBox.classList.remove('d-none');
         }
 
+        // Penanganan khusus tampilan visual (Real-Count & Profil Calon Kades)
+        if (isVisual) {
+            tableScrollContainer.classList.add('d-none');
+            customVisualContainer.classList.remove('d-none');
+            if(paginationContainer) paginationContainer.classList.add('d-none');
+        } else {
+            tableScrollContainer.classList.remove('d-none');
+            customVisualContainer.classList.add('d-none');
+            if(paginationContainer) paginationContainer.classList.remove('d-none');
+        }
+
         const table = document.getElementById('dataTable');
         const cachedData = sessionStorage.getItem('cache_' + sheetName);
         if (cachedData && !forceRefresh) {
             currentRawData = JSON.parse(cachedData);
             filteredData = currentRawData;
             currentPage = 1;
-            renderTablePage();
+            
+            if (isVisual) {
+                renderVisualContent(sheetName);
+            } else {
+                renderTablePage();
+            }
             populateRtDropdown();
             populateRowRtSelect();
-            if (!isCommittee && !document.getElementById('directChartSection').classList.contains('d-none')) {
+            if (!isCommittee && !isVisual && !document.getElementById('directChartSection').classList.contains('d-none')) {
                 generateSeparateChartsAndAccumulation();
             }
             return;
         }
 
-        table.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Sinkronisasi data sheet...</p></td></tr>';
+        if(!isVisual) {
+            table.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Sinkronisasi data sheet...</p></td></tr>';
+        } else {
+            customVisualContainer.innerHTML = '<div class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Memuat modul visual ' + sheetName + '...</p></div>';
+        }
 
         fetch(`${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${new Date().getTime()}`)
             .then(response => response.json())
@@ -740,21 +785,135 @@
                 filteredData = data;
                 sessionStorage.setItem('cache_' + sheetName, JSON.stringify(data));
                 currentPage = 1;
-                renderTablePage();
+
+                if (isVisual) {
+                    renderVisualContent(sheetName);
+                } else {
+                    renderTablePage();
+                }
                 populateRtDropdown();
                 populateRowRtSelect();
-                if (!isCommittee && !document.getElementById('directChartSection').classList.contains('d-none')) {
+                if (!isCommittee && !isVisual && !document.getElementById('directChartSection').classList.contains('d-none')) {
                     generateSeparateChartsAndAccumulation();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Periksa koneksi internet Anda.</td></tr>';
+                if(!isVisual) {
+                    table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Periksa koneksi internet Anda.</td></tr>';
+                } else {
+                    customVisualContainer.innerHTML = '<div class="text-center text-danger py-4">Gagal memuat data visual. Periksa koneksi jaringan Anda.</div>';
+                }
             });
     }
 
+    // Fungsi Render Khusus Menu Real-Count & Profil Calon Kades
+    function renderVisualContent(sheetName) {
+        const container = document.getElementById('customVisualContainer');
+        if (!currentRawData || currentRawData.length <= 1) {
+            container.innerHTML = '<div class="text-center py-4 text-muted">Belum ada data untuk ditampilkan.</div>';
+            return;
+        }
+
+        const headers = currentRawData[0];
+        const rows = currentRawData.slice(1);
+
+        if (sheetName === 'PROFIL CALON KADES') {
+            let html = '<div class="row g-4">';
+            rows.forEach((row, idx) => {
+                let nama = row[1] || row[0] || `Calon Nomor ${idx + 1}`;
+                let noUrut = row[0] || (idx + 1);
+                let visiMisi = row[2] || 'Visi dan Misi membangun Desa Payo Lebar yang lebih maju, transparan, dan Sejahtera.';
+                let fotoUrl = row[3] || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80';
+
+                html += `
+                    <div class="col-md-4">
+                        <div class="candidate-card h-100 shadow-sm">
+                            <div class="position-relative">
+                                <img src="${fotoUrl}" class="card-img-top object-fit-cover" style="height: 260px;" alt="${nama}" onerror="this.src='https://via.placeholder.com/400x300?text=Foto+Kandidat'">
+                                <span class="position-absolute top-0 start-0 m-3 badge bg-danger fs-6 px-3 py-2 shadow fw-bold rounded-pill">No. Urut ${noUrut}</span>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h4 class="fw-bold text-dark mb-1">${nama}</h4>
+                                <p class="text-muted small mb-3"><i class="fas fa-award text-warning me-1"></i> Kandidat Kepala Desa Payo Lebar</p>
+                                <hr class="text-muted opacity-25">
+                                <h6 class="fw-bold text-secondary small text-uppercase">Visi & Misi Utama:</h6>
+                                <p class="text-secondary small flex-grow-1">${visiMisi}</p>
+                                <div class="mt-3 pt-2 border-top text-end">
+                                    <span class="badge bg-light text-dark border px-2 py-1"><i class="fas fa-check-circle text-success me-1"></i> Terverifikasi KPU Des</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+
+        } else if (sheetName === 'INPUT SUARA') {
+            // Render Real-Count Visual Grafik Suara Masuk & Perolehan
+            let totalSuaraMasuk = 0;
+            let labels = [];
+            let counts = [];
+
+            rows.forEach((row) => {
+                let namaKandidat = row[1] || row[0] || 'Kandidat';
+                let perolehan = parseInt(row[2] || row[3] || 0);
+                labels.push(namaKandidat);
+                counts.push(perolehan);
+                totalSuaraMasuk += perolehan;
+            });
+
+            let html = `
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="stat-card bg-danger p-4">
+                            <div class="small fw-semibold text-white-50 text-uppercase">Total Suara Masuk (Real-Count)</div>
+                            <h2 class="fw-bold mb-0">${totalSuaraMasuk.toLocaleString('id-ID')} Suara</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card bg-dark p-4">
+                            <div class="small fw-semibold text-white-50 text-uppercase">Status Tabulasi TPS</div>
+                            <h2 class="fw-bold mb-0 text-warning">LIVE & REALTIME</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border rounded-3 bg-light shadow-sm">
+                    <h5 class="fw-bold text-center mb-3 text-secondary"><i class="fas fa-chart-bar me-2 text-danger"></i> Grafik Perolehan Suara Sementara Calon Kades</h5>
+                    <div style="position: relative; height: 350px; width: 100%;">
+                        <canvas id="realcountChartCanvas"></canvas>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            setTimeout(() => {
+                const ctxReal = document.getElementById('realcountChartCanvas').getContext('2d');
+                if (realcountChartInstance) realcountChartInstance.destroy();
+                realcountChartInstance = new Chart(ctxReal, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Jumlah Suara Sah',
+                            data: counts,
+                            backgroundColor: ['#580c1f', '#f59e0b', '#10b981', '#3b82f6', '#8b1531'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                    }
+                });
+            }, 100);
+        }
+    }
+
     function populateRtDropdown() {
-        if (committeeSheets.includes(activeSheet)) return;
+        if (committeeSheets.includes(activeSheet) || visualSheets.includes(activeSheet)) return;
         const rtSelect = document.getElementById('filterRt');
         rtSelect.innerHTML = '<option value="">-- Semua RT (1-36) --</option>';
         for (let i = 1; i <= 36; i++) {
@@ -777,7 +936,7 @@
     }
 
     function applyFilters() {
-        if (committeeSheets.includes(activeSheet)) return;
+        if (committeeSheets.includes(activeSheet) || visualSheets.includes(activeSheet)) return;
         if (!currentRawData || currentRawData.length <= 1) return;
 
         const headers = currentRawData[0];
@@ -848,6 +1007,7 @@
     }
 
     function renderTablePage() {
+        if (visualSheets.includes(activeSheet)) return;
         const table = document.getElementById('dataTable');
         if (!currentRawData || currentRawData.length === 0) {
             table.innerHTML = '<tr><td colspan="100" class="text-center py-4 text-muted">Belum ada data tersedia.</td></tr>';
@@ -1052,7 +1212,7 @@
     }
 
     function toggleChartSection() {
-        if (committeeSheets.includes(activeSheet)) return;
+        if (committeeSheets.includes(activeSheet) || visualSheets.includes(activeSheet)) return;
         const section = document.getElementById('directChartSection');
         const btnText = document.getElementById('chartToggleText');
         if (section.classList.contains('d-none')) {
@@ -1066,7 +1226,7 @@
     }
 
     function generateSeparateChartsAndAccumulation() {
-        if (committeeSheets.includes(activeSheet)) return;
+        if (committeeSheets.includes(activeSheet) || visualSheets.includes(activeSheet)) return;
         if (!filteredData || filteredData.length <= 1) return;
 
         const headers = filteredData[0];
@@ -1091,13 +1251,11 @@
             else detailedCounts[val] = (detailedCounts[val] || 0) + 1;
         });
 
-        // Set akumulasi angka pada kartu ringkasan
         document.getElementById('accTotalCount').innerText = total;
         document.getElementById('accMsCount').innerText = countMs;
         document.getElementById('accTmsCount').innerText = countTms;
         document.getElementById('accOtherCount').innerText = countOther;
 
-        // 1. Grafik MS vs TMS (Pie Chart)
         const ctxMsTms = document.getElementById('msTmsChart').getContext('2d');
         if (msTmsChartInstance) msTmsChartInstance.destroy();
         msTmsChartInstance = new Chart(ctxMsTms, {
@@ -1113,7 +1271,6 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
         });
 
-        // 2. Grafik Detail Sesuai Kode Coklit (Bar Chart terpisah)
         let detailLabels = Object.keys(detailedCounts).map(k => `${k} - ${coklitMap[k] || 'Lainnya'}`);
         let detailValues = Object.values(detailedCounts);
 
@@ -1147,7 +1304,7 @@
                     bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
                     document.getElementById('adminPassword').value = '';
                     updateAuthUI();
-                    renderTablePage();
+                    if(!visualSheets.includes(activeSheet)) renderTablePage();
                     showToast("Login Berhasil! Tombol Edit & Hapus aktif.", "bg-success");
                 } else { alert("Password salah!"); }
             });
@@ -1156,7 +1313,7 @@
     function processLogout() {
         isAdmin = false;
         updateAuthUI();
-        renderTablePage();
+        if(!visualSheets.includes(activeSheet)) renderTablePage();
         showToast("Berhasil Logout.", "bg-secondary");
     }
 
