@@ -193,12 +193,6 @@
             background-color: #f1f5f9 !important;
         }
 
-        .editable-cell:hover {
-            background-color: #fff1f2;
-            outline: 1.5px dashed #991b32;
-            cursor: text;
-        }
-
         #statusToast {
             position: fixed;
             bottom: 25px;
@@ -453,13 +447,20 @@
                     </div>
 
                     <div class="mb-3 position-relative">
-                        <label class="form-label fw-bold text-secondary small">Cari Pemilih Asal (Berdasarkan NIK / Nama):</label>
-                        <input type="text" id="searchPemilihAsal" class="form-control" placeholder="Ketik NIK atau Nama pemilih..." autocomplete="off" oninput="searchPemilihDatabase()">
+                        <label class="form-label fw-bold text-secondary small">Cari Pemilih Asal (Berdasarkan NIK / NKK / Nama):</label>
+                        <input type="text" id="searchPemilihAsal" class="form-control" placeholder="Ketik NIK, NKK, atau Nama pemilih..." autocomplete="off" oninput="searchPemilihDatabase()">
                         <div id="searchResultBox" class="list-group position-absolute shadow-sm w-100 mt-1" style="z-index: 1000; max-height: 150px; overflow-y: auto;"></div>
                     </div>
 
                     <div class="p-3 bg-light rounded-3 mb-3 border" id="selectedPemilihInfo">
-                        <span class="text-muted small">Belum ada pemilih yang dipilih. Ketik nama/NIK di atas.</span>
+                        <span class="text-muted small">Belum ada pemilih yang dipilih. Ketik nama/NIK/NKK di atas.</span>
+                    </div>
+
+                    <div id="panelUbahData" class="border-top pt-3 d-none">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-edit me-1"></i> Form Edit / Pemutakhiran Data Pemilih</h6>
+                        <div id="dynamicEditFieldsContainer" class="row g-3">
+                            <!-- Field dinamis berdasarkan kolom sheet akan dimuat di sini -->
+                        </div>
                     </div>
 
                     <div id="panelPindahLuar" class="border-top pt-3 d-none">
@@ -576,6 +577,7 @@
     let currentPage = 1;
     let rowsPerPage = 5000; // Set default tampil 5000 baris agar seluruh data langsung termuat
     let selectedTargetRowIndex = null;
+    let selectedTargetRowData = null;
     
     // URL Web App Google Apps Script terbaru
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzqLHfzqRu5g5znrLsCdxDU3FpwKywaO9ds2UuoRhsm3zChuKyRy-7-XybQ8kYdzELfvg/exec';
@@ -935,42 +937,12 @@
                     let isLeftCol = colNameUpper.includes('NAMA') || colNameUpper.includes('ALAMAT') || colNameUpper.includes('DUSUN') || colNameUpper.includes('KETERANGAN');
                     let alignClass = isLeftCol ? 'align-left' : '';
 
-                    if (isAdmin && (j === coklitColIdx || colNameUpper.includes('KODE COKLIT'))) {
-                        let currentVal = String(cell || '').trim();
-                        let dropdownHtml = `<select class="form-select form-select-sm fw-semibold shadow-sm ${isTms ? 'border-danger bg-light text-danger' : 'border-secondary'}" style="min-width: 190px;" onchange="updateCoklitInline(${absoluteIndex + 1}, ${j}, this)">`;
-                        
-                        const allCodes = [
-                            {val: "0", label: "0 - Aktif"},
-                            {val: "1", label: "1 - Meninggal (TMS)"},
-                            {val: "2", label: "2 - Ganda (TMS)"},
-                            {val: "3", label: "3 - TNI (TMS)"},
-                            {val: "4", label: "4 - Polisi (TMS)"},
-                            {val: "5", label: "5 - Pindah domisili (Luar Desa) (TMS)"},
-                            {val: "6", label: "6 - Pindah Domisili (Dalam Desa)"},
-                            {val: "7", label: "7 - Pisah KK"},
-                            {val: "U", label: "U - Ubah"},
-                            {val: "B", label: "B - Baru"},
-                            {val: "P", label: "P - xxxx"}
-                        ];
+                    let displayCell = formatDate(cell);
+                    displayCell = formatCoklitCode(headers[j], displayCell);
+                    displayCell = maskSensitiveData(headers[j], displayCell);
 
-                        allCodes.forEach(item => {
-                            let selected = (currentVal === item.val) ? 'selected' : '';
-                            dropdownHtml += `<option value="${item.val}" ${selected}>${item.label}</option>`;
-                        });
-                        dropdownHtml += `</select>`;
-
-                        bodyHtml += `<td class="${alignClass}">${dropdownHtml}</td>`;
-                    } else {
-                        let displayCell = formatDate(cell);
-                        displayCell = formatCoklitCode(headers[j], displayCell);
-                        displayCell = maskSensitiveData(headers[j], displayCell);
-
-                        if (isAdmin) {
-                            bodyHtml += `<td contenteditable="true" class="editable-cell ${alignClass}" onblur="updateData(${absoluteIndex + 1}, ${j}, this)">${displayCell}</td>`;
-                        } else {
-                            bodyHtml += `<td class="${alignClass}">${displayCell}</td>`;
-                        }
-                    }
+                    // Menu edit langsung pada tabel telah dihapus sepenuhnya sesuai permintaan. Data hanya dapat diubah melalui menu Coklit khusus admin.
+                    bodyHtml += `<td class="${alignClass}">${displayCell}</td>`;
                 });
                 bodyHtml += `</tr>`;
             });
@@ -1008,8 +980,9 @@
     function openCoklitAdminModal() {
         if (!isAdmin) return;
         selectedTargetRowIndex = null;
+        selectedTargetRowData = null;
         document.getElementById('searchPemilihAsal').value = '';
-        document.getElementById('selectedPemilihInfo').innerHTML = '<span class="text-muted small">Belum ada pemilih yang dipilih. Ketik nama/NIK di atas.</span>';
+        document.getElementById('selectedPemilihInfo').innerHTML = '<span class="text-muted small">Belum ada pemilih yang dipilih. Ketik nama/NIK/NKK di atas.</span>';
         document.getElementById('adminCoklitType').value = '0';
         document.getElementById('targetPindahLuarInput').value = '';
         document.getElementById('newNkkInput').value = '';
@@ -1018,6 +991,7 @@
         document.getElementById('newTempatLahirInput').value = '';
         document.getElementById('newTglLahirInput').value = '';
         document.getElementById('calculatedAgeOutput').value = '';
+        document.getElementById('dynamicEditFieldsContainer').innerHTML = '';
         
         toggleAdminFormFields();
 
@@ -1027,21 +1001,46 @@
 
     function toggleAdminFormFields() {
         const val = document.getElementById('adminCoklitType').value;
+        const panelUbah = document.getElementById('panelUbahData');
         const panelPindahLuar = document.getElementById('panelPindahLuar');
         const panelPindahDalam = document.getElementById('panelPindahDalam');
         const panelPisah = document.getElementById('panelPisahKK');
 
+        panelUbah.classList.add('d-none');
         panelPindahLuar.classList.add('d-none');
         panelPindahDalam.classList.add('d-none');
         panelPisah.classList.add('d-none');
 
-        if (val === '5') {
+        if (val === 'U') {
+            panelUbah.classList.remove('d-none');
+            buildDynamicEditFields();
+        } else if (val === '5') {
             panelPindahLuar.classList.remove('d-none');
         } else if (val === '6') {
             panelPindahDalam.classList.remove('d-none');
         } else if (val === '7') {
             panelPisah.classList.remove('d-none');
         }
+    }
+
+    function buildDynamicEditFields() {
+        const container = document.getElementById('dynamicEditFieldsContainer');
+        container.innerHTML = '';
+        if (!currentRawData || currentRawData.length === 0) return;
+
+        const headers = currentRawData[0];
+        headers.forEach((header, idx) => {
+            let colName = String(header);
+            let val = selectedTargetRowData ? (selectedTargetRowData[idx] || '') : '';
+
+            let colDiv = document.createElement('div');
+            colDiv.className = 'col-md-6';
+            colDiv.innerHTML = `
+                <label class="form-label small fw-bold">${colName}:</label>
+                <input type="text" class="form-control form-control-sm dynamic-edit-input" data-col-index="${idx}" value="${val}" placeholder="Masukkan ${colName}...">
+            `;
+            container.appendChild(colDiv);
+        });
     }
 
     function searchPemilihDatabase() {
@@ -1082,13 +1081,18 @@
 
     function selectPemilihTarget(rowIdx, rowData) {
         selectedTargetRowIndex = rowIdx;
+        selectedTargetRowData = rowData;
         document.getElementById('searchResultBox').innerHTML = '';
         document.getElementById('searchPemilihAsal').value = `Terpilih Baris #${rowIdx} (${rowData[2] || rowData[1]})`;
         
         document.getElementById('selectedPemilihInfo').innerHTML = `
             <div class="small fw-bold text-success"><i class="fas fa-check-circle me-1"></i> Pemilih Terpilih:</div>
-            <div class="small text-dark">Nama: <b>${rowData[2] || '-'}</b> | NIK Asal: <b>${rowData[1] || '-'}</b></div>
+            <div class="small text-dark">Nama: <b>${rowData[2] || '-'}</b> | NIK: <b>${rowData[1] || '-'}</b> | NKK: <b>${rowData[0] || '-'}</b></div>
         `;
+
+        if (document.getElementById('adminCoklitType').value === 'U') {
+            buildDynamicEditFields();
+        }
     }
 
     function executeAdminCoklitAction() {
@@ -1108,7 +1112,15 @@
             rowIndex: selectedTargetRowIndex
         };
 
-        if (coklitType === '5') {
+        if (coklitType === 'U') {
+            let updatedValues = [...selectedTargetRowData];
+            const inputs = document.querySelectorAll('.dynamic-edit-input');
+            inputs.forEach(input => {
+                let cIdx = parseInt(input.getAttribute('data-col-index'));
+                updatedValues[cIdx] = input.value;
+            });
+            payload.values = updatedValues;
+        } else if (coklitType === '5') {
             payload.targetPindahLuar = document.getElementById('targetPindahLuarInput').value;
         } else if (coklitType === '6') {
             payload.targetRt = document.getElementById('targetRtSelect').value;
@@ -1124,6 +1136,18 @@
                 alert("Harap lengkapi NKK Baru, NIK, dan Nama keluarga baru!");
                 return;
             }
+        } else {
+            // Untuk kode coklit status lainnya (seperti 0, 1, 2, 3, 4, B, P, dll), cari kolom kode coklit dan perbarui nilainya sesuai baris asli
+            let headers = currentRawData[0];
+            let coklitColIdx = headers.findIndex(h => {
+                let hUp = String(h).toUpperCase();
+                return hUp.includes('KODE COKLIT') || hUp === 'KODE COKLIT';
+            });
+            let updatedValues = [...selectedTargetRowData];
+            if (coklitColIdx !== -1) {
+                updatedValues[coklitColIdx] = coklitType;
+            }
+            payload.values = updatedValues;
         }
 
         fetch(WEB_APP_URL, {
@@ -1138,54 +1162,13 @@
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 modal.hide();
                 loadSheetData(activeSheet, null, true);
-                showToast("Aksi Coklit berhasil diterapkan dan disinkronkan!", "bg-success");
+                showToast("Perubahan data berhasil disimpan berdasarkan NKK/NIK pemilih tanpa membuat baris baru!", "bg-success");
             } else {
-                showToast("Gagal memproses aksi coklit.", "bg-danger");
+                showToast("Gagal memproses perubahan data.", "bg-danger");
             }
         })
         .catch(err => {
             showToast("Terjadi kesalahan koneksi server.", "bg-danger");
-        });
-    }
-
-    function updateCoklitInline(rowIdx, colIdx, selectElement) {
-        if (!isAdmin) return;
-        const newCode = selectElement.value;
-
-        const row = selectElement.closest('tr');
-        if (tmsCodes.includes(newCode)) {
-            row.classList.add('tms-row');
-            selectElement.classList.add('border-danger', 'bg-light', 'text-danger');
-        } else {
-            row.classList.remove('tms-row');
-            selectElement.classList.remove('border-danger', 'bg-light', 'text-danger');
-        }
-
-        let rowValues = [];
-        for (let k = 1; k < row.cells.length; k++) {
-            let cellNode = row.cells[k];
-            let selectChild = cellNode.querySelector('select');
-            if (selectChild) {
-                rowValues.push(selectChild.value);
-            } else {
-                rowValues.push(cellNode.innerText.split(' - ')[0]);
-            }
-        }
-
-        const payload = { sheet: activeSheet, row: rowIdx, values: rowValues };
-
-        fetch(WEB_APP_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(result => {
-            if(result.status === 'success') {
-                sessionStorage.removeItem('cache_' + activeSheet);
-                showToast("Kode Coklit berhasil diperbarui", "bg-success");
-            } else {
-                showToast("Gagal menyimpan kode coklit", "bg-danger");
-            }
         });
     }
 
@@ -1323,7 +1306,7 @@
                     
                     updateAuthUI();
                     renderTablePage();
-                    showToast("Login Berhasil! Baris TMS berwarna merah otomatis & Dropdown Coklit aktif.", "bg-success");
+                    showToast("Login Berhasil! Panel Coklit & Edit terpusat aktif.", "bg-success");
                 } else {
                     alert("Password salah! Silakan coba lagi.");
                 }
@@ -1351,38 +1334,6 @@
             adminActionButtons.classList.remove('d-flex');
             adminActionButtons.classList.add('d-none');
         }
-    }
-
-    function updateData(rowIdx, colIdx, cellElement) {
-        if (!isAdmin) return;
-
-        const row = cellElement.parentNode;
-        let rowValues = [];
-        for (let k = 1; k < row.cells.length; k++) {
-            let cellNode = row.cells[k];
-            let selectChild = cellNode.querySelector('select');
-            if (selectChild) {
-                rowValues.push(selectChild.value);
-            } else {
-                rowValues.push(cellNode.innerText.split(' - ')[0]);
-            }
-        }
-
-        const payload = { sheet: activeSheet, row: rowIdx, values: rowValues };
-
-        fetch(WEB_APP_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(result => {
-            if(result.status === 'success') {
-                sessionStorage.removeItem('cache_' + activeSheet);
-                showToast("Perubahan berhasil disinkronkan", "bg-success");
-            } else {
-                showToast("Gagal menyimpan data", "bg-danger");
-            }
-        });
     }
 
     function printFolioLandscape() {
