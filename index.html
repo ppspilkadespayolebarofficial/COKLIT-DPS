@@ -413,7 +413,7 @@
                             <option value="100">100 baris</option>
                             <option value="500">500 baris</option>
                             <option value="1000">1000 baris</option>
-                            <option value="5000">5000 baris</option>
+                            <option value="5000" selected>5000 baris</option>
                         </select>
                     </div>
                     <nav>
@@ -574,11 +574,11 @@
     let myChart = null;
     let isAdmin = false; 
     let currentPage = 1;
-    let rowsPerPage = 50; 
+    let rowsPerPage = 5000; // Set default tampil 5000 baris agar seluruh data langsung termuat
     let selectedTargetRowIndex = null;
     
-    // URL Web App Google Apps Script
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbybbKth1VoP8OFAb4EpqxoApkNDuHcHdYE9fm1c1mOD7kYRTy_S1f2PaztEHsIGl7AM/exec';
+    // URL Web App Google Apps Script terbaru
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzqLHfzqRu5g5znrLsCdxDU3FpwKywaO9ds2UuoRhsm3zChuKyRy-7-XybQ8kYdzELfvg/exec';
 
     const coklitMap = {
         "0": "Aktif",
