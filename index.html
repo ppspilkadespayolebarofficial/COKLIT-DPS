@@ -371,6 +371,7 @@
                     <a class="nav-link" onclick="loadSheetData('DPS (SEMENTARA)', this)"><i class="fas fa-user-clock"></i>DPS (SEMENTARA)</a>
                     <a class="nav-link" onclick="loadSheetData('DPTAM (TAMBAHAN)', this)"><i class="fas fa-user-plus"></i>DPTAM (TAMBAHAN)</a>
                     <a class="nav-link" onclick="loadSheetData('DPT (TETAP)', this)"><i class="fas fa-address-book"></i>DPT (TETAP)</a>
+                    <a class="nav-link d-none admin-only-menu" id="addVoterMenuLink" onclick="openAddVoterModal()"><i class="fas fa-user-plus"></i>Tambah Pemilih Baru</a>
                 </div>
 
                 <div class="menu-category-header" onclick="toggleSubMenu('subCategoryPanitia', this)">
@@ -523,6 +524,9 @@
                     </div>
 
                     <div id="adminActionButtons" class="d-none gap-2 flex-wrap">
+                        <button class="btn btn-primary btn-sm fw-bold px-3 shadow-sm" onclick="openAddVoterModal()">
+                            <i class="fas fa-user-plus me-1"></i> Tambah Pemilih Baru
+                        </button>
                         <button class="btn btn-success btn-sm fw-bold px-3 shadow-sm" onclick="exportToExcel()">
                             <i class="fas fa-file-excel me-1"></i> Ekstrak Excel
                         </button>
@@ -682,6 +686,40 @@
                     <div class="mt-4 text-end">
                         <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-danger btn-sm px-4 fw-bold" id="btnSubmitRowEdit">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Pemilih Baru -->
+<div class="modal fade" id="addVoterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header text-white" style="background: var(--kpu-primary);">
+                <div>
+                    <h5 class="modal-title fw-bold text-uppercase"><i class="fas fa-user-plus me-2"></i>Tambah Pemilih Baru</h5>
+                    <small class="text-warning fw-semibold">Biodata mengikuti kolom yang tersedia pada tabel Google Sheet</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="alert alert-warning border-0 shadow-sm small mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <b>Admin:</b> data NKK/NIK di form ini tampil lengkap. Nomor urut dibuat otomatis. Jika NKK sudah ada, pemilih baru akan ditempatkan setelah anggota terakhir pada KK tersebut di Google Sheet.
+                </div>
+                <form id="formAddVoter" onsubmit="event.preventDefault(); saveNewVoter();">
+                    <div class="row g-3" id="addVoterFieldsContainer"></div>
+                    <div class="mt-3 p-3 rounded-3 border bg-light">
+                        <div class="row g-2 small">
+                            <div class="col-md-6"><b>Sheet tujuan:</b> <span id="addVoterTargetSheet">DPS (SEMENTARA)</span></div>
+                            <div class="col-md-6"><b>Posisi otomatis:</b> <span id="addVoterInsertInfo">Menentukan berdasarkan NKK</span></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-end">
+                        <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold" id="btnSaveNewVoter"><i class="fas fa-save me-1"></i>Simpan Pemilih Baru</button>
                     </div>
                 </form>
             </div>
@@ -1361,6 +1399,318 @@
         });
     }
 
+    // ========================= TAMBAH PEMILIH BARU =========================
+    // Form dibuat dinamis berdasarkan header sheet yang sedang digunakan,
+    // sehingga tidak merusak urutan/struktur kolom Google Sheet.
+    function voterHeaderIndex(headers, patterns) {
+        return headers.findIndex(h => {
+            const n = String(h || '').toUpperCase().trim();
+            return patterns.some(p => n.includes(p));
+        });
+    }
+
+    function calculateNewVoterAge(dateValue) {
+        if (!dateValue) return '';
+        const birth = new Date(dateValue + 'T00:00:00');
+        const target = new Date('2026-10-29T00:00:00');
+        if (isNaN(birth.getTime())) return '';
+        let age = target.getFullYear() - birth.getFullYear();
+        const m = target.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && target.getDate() < birth.getDate())) age--;
+        return age >= 0 ? String(age) : '';
+    }
+
+    function getNextVoterNumber(headers, rows) {
+        const noIdx = voterHeaderIndex(headers, ['NO', 'NOMOR']);
+        if (noIdx === -1) return '';
+        let maxNo = 0;
+        rows.forEach(r => {
+            const n = parseInt(String(r[noIdx] ?? '').replace(/\D/g, ''), 10);
+            if (!isNaN(n)) maxNo = Math.max(maxNo, n);
+        });
+        return String(maxNo + 1);
+    }
+
+    function makeAddField(label, idx, value, type = 'text', options = {}) {
+        const wrap = document.createElement('div');
+        wrap.className = options.full ? 'col-12' : 'col-md-6';
+        const lab = document.createElement('label');
+        lab.className = 'form-label small fw-bold text-uppercase';
+        lab.textContent = label + ':';
+        wrap.appendChild(lab);
+
+        let input;
+        if (options.selectOptions) {
+            input = document.createElement('select');
+            input.className = 'form-select form-select-sm add-voter-input';
+            options.selectOptions.forEach(opt => {
+                const o = document.createElement('option');
+                o.value = opt.value;
+                o.textContent = opt.label;
+                if (String(opt.value) === String(value)) o.selected = true;
+                input.appendChild(o);
+            });
+        } else {
+            input = document.createElement('input');
+            input.type = type;
+            input.className = 'form-control form-control-sm add-voter-input';
+            input.value = value ?? '';
+        }
+        input.dataset.colIndex = String(idx);
+        input.dataset.header = String(label);
+        if (options.readonly) input.readOnly = true;
+        if (options.placeholder) input.placeholder = options.placeholder;
+        if (options.inputMode) input.inputMode = options.inputMode;
+        if (options.maxLength) input.maxLength = options.maxLength;
+        if (options.required) input.required = true;
+        if (options.onInput) input.addEventListener('input', options.onInput);
+        if (options.onChange) input.addEventListener('change', options.onChange);
+        wrap.appendChild(input);
+        if (options.help) {
+            const help = document.createElement('div');
+            help.className = 'form-text';
+            help.textContent = options.help;
+            wrap.appendChild(help);
+        }
+        return wrap;
+    }
+
+    function buildAddVoterFields() {
+        const container = document.getElementById('addVoterFieldsContainer');
+        container.innerHTML = '';
+        if (!currentRawData || currentRawData.length === 0) return;
+
+        const headers = currentRawData[0];
+        const rows = currentRawData.slice(1);
+        const nextNo = getNextVoterNumber(headers, rows);
+        const noIdx = voterHeaderIndex(headers, ['NO', 'NOMOR']);
+        const nkkIdx = voterHeaderIndex(headers, ['NKK', 'NO KK', 'NOMOR KARTU KELUARGA']);
+        const nikIdx = voterHeaderIndex(headers, ['NIK', 'NO KTP', 'NOMOR INDUK KEPENDUDUKAN']);
+        const tglIdx = voterHeaderIndex(headers, ['TANGGAL LAHIR', 'TGL LAHIR', 'TGL. LAHIR']);
+        const usiaIdx = voterHeaderIndex(headers, ['USIA', 'UMUR']);
+        const lpIdx = voterHeaderIndex(headers, ['L/P', 'JENIS KELAMIN', 'JK']);
+        const hubIdx = voterHeaderIndex(headers, ['STATUS HUB', 'HUBUNGAN', 'STATUS HUBUNGAN']);
+        const coklitIdx = voterHeaderIndex(headers, ['KODE COKLIT', 'COKLIT']);
+        const statusDataIdx = voterHeaderIndex(headers, ['STATUS DATA']);
+        const dpIdx = voterHeaderIndex(headers, ['DP-ID', 'DP ID']);
+
+        headers.forEach((header, idx) => {
+            const name = String(header || '').trim();
+            const upper = name.toUpperCase();
+            let value = '';
+            let type = 'text';
+            const opts = {};
+
+            if (idx === noIdx || upper === 'NO') {
+                value = nextNo;
+                opts.readonly = true;
+                opts.help = 'Nomor dibuat otomatis dari nomor terbesar pada sheet.';
+            } else if (idx === dpIdx || upper.includes('DP-ID') || upper.includes('DP ID')) {
+                value = '';
+                opts.readonly = true;
+                opts.help = 'DP-ID dibiarkan kosong untuk pemilih baru; tidak dibuat secara manual.';
+            } else if (idx === coklitIdx || upper.includes('KODE COKLIT') || upper === 'COKLIT') {
+                value = 'B';
+                opts.readonly = true;
+                opts.help = 'Otomatis: B - Baru.';
+            } else if (idx === statusDataIdx || upper.includes('STATUS DATA')) {
+                value = 'B';
+                opts.selectOptions = [
+                    {value:'B', label:'B - Baru'},
+                    {value:'U', label:'U - Ubah'}
+                ];
+            } else if (idx === hubIdx || upper.includes('STATUS HUB') || upper.includes('STATUS HUBUNGAN') || upper.includes('HUBUNGAN')) {
+                value = 'ANAK';
+                opts.selectOptions = [
+                    {value:'KEPALA KELUARGA',label:'KEPALA KELUARGA'},
+                    {value:'SUAMI',label:'SUAMI'},
+                    {value:'ISTRI',label:'ISTRI'},
+                    {value:'ANAK',label:'ANAK'},
+                    {value:'BELUM CUKUP UMUR (BCU)',label:'BELUM CUKUP UMUR (BCU)'}
+                ];
+            } else if (idx === lpIdx || upper === 'L/P' || upper.includes('JENIS KELAMIN')) {
+                value = 'L';
+                opts.selectOptions = [{value:'L',label:'L - Laki-laki'},{value:'P',label:'P - Perempuan'}];
+            } else if (idx === nkkIdx || upper.includes('NKK') || upper.includes('NO KK')) {
+                opts.required = true;
+                opts.inputMode = 'numeric';
+                opts.maxLength = 16;
+                opts.placeholder = '16 digit NKK';
+            } else if (idx === nikIdx || upper === 'NIK' || upper.includes('NO KTP')) {
+                opts.required = true;
+                opts.inputMode = 'numeric';
+                opts.maxLength = 16;
+                opts.placeholder = '16 digit NIK';
+            } else if (idx === tglIdx || upper.includes('TANGGAL LAHIR') || upper.includes('TGL LAHIR')) {
+                type = 'date';
+                opts.required = true;
+                opts.onChange = () => {
+                    if (usiaIdx !== -1) {
+                        const ageInput = container.querySelector(`[data-col-index="${usiaIdx}"]`);
+                        if (ageInput) ageInput.value = calculateNewVoterAge(input.value);
+                    }
+                };
+            } else if (idx === usiaIdx || upper === 'USIA' || upper === 'UMUR') {
+                opts.readonly = true;
+                opts.help = 'Usia otomatis dihitung per 29 Oktober 2026.';
+            } else if (upper.includes('RT')) {
+                opts.selectOptions = Array.from({length:36}, (_,i) => ({value:String(i+1),label:`RT ${String(i+1).padStart(2,'0')}`}));
+            } else if (upper.includes('TPS')) {
+                opts.placeholder = 'Nomor TPS jika ada';
+            }
+
+            container.appendChild(makeAddField(name, idx, value, type, opts));
+        });
+
+        const nkkInput = nkkIdx !== -1 ? container.querySelector(`[data-col-index="${nkkIdx}"]`) : null;
+        if (nkkInput) {
+            nkkInput.addEventListener('input', updateAddVoterInsertInfo);
+            nkkInput.addEventListener('change', updateAddVoterInsertInfo);
+        }
+        updateAddVoterInsertInfo();
+    }
+
+    function updateAddVoterInsertInfo() {
+        const info = document.getElementById('addVoterInsertInfo');
+        if (!info || !currentRawData.length) return;
+        const headers = currentRawData[0];
+        const nkkIdx = voterHeaderIndex(headers, ['NKK', 'NO KK', 'NOMOR KARTU KELUARGA']);
+        const input = nkkIdx !== -1 ? document.querySelector(`#addVoterFieldsContainer [data-col-index="${nkkIdx}"]`) : null;
+        const nkk = String(input?.value || '').trim();
+        if (!nkk) {
+            info.textContent = 'Menentukan berdasarkan NKK';
+            return;
+        }
+        let last = -1;
+        for (let i = 1; i < currentRawData.length; i++) {
+            if (String(currentRawData[i][nkkIdx] || '').trim() === nkk) last = i;
+        }
+        info.textContent = last !== -1
+            ? `Ditempatkan setelah anggota terakhir NKK ${nkk}`
+            : 'NKK belum ada: ditempatkan setelah data terakhir';
+    }
+
+    function openAddVoterModal() {
+        if (!isAdmin) {
+            showToast('Silakan Login Admin terlebih dahulu.', 'bg-warning');
+            return;
+        }
+        // Pemilih baru diarahkan ke DPS agar kode B tercatat pada daftar pemilih sementara.
+        if (activeSheet !== 'DPS (SEMENTARA)') {
+            const dpsLink = Array.from(document.querySelectorAll('#subCategoryPemilih .nav-link'))
+                .find(el => el.textContent.toUpperCase().includes('DPS (SEMENTARA)'));
+            loadSheetData('DPS (SEMENTARA)', dpsLink || null);
+            let tries = 0;
+            const waitForDps = setInterval(() => {
+                tries++;
+                if (activeSheet === 'DPS (SEMENTARA)' && currentRawData && currentRawData.length > 0) {
+                    clearInterval(waitForDps);
+                    document.getElementById('addVoterTargetSheet').textContent = activeSheet;
+                    buildAddVoterFields();
+                    new bootstrap.Modal(document.getElementById('addVoterModal')).show();
+                } else if (tries >= 30) {
+                    clearInterval(waitForDps);
+                    showToast('Data DPS belum berhasil dimuat. Silakan klik Refresh Cache lalu coba lagi.', 'bg-warning');
+                }
+            }, 200);
+            return;
+        }
+        if (!currentRawData || currentRawData.length < 1) {
+            showToast('Data DPS belum selesai dimuat. Silakan tunggu sebentar.', 'bg-warning');
+            return;
+        }
+        document.getElementById('addVoterTargetSheet').textContent = activeSheet;
+        buildAddVoterFields();
+        new bootstrap.Modal(document.getElementById('addVoterModal')).show();
+    }
+
+    function saveNewVoter() {
+        if (!isAdmin) return;
+        if (activeSheet !== 'DPS (SEMENTARA)') {
+            showToast('Tambah pemilih baru hanya dilakukan pada DPS (SEMENTARA).', 'bg-warning');
+            return;
+        }
+        const headers = currentRawData[0] || [];
+        const values = Array(headers.length).fill('');
+        document.querySelectorAll('.add-voter-input').forEach(input => {
+            values[parseInt(input.dataset.colIndex, 10)] = input.value.trim();
+        });
+
+        const nkkIdx = voterHeaderIndex(headers, ['NKK', 'NO KK', 'NOMOR KARTU KELUARGA']);
+        const nikIdx = voterHeaderIndex(headers, ['NIK', 'NO KTP', 'NOMOR INDUK KEPENDUDUKAN']);
+        const namaIdx = voterHeaderIndex(headers, ['NAMA', 'NAMA LENGKAP']);
+        const tglIdx = voterHeaderIndex(headers, ['TANGGAL LAHIR', 'TGL LAHIR']);
+        const coklitIdx = voterHeaderIndex(headers, ['KODE COKLIT', 'COKLIT']);
+
+        if (nkkIdx === -1 || nikIdx === -1 || namaIdx === -1) {
+            showToast('Kolom NKK, NIK, atau NAMA tidak ditemukan pada header DPS.', 'bg-danger');
+            return;
+        }
+        if (!/^\d{16}$/.test(values[nkkIdx])) {
+            showToast('NKK harus 16 digit angka.', 'bg-danger');
+            return;
+        }
+        if (!/^\d{16}$/.test(values[nikIdx])) {
+            showToast('NIK harus 16 digit angka.', 'bg-danger');
+            return;
+        }
+        if (!values[namaIdx]) {
+            showToast('Nama lengkap wajib diisi.', 'bg-danger');
+            return;
+        }
+        if (tglIdx !== -1 && values[tglIdx]) {
+            const usiaIdx = voterHeaderIndex(headers, ['USIA', 'UMUR']);
+            if (usiaIdx !== -1) values[usiaIdx] = calculateNewVoterAge(values[tglIdx]);
+        }
+        if (coklitIdx !== -1) values[coklitIdx] = 'B';
+
+        // Cari baris terakhir keluarga dengan NKK yang sama. +1 karena rowIndex API adalah nomor baris Sheet.
+        let lastSameNkkArrayIndex = -1;
+        for (let i = 1; i < currentRawData.length; i++) {
+            if (String(currentRawData[i][nkkIdx] || '').trim() === values[nkkIdx]) lastSameNkkArrayIndex = i;
+        }
+        let lastNonEmptyArrayIndex = 0;
+        for (let i = currentRawData.length - 1; i >= 1; i--) {
+            if (currentRawData[i].some(v => String(v ?? '').trim() !== '')) { lastNonEmptyArrayIndex = i; break; }
+        }
+        const insertAfterRow = (lastSameNkkArrayIndex !== -1 ? lastSameNkkArrayIndex : lastNonEmptyArrayIndex) + 1;
+
+        const btn = document.getElementById('btnSaveNewVoter');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan ke Google Sheet...';
+
+        const payload = {
+            sheet: 'DPS (SEMENTARA)',
+            actionType: 'B',
+            values: values,
+            insertAfterRow: insertAfterRow,
+            insertMode: 'AFTER_FAMILY',
+            source: 'Tambah Pemilih Baru',
+            autoNumber: true
+        };
+
+        fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(result => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-1"></i>Simpan Pemilih Baru';
+                if (result.status === 'success') {
+                    sessionStorage.removeItem('cache_DPS (SEMENTARA)');
+                    bootstrap.Modal.getInstance(document.getElementById('addVoterModal')).hide();
+                    loadSheetData('DPS (SEMENTARA)', null, true);
+                    showToast('Pemilih baru berhasil ditambahkan dan disusun pada Google Sheet.', 'bg-success');
+                } else {
+                    showToast('Gagal menambah pemilih: ' + (result.message || 'Server belum menerima aksi B.'), 'bg-danger');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-1"></i>Simpan Pemilih Baru';
+                showToast('Gagal terhubung ke server Google Sheet.', 'bg-danger');
+            });
+    }
+
     function deleteRowData(originalRowIndex) {
         if (!isAdmin || !confirm(`Hapus baris sheet #${originalRowIndex + 1}?`)) return;
         fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ sheet: activeSheet, actionType: 'DELETE', rowIndex: originalRowIndex + 1 }) })
@@ -1634,10 +1984,12 @@
             authArea.innerHTML = `<button class="btn btn-warning btn-sm px-3 fw-bold text-dark shadow-sm" onclick="processLogout()"><i class="fas fa-sign-out-alt me-1"></i> Logout Admin</button>`;
             adminActionButtons.classList.remove('d-none');
             adminActionButtons.classList.add('d-flex');
+            document.querySelectorAll('.admin-only-menu').forEach(el => el.classList.remove('d-none'));
         } else {
             authArea.innerHTML = `<button class="btn btn-outline-light btn-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fas fa-lock me-1"></i> Login Admin</button>`;
             adminActionButtons.classList.remove('d-flex');
             adminActionButtons.classList.add('d-none');
+            document.querySelectorAll('.admin-only-menu').forEach(el => el.classList.add('d-none'));
         }
     }
 
