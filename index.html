@@ -15,8 +15,9 @@
             --kpu-primary: #580c1f;
             --kpu-secondary: #8b1531;
             --kpu-accent: #f59e0b;
-            --kpu-bg: #f8fafc;
+            --kpu-bg: #fdf2f4;
             --kpu-gradient: linear-gradient(145deg, #580c1f 0%, #350511 100%);
+            --kpu-card-bg: #ffffff;
         }
 
         body {
@@ -30,36 +31,71 @@
             min-height: 100vh;
             background: var(--kpu-gradient);
             color: #fff;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 0 20px rgba(88, 12, 31, 0.15);
             position: sticky;
             top: 0;
             height: 100vh;
             overflow-y: auto;
+            border-right: 2px solid rgba(245, 158, 11, 0.2);
         }
 
         .sidebar .brand-box {
             padding: 24px 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        .sidebar .menu-category {
-            font-size: 0.7rem;
+        .sidebar .menu-category-header {
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1.2px;
             color: #fbbf24;
-            padding: 14px 20px 4px 20px;
+            padding: 14px 16px 8px 16px;
             font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.2s;
+            border-radius: 8px;
+            margin: 4px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #fbbf24;
+        }
+
+        .sidebar .menu-category-header:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .sidebar .menu-category-header i.chevron-icon {
+            transition: transform 0.3s ease;
+            font-size: 0.75rem;
+        }
+
+        .sidebar .menu-category-header.expanded i.chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        .sidebar .collapsible-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            padding-left: 8px;
+        }
+
+        .sidebar .collapsible-submenu.show {
+            max-height: 400px;
         }
 
         .sidebar .nav-link {
             color: #f1f5f9;
-            padding: 10px 16px;
-            margin: 4px 12px;
+            padding: 9px 16px;
+            margin: 3px 12px 3px 20px;
             border-radius: 8px;
             font-weight: 500;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             transition: all 0.25s ease;
             display: flex;
             align-items: center;
@@ -68,13 +104,13 @@
 
         .sidebar .nav-link i {
             margin-right: 10px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #cbd5e1;
         }
 
         .sidebar .nav-link:hover {
             color: #fff;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(139, 21, 49, 0.6);
             transform: translateX(3px);
         }
 
@@ -84,54 +120,67 @@
 
         .sidebar .nav-link.active {
             color: #fff;
-            background: #991b32;
-            box-shadow: 0 4px 12px rgba(153, 27, 50, 0.4);
+            background: linear-gradient(135deg, #b91c3c 0%, #8b1531 100%);
+            box-shadow: 0 4px 15px rgba(185, 28, 60, 0.4);
             font-weight: 600;
+            border-left: 3px solid #fbbf24;
         }
 
         .sidebar .nav-link.active i {
             color: #fbbf24;
         }
 
-        .sidebar .sub-menu {
-            padding-left: 12px;
-        }
-
         .portal-header {
-            background: linear-gradient(135deg, #6b0f24 0%, #350511 100%);
+            background: linear-gradient(135deg, #700f26 0%, #40030d 100%);
             color: white;
             border-radius: 16px;
             padding: 32px 36px;
-            box-shadow: 0 10px 25px rgba(88, 12, 31, 0.15);
+            box-shadow: 0 10px 30px rgba(112, 15, 38, 0.25);
             margin-bottom: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-header::after {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(245, 158, 11, 0.08);
+            border-radius: 50%;
+            pointer-events: none;
         }
 
         .portal-header h2 {
             font-size: 2.1rem !important;
             font-weight: 800 !important;
             letter-spacing: -0.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .card-custom {
             border: none;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 6px 20px rgba(112, 15, 38, 0.06);
+            background: var(--kpu-card-bg);
+            border: 1px solid rgba(112, 15, 38, 0.08);
         }
 
-        /* Statistik Akumulasi Card */
         .stat-card {
             border-radius: 12px;
-            padding: 16px;
+            padding: 18px;
             color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: linear-gradient(135deg, #8b1531 0%, #580c1f 100%);
+            border-bottom: 4px solid #f59e0b;
         }
         .stat-card:hover {
             transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(139, 21, 49, 0.25);
         }
 
         .table-scroll-container {
@@ -153,23 +202,26 @@
         .sheet-table th {
             position: sticky;
             top: 0;
-            background-color: #f1f5f9 !important;
-            color: #334155;
+            background-color: #700f26 !important;
+            color: #ffffff;
             font-weight: 700 !important;
             text-align: center;
             padding: 12px 10px;
-            border-bottom: 2px solid #cbd5e1 !important;
-            border-top: 1px solid #e2e8f0 !important;
+            border-bottom: 2px solid #580c1f !important;
             white-space: nowrap;
             z-index: 10;
         }
 
         .sheet-table td {
-            border: 1px solid #e2e8f0 !important;
+            border: 1px solid #f1d3d8 !important;
             vertical-align: middle;
             padding: 9px 10px;
             text-align: center;
             color: #334155;
+        }
+
+        .sheet-table tr:hover td {
+            background-color: #fae8ec !important;
         }
 
         .sheet-table td.align-left, 
@@ -185,7 +237,7 @@
         }
 
         .border-top-family td {
-            border-top: 3px solid #94a3b8 !important;
+            border-top: 3px solid #b91c3c !important;
         }
 
         .row-index {
@@ -202,7 +254,8 @@
 
         .sheet-table th.row-index {
             z-index: 15;
-            background-color: #f1f5f9 !important;
+            background-color: #580c1f !important;
+            color: #fff;
         }
 
         #statusToast {
@@ -225,8 +278,8 @@
         }
 
         .realtime-clock-box-bottom {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
             padding: 8px 18px;
             border-radius: 12px;
             font-size: 0.9rem;
@@ -236,19 +289,6 @@
             align-items: center;
             gap: 10px;
             backdrop-filter: blur(5px);
-        }
-
-        /* Styling Khusus Profil Calon Kades & Realcount */
-        .candidate-card {
-            transition: all 0.3s ease;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            overflow: hidden;
-            background: #fff;
-        }
-        .candidate-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
         }
 
         @keyframes fadeIn {
@@ -278,20 +318,31 @@
             </div>
             
             <div class="py-2" id="menuList">
-                <div class="menu-category">Menu Utama</div>
-                <a class="nav-link" onclick="loadSheetData('INPUT SUARA', this)"><i class="fas fa-chart-line"></i>Live Real-Count</a>
-                <a class="nav-link" onclick="loadSheetData('PROFIL CALON KADES', this)"><i class="fas fa-user-tie"></i>Profil Calon Kades</a>
+                <div class="menu-category-header expanded" onclick="toggleSubMenu('subCategoryUtama', this)">
+                    <span><i class="fas fa-bars me-2"></i> Menu Utama</span>
+                    <i class="fas fa-chevron-down chevron-icon"></i>
+                </div>
+                <div class="collapsible-submenu show" id="subCategoryUtama">
+                    <a class="nav-link active" onclick="loadSheetData('INPUT SUARA', this)"><i class="fas fa-chart-line"></i>Live Real-Count</a>
+                    <a class="nav-link" onclick="loadSheetData('PROFIL CALON KADES', this)"><i class="fas fa-user-tie"></i>Profil Calon Kades</a>
+                </div>
 
-                <div class="menu-category">Data Pemilih</div>
-                <div class="sub-menu">
-                    <a class="nav-link active" onclick="loadSheetData('DPT AWAL KPU', this)"><i class="fas fa-users"></i>DPT Awal KPU</a>
+                <div class="menu-category-header" onclick="toggleSubMenu('subCategoryPemilih', this)">
+                    <span><i class="fas fa-users-cog me-2"></i> Data Pemilih</span>
+                    <i class="fas fa-chevron-down chevron-icon"></i>
+                </div>
+                <div class="collapsible-submenu" id="subCategoryPemilih">
+                    <a class="nav-link" onclick="loadSheetData('DPT AWAL KPU', this)"><i class="fas fa-users"></i>DPT Awal KPU</a>
                     <a class="nav-link" onclick="loadSheetData('DPS (SEMENTARA)', this)"><i class="fas fa-user-clock"></i>DPS (Semua)</a>
                     <a class="nav-link" onclick="loadSheetData('DPTAM (TAMBAHAN)', this)"><i class="fas fa-user-plus"></i>DPTAM (Tambahan)</a>
                     <a class="nav-link" onclick="loadSheetData('DPT (TETAP)', this)"><i class="fas fa-address-book"></i>DPT (Tetap)</a>
                 </div>
 
-                <div class="menu-category">Panitia & Pengawas</div>
-                <div class="sub-menu">
+                <div class="menu-category-header" onclick="toggleSubMenu('subCategoryPanitia', this)">
+                    <span><i class="fas fa-user-shield me-2"></i> Panitia & Pengawas</span>
+                    <i class="fas fa-chevron-down chevron-icon"></i>
+                </div>
+                <div class="collapsible-submenu" id="subCategoryPanitia">
                     <a class="nav-link" onclick="loadSheetData('PPS (PANITIA DESA)', this)"><i class="fas fa-id-badge"></i>PPS (Panitia Desa)</a>
                     <a class="nav-link" onclick="loadSheetData('PENGAWAS BPD', this)"><i class="fas fa-shield-alt"></i>Pengawas BPD</a>
                     <a class="nav-link" onclick="loadSheetData('KPPS TPS 01', this)"><i class="fas fa-vote-yea"></i>KPPS TPS 01</a>
@@ -302,7 +353,6 @@
 
         <!-- Area Konten Utama -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            <!-- Header Portal -->
             <div class="portal-header no-print">
                 <div class="row align-items-center">
                     <div class="col-lg-7 mb-3 mb-lg-0">
@@ -338,54 +388,52 @@
                 </div>
             </div>
 
-            <!-- Panel Akumulasi & Grafik Terpisah -->
-            <div class="card card-custom p-4 mb-3 d-none chart-section-box no-print" id="directChartSection">
+            <!-- Panel Akumulasi & Grafik -->
+            <div class="card card-custom p-4 mb-3 chart-section-box no-print" id="directChartSection">
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
-                    <h5 class="fw-bold text-danger mb-0 fs-6"><i class="fas fa-chart-bar me-2"></i> Akumulasi Data & Grafik: <span id="directChartTitle">DPT AWAL KPU</span></h5>
+                    <h5 class="fw-bold mb-0 fs-6" style="color: var(--kpu-secondary);"><i class="fas fa-chart-bar me-2"></i> Akumulasi Data & Grafik Rekapitulasi: <span id="directChartTitle">INPUT SUARA</span></h5>
                     <button class="btn btn-outline-secondary btn-sm" onclick="toggleChartSection()" title="Tutup Grafik"><i class="fas fa-times"></i></button>
                 </div>
 
-                <!-- Kotak Akumulasi Ringkasan Data -->
                 <div class="row g-3 mb-4" id="summaryAccumulationCards">
                     <div class="col-md-3">
-                        <div class="stat-card bg-primary">
-                            <div class="small fw-semibold text-white-50 text-uppercase">Total Pemilih</div>
-                            <h3 class="fw-bold mb-0" id="accTotalCount">0</h3>
+                        <div class="stat-card">
+                            <div class="small fw-semibold text-white-50 text-uppercase" id="cardLabel1">Total Entri / Pemilih</div>
+                            <h3 class="fw-bold mb-0 text-warning" id="accTotalCount">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="stat-card bg-success">
-                            <div class="small fw-semibold text-white-50 text-uppercase">Memenuhi Syarat (MS - Aktif)</div>
-                            <h3 class="fw-bold mb-0" id="accMsCount">0</h3>
+                        <div class="stat-card">
+                            <div class="small fw-semibold text-white-50 text-uppercase" id="cardLabel2">MS / Suara Sah</div>
+                            <h3 class="fw-bold mb-0 text-warning" id="accMsCount">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="stat-card bg-danger">
-                            <div class="small fw-semibold text-white-50 text-uppercase">Tidak Memenuhi Syarat (TMS)</div>
-                            <h3 class="fw-bold mb-0" id="accTmsCount">0</h3>
+                        <div class="stat-card">
+                            <div class="small fw-semibold text-white-50 text-uppercase" id="cardLabel3">TMS / Suara Tidak Sah</div>
+                            <h3 class="fw-bold mb-0 text-warning" id="accTmsCount">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="stat-card bg-warning text-dark">
-                            <div class="small fw-semibold text-dark opacity-75 text-uppercase">Ubah / Baru / Pindah / Lainnya</div>
-                            <h3 class="fw-bold mb-0" id="accOtherCount">0</h3>
+                        <div class="stat-card">
+                            <div class="small fw-semibold text-white-50 text-uppercase" id="cardLabel4">Total Suara Masuk</div>
+                            <h3 class="fw-bold mb-0 text-warning" id="accOtherCount">0</h3>
                         </div>
                     </div>
                 </div>
 
-                <!-- Grafik Terpisah -->
                 <div class="row g-4">
                     <div class="col-lg-6">
-                        <div class="p-3 border rounded-3 bg-light shadow-sm">
-                            <h6 class="fw-bold text-center mb-3 text-secondary">Proporsi Status Utama (MS vs TMS)</h6>
+                        <div class="p-3 border rounded-3 bg-white shadow-sm">
+                            <h6 class="fw-bold text-center mb-3" style="color: var(--kpu-secondary);" id="chartTitleLeft">Proporsi Status Utama</h6>
                             <div class="chart-container">
                                 <canvas id="msTmsChart"></canvas>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div class="p-3 border rounded-3 bg-light shadow-sm">
-                            <h6 class="fw-bold text-center mb-3 text-secondary">Rincian Lengkap per Kode Coklit</h6>
+                        <div class="p-3 border rounded-3 bg-white shadow-sm">
+                            <h6 class="fw-bold text-center mb-3" style="color: var(--kpu-secondary);" id="chartTitleRight">Rincian Lengkap / Perbandingan Suara Kandidat</h6>
                             <div class="chart-container">
                                 <canvas id="detailedCoklitChart"></canvas>
                             </div>
@@ -394,15 +442,15 @@
                 </div>
             </div>
 
-            <!-- Panel Filter & Tombol Aksi Khusus Admin -->
+            <!-- Panel Filter & Aksi -->
             <div class="d-flex align-items-center justify-content-between mb-3 px-1 flex-wrap gap-2 no-print" id="filterAndActionContainer">
                 <div>
-                    <h4 class="fw-bold text-uppercase fs-5 mb-0" id="currentTitle" style="color: var(--kpu-primary);">DPT AWAL KPU</h4>
+                    <h4 class="fw-bold text-uppercase fs-5 mb-0" id="currentTitle" style="color: var(--kpu-primary);">INPUT SUARA</h4>
                 </div>
                 
                 <div class="d-flex gap-2 align-items-center flex-wrap">
                     <div class="d-flex gap-2 align-items-center flex-wrap" id="filterControlsBox">
-                        <div class="input-group input-group-sm shadow-sm" style="width: 200px;">
+                        <div class="input-group input-group-sm shadow-sm" style="width: 200px;" id="filterKeywordWrapper">
                             <span class="input-group-text bg-light text-secondary"><i class="fas fa-search"></i></span>
                             <input type="text" id="filterKeyword" class="form-control" placeholder="Cari NKK / NIK / Nama..." oninput="applyFilters()">
                         </div>
@@ -428,7 +476,6 @@
                         <button class="btn btn-outline-secondary btn-sm shadow-sm" type="button" onclick="resetFilter()" title="Reset Semua Filter"><i class="fas fa-redo"></i></button>
                     </div>
 
-                    <!-- Tombol Fitur Khusus Admin -->
                     <div id="adminActionButtons" class="d-none gap-2 flex-wrap">
                         <button class="btn btn-success btn-sm fw-bold px-3 shadow-sm" onclick="exportToExcel()">
                             <i class="fas fa-file-excel me-1"></i> Ekstrak Excel
@@ -440,14 +487,13 @@
                 </div>
             </div>
 
-            <!-- Printable Area (Tabel & Tampilan Khusus Profil Calon/Realcount) -->
+            <!-- Printable Area -->
             <div class="card card-custom p-3" id="printableArea">
                 <div class="text-center d-none" id="printHeader">
                     <h4 class="fw-bold text-uppercase mb-1">PEMILIHAN KEPALA DESA PAYO LEBAR 2026</h4>
                     <p class="text-muted small mb-3">Laporan Dokumen Resmi - <span id="printSheetName"></span></p>
                 </div>
                 
-                <!-- Container Tabel Dinamis -->
                 <div class="table-scroll-container" id="tableScrollContainer">
                     <table class="table sheet-table align-middle" id="dataTable">
                         <tbody>
@@ -455,9 +501,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Container Khusus Tampilan Visual Calon Kades & Realcount (Disesuaikan) -->
-                <div id="customVisualContainer" class="d-none p-3"></div>
                 
                 <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top no-print flex-wrap gap-2" id="paginationContainer">
                     <div class="d-flex align-items-center gap-2">
@@ -479,7 +522,7 @@
     </div>
 </div>
 
-<!-- Modal Edit & Tambah Data Coklit Langsung per Baris -->
+<!-- Modal Edit & Tambah Data -->
 <div class="modal fade" id="adminRowEditModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
@@ -593,7 +636,7 @@
     </div>
 </div>
 
-<!-- Toast Notifikasi Status -->
+<!-- Toast Notifikasi -->
 <div id="statusToast" class="toast align-items-center text-white bg-success border-0 p-2 shadow" role="alert">
     <div class="d-flex">
         <div class="toast-body fw-medium" id="toastMessage">
@@ -607,12 +650,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    let activeSheet = 'DPT AWAL KPU';
+    let activeSheet = 'INPUT SUARA';
     let currentRawData = [];
     let filteredData = [];
     let msTmsChartInstance = null;
     let detailChartInstance = null;
-    let realcountChartInstance = null;
     let isAdmin = false; 
     let currentPage = 1;
     let rowsPerPage = 5000; 
@@ -636,7 +678,20 @@
 
     const tmsCodes = ["1", "2", "3", "4", "5"];
     const committeeSheets = ['PPS (PANITIA DESA)', 'PENGAWAS BPD', 'KPPS TPS 01', 'KPPS TPS 02'];
-    const visualSheets = ['INPUT SUARA', 'PROFIL CALON KADES'];
+    const noFilterSheets = ['INPUT SUARA', 'PROFIL CALON KADES'];
+
+    function toggleSubMenu(submenuId, headerEl) {
+        const submenu = document.getElementById(submenuId);
+        const isExpanded = submenu.classList.contains('show');
+        
+        document.querySelectorAll('.collapsible-submenu').forEach(el => el.classList.remove('show'));
+        document.querySelectorAll('.menu-category-header').forEach(el => el.classList.remove('expanded'));
+
+        if (!isExpanded) {
+            submenu.classList.add('show');
+            headerEl.classList.add('expanded');
+        }
+    }
 
     function updateRealtimeClock() {
         const now = new Date();
@@ -645,7 +700,6 @@
         let day = String(now.getDate()).padStart(2, '0');
         let month = String(now.getMonth() + 1).padStart(2, '0');
         let year = now.getFullYear();
-        
         let hours = String(now.getHours()).padStart(2, '0');
         let minutes = String(now.getMinutes()).padStart(2, '0');
         let seconds = String(now.getSeconds()).padStart(2, '0');
@@ -655,18 +709,13 @@
         if (clockElement) clockElement.innerText = clockString;
     }
 
-    // Format Tanggal diubah otomatis menjadi dd/bb/thn (dd/mm/yyyy)
     function formatDate(val) {
         if (val === null || val === undefined || val === "") return "";
         let strVal = String(val).trim();
-        
-        // Deteksi format ISO YYYY-MM-DD atau sejenisnya
         if (strVal.match(/^\d{4}-\d{2}-\d{2}/)) {
             try {
                 let parts = strVal.split('T')[0].split('-');
-                if (parts.length === 3) {
-                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
-                }
+                if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
             } catch (e) { return strVal; }
         }
         return strVal;
@@ -676,7 +725,6 @@
         if (val === null || val === undefined || val === "") return "";
         let cName = String(colName).toUpperCase();
         let sVal = String(val).trim();
-        
         if ((cName.includes('KODE') || cName.includes('STATUS') || cName.includes('COKLIT')) && coklitMap.hasOwnProperty(sVal)) {
             return `${sVal} - ${coklitMap[sVal]}`;
         }
@@ -697,12 +745,11 @@
         return sVal;
     }
 
-    // Perhitungan usia otomatis terhitung sampai 29 Oktober 2026
     function calculateRowAutoAge() {
         const tglLhrVal = document.getElementById('rowNewTglLahirInput').value;
         if (!tglLhrVal) return;
         let birthDate = new Date(tglLhrVal);
-        let targetDate = new Date('2026-10-29'); // Target s.d 29 Oktober 2026
+        let targetDate = new Date('2026-10-29');
         let age = targetDate.getFullYear() - birthDate.getFullYear();
         let m = targetDate.getMonth() - birthDate.getMonth();
         if (m < 0 || (m === 0 && targetDate.getDate() < birthDate.getDate())) age--;
@@ -724,32 +771,32 @@
         }
 
         const isCommittee = committeeSheets.includes(sheetName);
-        const isVisual = visualSheets.includes(sheetName);
-        const toggleChartBtn = document.getElementById('toggleChartBtn');
+        const isNoFilter = noFilterSheets.includes(sheetName);
         const filterControlsBox = document.getElementById('filterControlsBox');
+        const toggleChartBtn = document.getElementById('toggleChartBtn');
         const directChartSection = document.getElementById('directChartSection');
-        const tableScrollContainer = document.getElementById('tableScrollContainer');
-        const customVisualContainer = document.getElementById('customVisualContainer');
-        const paginationContainer = document.getElementById('paginationContainer');
+        const filterKeywordWrapper = document.getElementById('filterKeywordWrapper');
+        const filterCoklitEl = document.getElementById('filterCoklit');
+        const filterRtEl = document.getElementById('filterRt');
 
-        if (isCommittee || isVisual) {
-            if (toggleChartBtn) toggleChartBtn.classList.add('d-none');
+        if (isCommittee) {
             if (filterControlsBox) filterControlsBox.classList.add('d-none');
+            if (toggleChartBtn) toggleChartBtn.classList.add('d-none');
             if (directChartSection) directChartSection.classList.add('d-none');
         } else {
-            if (toggleChartBtn) toggleChartBtn.classList.remove('d-none');
             if (filterControlsBox) filterControlsBox.classList.remove('d-none');
-        }
+            if (toggleChartBtn) toggleChartBtn.classList.remove('d-none');
+            if (directChartSection) directChartSection.classList.remove('d-none');
 
-        // Penanganan khusus tampilan visual (Real-Count & Profil Calon Kades)
-        if (isVisual) {
-            tableScrollContainer.classList.add('d-none');
-            customVisualContainer.classList.remove('d-none');
-            if(paginationContainer) paginationContainer.classList.add('d-none');
-        } else {
-            tableScrollContainer.classList.remove('d-none');
-            customVisualContainer.classList.add('d-none');
-            if(paginationContainer) paginationContainer.classList.remove('d-none');
+            if (isNoFilter) {
+                if (filterKeywordWrapper) filterKeywordWrapper.classList.add('d-none');
+                if (filterCoklitEl) filterCoklitEl.classList.add('d-none');
+                if (filterRtEl) filterRtEl.classList.add('d-none');
+            } else {
+                if (filterKeywordWrapper) filterKeywordWrapper.classList.remove('d-none');
+                if (filterCoklitEl) filterCoklitEl.classList.remove('d-none');
+                if (filterRtEl) filterRtEl.classList.remove('d-none');
+            }
         }
 
         const table = document.getElementById('dataTable');
@@ -758,25 +805,14 @@
             currentRawData = JSON.parse(cachedData);
             filteredData = currentRawData;
             currentPage = 1;
-            
-            if (isVisual) {
-                renderVisualContent(sheetName);
-            } else {
-                renderTablePage();
-            }
+            renderTablePage();
             populateRtDropdown();
             populateRowRtSelect();
-            if (!isCommittee && !isVisual && !document.getElementById('directChartSection').classList.contains('d-none')) {
-                generateSeparateChartsAndAccumulation();
-            }
+            if (!isCommittee) generateCustomChartsAndAccumulation();
             return;
         }
 
-        if(!isVisual) {
-            table.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Sinkronisasi data sheet...</p></td></tr>';
-        } else {
-            customVisualContainer.innerHTML = '<div class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Memuat modul visual ' + sheetName + '...</p></div>';
-        }
+        table.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Sinkronisasi data server...</p></td></tr>';
 
         fetch(`${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${new Date().getTime()}`)
             .then(response => response.json())
@@ -786,134 +822,19 @@
                 sessionStorage.setItem('cache_' + sheetName, JSON.stringify(data));
                 currentPage = 1;
 
-                if (isVisual) {
-                    renderVisualContent(sheetName);
-                } else {
-                    renderTablePage();
-                }
+                renderTablePage();
                 populateRtDropdown();
                 populateRowRtSelect();
-                if (!isCommittee && !isVisual && !document.getElementById('directChartSection').classList.contains('d-none')) {
-                    generateSeparateChartsAndAccumulation();
-                }
+                if (!isCommittee) generateCustomChartsAndAccumulation();
             })
             .catch(error => {
                 console.error('Error:', error);
-                if(!isVisual) {
-                    table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Periksa koneksi internet Anda.</td></tr>';
-                } else {
-                    customVisualContainer.innerHTML = '<div class="text-center text-danger py-4">Gagal memuat data visual. Periksa koneksi jaringan Anda.</div>';
-                }
+                table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Periksa koneksi internet Anda.</td></tr>';
             });
-    }
-
-    // Fungsi Render Khusus Menu Real-Count & Profil Calon Kades
-    function renderVisualContent(sheetName) {
-        const container = document.getElementById('customVisualContainer');
-        if (!currentRawData || currentRawData.length <= 1) {
-            container.innerHTML = '<div class="text-center py-4 text-muted">Belum ada data untuk ditampilkan.</div>';
-            return;
-        }
-
-        const headers = currentRawData[0];
-        const rows = currentRawData.slice(1);
-
-        if (sheetName === 'PROFIL CALON KADES') {
-            let html = '<div class="row g-4">';
-            rows.forEach((row, idx) => {
-                let nama = row[1] || row[0] || `Calon Nomor ${idx + 1}`;
-                let noUrut = row[0] || (idx + 1);
-                let visiMisi = row[2] || 'Visi dan Misi membangun Desa Payo Lebar yang lebih maju, transparan, dan Sejahtera.';
-                let fotoUrl = row[3] || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80';
-
-                html += `
-                    <div class="col-md-4">
-                        <div class="candidate-card h-100 shadow-sm">
-                            <div class="position-relative">
-                                <img src="${fotoUrl}" class="card-img-top object-fit-cover" style="height: 260px;" alt="${nama}" onerror="this.src='https://via.placeholder.com/400x300?text=Foto+Kandidat'">
-                                <span class="position-absolute top-0 start-0 m-3 badge bg-danger fs-6 px-3 py-2 shadow fw-bold rounded-pill">No. Urut ${noUrut}</span>
-                            </div>
-                            <div class="card-body p-4 d-flex flex-column">
-                                <h4 class="fw-bold text-dark mb-1">${nama}</h4>
-                                <p class="text-muted small mb-3"><i class="fas fa-award text-warning me-1"></i> Kandidat Kepala Desa Payo Lebar</p>
-                                <hr class="text-muted opacity-25">
-                                <h6 class="fw-bold text-secondary small text-uppercase">Visi & Misi Utama:</h6>
-                                <p class="text-secondary small flex-grow-1">${visiMisi}</p>
-                                <div class="mt-3 pt-2 border-top text-end">
-                                    <span class="badge bg-light text-dark border px-2 py-1"><i class="fas fa-check-circle text-success me-1"></i> Terverifikasi KPU Des</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
-
-        } else if (sheetName === 'INPUT SUARA') {
-            // Render Real-Count Visual Grafik Suara Masuk & Perolehan
-            let totalSuaraMasuk = 0;
-            let labels = [];
-            let counts = [];
-
-            rows.forEach((row) => {
-                let namaKandidat = row[1] || row[0] || 'Kandidat';
-                let perolehan = parseInt(row[2] || row[3] || 0);
-                labels.push(namaKandidat);
-                counts.push(perolehan);
-                totalSuaraMasuk += perolehan;
-            });
-
-            let html = `
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                        <div class="stat-card bg-danger p-4">
-                            <div class="small fw-semibold text-white-50 text-uppercase">Total Suara Masuk (Real-Count)</div>
-                            <h2 class="fw-bold mb-0">${totalSuaraMasuk.toLocaleString('id-ID')} Suara</h2>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="stat-card bg-dark p-4">
-                            <div class="small fw-semibold text-white-50 text-uppercase">Status Tabulasi TPS</div>
-                            <h2 class="fw-bold mb-0 text-warning">LIVE & REALTIME</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-4 border rounded-3 bg-light shadow-sm">
-                    <h5 class="fw-bold text-center mb-3 text-secondary"><i class="fas fa-chart-bar me-2 text-danger"></i> Grafik Perolehan Suara Sementara Calon Kades</h5>
-                    <div style="position: relative; height: 350px; width: 100%;">
-                        <canvas id="realcountChartCanvas"></canvas>
-                    </div>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            setTimeout(() => {
-                const ctxReal = document.getElementById('realcountChartCanvas').getContext('2d');
-                if (realcountChartInstance) realcountChartInstance.destroy();
-                realcountChartInstance = new Chart(ctxReal, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Jumlah Suara Sah',
-                            data: counts,
-                            backgroundColor: ['#580c1f', '#f59e0b', '#10b981', '#3b82f6', '#8b1531'],
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-                    }
-                });
-            }, 100);
-        }
     }
 
     function populateRtDropdown() {
-        if (committeeSheets.includes(activeSheet) || visualSheets.includes(activeSheet)) return;
+        if (committeeSheets.includes(activeSheet)) return;
         const rtSelect = document.getElementById('filterRt');
         rtSelect.innerHTML = '<option value="">-- Semua RT (1-36) --</option>';
         for (let i = 1; i <= 36; i++) {
@@ -936,42 +857,23 @@
     }
 
     function applyFilters() {
-        if (committeeSheets.includes(activeSheet) || visualSheets.includes(activeSheet)) return;
+        if (committeeSheets.includes(activeSheet) || noFilterSheets.includes(activeSheet)) return;
         if (!currentRawData || currentRawData.length <= 1) return;
 
         const headers = currentRawData[0];
         const rows = currentRawData.slice(1);
-
         const keyword = document.getElementById('filterKeyword').value.toLowerCase().trim();
         const selectedCoklit = document.getElementById('filterCoklit').value;
         const selectedRt = document.getElementById('filterRt').value;
 
-        let coklitIdx = headers.findIndex(h => {
-            let hUp = String(h).toUpperCase();
-            return hUp.includes('KODE COKLIT') || hUp.includes('COKLIT');
-        });
+        let coklitIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
         let rtIdx = headers.findIndex(h => String(h).toUpperCase().includes('RT'));
-        let nkkIdx = headers.findIndex(h => {
-            let hUp = String(h).toUpperCase();
-            return hUp.includes('NKK') || hUp.includes('NO KK');
-        });
+        let nkkIdx = headers.findIndex(h => String(h).toUpperCase().includes('NKK') || String(h).toUpperCase().includes('NO KK'));
 
         const matchedRows = rows.filter(row => {
-            let matchKeyword = true;
-            if (keyword !== "") matchKeyword = row.some(cell => String(cell || '').toLowerCase().includes(keyword));
-
-            let matchCoklit = true;
-            if (selectedCoklit !== "" && coklitIdx !== -1) {
-                let cellCoklit = String(row[coklitIdx] || '').trim();
-                matchCoklit = (cellCoklit === selectedCoklit);
-            }
-
-            let matchRt = true;
-            if (selectedRt !== "" && rtIdx !== -1) {
-                let cellRt = String(row[rtIdx] || '').trim();
-                matchRt = (cellRt === selectedRt);
-            }
-
+            let matchKeyword = keyword === "" || row.some(cell => String(cell || '').toLowerCase().includes(keyword));
+            let matchCoklit = selectedCoklit === "" || (coklitIdx !== -1 && String(row[coklitIdx] || '').trim() === selectedCoklit);
+            let matchRt = selectedRt === "" || (rtIdx !== -1 && String(row[rtIdx] || '').trim() === selectedRt);
             return matchKeyword && matchCoklit && matchRt;
         });
 
@@ -982,10 +884,7 @@
         filteredData = [headers, ...matchedRows];
         currentPage = 1;
         renderTablePage();
-
-        if (!document.getElementById('directChartSection').classList.contains('d-none')) {
-            generateSeparateChartsAndAccumulation();
-        }
+        generateCustomChartsAndAccumulation();
     }
 
     function resetFilter() {
@@ -995,9 +894,7 @@
         filteredData = currentRawData;
         currentPage = 1;
         renderTablePage();
-        if (!document.getElementById('directChartSection').classList.contains('d-none')) {
-            generateSeparateChartsAndAccumulation();
-        }
+        generateCustomChartsAndAccumulation();
     }
 
     function changeRowsPerPage() {
@@ -1007,7 +904,6 @@
     }
 
     function renderTablePage() {
-        if (visualSheets.includes(activeSheet)) return;
         const table = document.getElementById('dataTable');
         if (!currentRawData || currentRawData.length === 0) {
             table.innerHTML = '<tr><td colspan="100" class="text-center py-4 text-muted">Belum ada data tersedia.</td></tr>';
@@ -1025,19 +921,13 @@
         const endIdx = startIdx + rowsPerPage;
         const paginatedRows = rows.slice(startIdx, endIdx);
 
-        let coklitColIdx = headers.findIndex(h => {
-            let hUp = String(h).toUpperCase();
-            return hUp.includes('KODE COKLIT') || hUp.includes('COKLIT');
-        });
-        let nkkIdx = headers.findIndex(h => {
-            let hUp = String(h).toUpperCase();
-            return hUp.includes('NKK') || hUp.includes('NO KK');
-        });
+        let coklitColIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
+        let nkkIdx = headers.findIndex(h => String(h).toUpperCase().includes('NKK') || String(h).toUpperCase().includes('NO KK'));
 
         let headerHtml = '<thead><tr><th class="row-index">#</th>';
         if (isAdmin) headerHtml += '<th class="no-print text-center" style="width: 90px;">AKSI</th>';
         headers.forEach((col) => {
-            let isLeftCol = String(col).toUpperCase().includes('NAMA') || String(col).toUpperCase().includes('ALAMAT') || String(col).toUpperCase().includes('DUSUN') || String(col).toUpperCase().includes('KETERANGAN');
+            let isLeftCol = String(col).toUpperCase().includes('NAMA') || String(col).toUpperCase().includes('ALAMAT') || String(col).toUpperCase().includes('DUSUN') || String(col).toUpperCase().includes('KETERANGAN') || String(col).toUpperCase().includes('PROFIL') || String(col).toUpperCase().includes('KANDIDAT') || String(col).toUpperCase().includes('VISI');
             headerHtml += `<th class="${isLeftCol ? 'align-left' : ''}">${col}</th>`;
         });
         headerHtml += '</tr></thead>';
@@ -1073,7 +963,7 @@
 
                 row.forEach((cell, j) => {
                     let colNameUpper = String(headers[j]).toUpperCase();
-                    let isLeftCol = colNameUpper.includes('NAMA') || colNameUpper.includes('ALAMAT') || colNameUpper.includes('DUSUN') || colNameUpper.includes('KETERANGAN');
+                    let isLeftCol = colNameUpper.includes('NAMA') || colNameUpper.includes('ALAMAT') || colNameUpper.includes('DUSUN') || colNameUpper.includes('KETERANGAN') || colNameUpper.includes('VISI');
                     let displayCell = maskSensitiveData(headers[j], formatCoklitCode(headers[j], formatDate(cell)));
                     bodyHtml += `<td class="${isLeftCol ? 'align-left' : ''}">${displayCell}</td>`;
                 });
@@ -1112,17 +1002,14 @@
         editingTargetRowData = rowData;
 
         let headers = currentRawData[0];
-        let coklitColIdx = headers.findIndex(h => {
-            let hUp = String(h).toUpperCase();
-            return hUp.includes('KODE COKLIT') || hUp.includes('COKLIT');
-        });
+        let coklitColIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
 
         let currentCoklit = coklitColIdx !== -1 ? String(rowData[coklitColIdx] || '0').trim() : '0';
         document.getElementById('rowEditCoklitType').value = coklitMap.hasOwnProperty(currentCoklit) ? currentCoklit : '0';
 
         document.getElementById('selectedRowTargetInfo').innerHTML = `
             <div class="small fw-bold text-success"><i class="fas fa-id-card me-1"></i> Baris Sheet #${originalRowIndex + 1} Terpilih:</div>
-            <div class="small text-dark">Nama: <b>${rowData[2] || '-'}</b> | NIK: <b>${rowData[1] || '-'}</b> | NKK: <b>${rowData[0] || '-'}</b></div>
+            <div class="small text-dark">Data Baris: <b>${rowData[1] || rowData[0] || '-'}</b></div>
         `;
 
         toggleRowEditFields();
@@ -1212,87 +1099,227 @@
     }
 
     function toggleChartSection() {
-        if (committeeSheets.includes(activeSheet) || visualSheets.includes(activeSheet)) return;
         const section = document.getElementById('directChartSection');
         const btnText = document.getElementById('chartToggleText');
         if (section.classList.contains('d-none')) {
             section.classList.remove('d-none');
             btnText.innerText = "Tutup Grafik";
-            generateSeparateChartsAndAccumulation();
+            generateCustomChartsAndAccumulation();
         } else {
             section.classList.add('d-none');
             btnText.innerText = "Tampilkan Akumulasi & Grafik";
         }
     }
 
-    function generateSeparateChartsAndAccumulation() {
-        if (committeeSheets.includes(activeSheet) || visualSheets.includes(activeSheet)) return;
+    function generateCustomChartsAndAccumulation() {
         if (!filteredData || filteredData.length <= 1) return;
 
         const headers = filteredData[0];
         const rows = filteredData.slice(1);
-        let coklitIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
 
-        let total = rows.length;
-        let countMs = 0;
-        let countTms = 0;
-        let countOther = 0;
-        let detailedCounts = {};
+        const cardLabel1 = document.getElementById('cardLabel1');
+        const cardLabel2 = document.getElementById('cardLabel2');
+        const cardLabel3 = document.getElementById('cardLabel3');
+        const cardLabel4 = document.getElementById('cardLabel4');
+        const chartTitleLeft = document.getElementById('chartTitleLeft');
+        const chartTitleRight = document.getElementById('chartTitleRight');
 
-        Object.keys(coklitMap).forEach(k => detailedCounts[k] = 0);
+        if (activeSheet === 'INPUT SUARA') {
+            cardLabel1.innerText = "Total TPS Masuk";
+            cardLabel2.innerText = "Akumulasi Suara Sah";
+            cardLabel3.innerText = "Suara Tidak Sah";
+            cardLabel4.innerText = "Total Suara Masuk";
+            chartTitleLeft.innerText = "Perbandingan Suara Sah vs Tidak Sah";
+            chartTitleRight.innerText = "Perolehan Suara Kandidat / Nomor Urut";
 
-        rows.forEach(row => {
-            let val = coklitIdx !== -1 ? String(row[coklitIdx] || '0').trim() : '0';
-            if (val === '0') countMs++;
-            else if (tmsCodes.includes(val)) countTms++;
-            else countOther++;
+            let totalTps = rows.length;
+            let totalSah = 0;
+            let totalTdkSah = 0;
+            let totalMasuk = 0;
+            let kandidatSuara = {};
 
-            if (detailedCounts.hasOwnProperty(val)) detailedCounts[val]++;
-            else detailedCounts[val] = (detailedCounts[val] || 0) + 1;
-        });
+            rows.forEach(r => {
+                let sah = parseFloat(r[r.length - 4]) || 0;
+                let tdkSah = parseFloat(r[r.length - 3]) || 0;
+                let masuk = parseFloat(r[r.length - 2]) || 0;
+                totalSah += sah;
+                totalTdkSah += tdkSah;
+                totalMasuk += masuk;
 
-        document.getElementById('accTotalCount').innerText = total;
-        document.getElementById('accMsCount').innerText = countMs;
-        document.getElementById('accTmsCount').innerText = countTms;
-        document.getElementById('accOtherCount').innerText = countOther;
+                for (let i = 2; i < r.length - 4; i++) {
+                    let kName = headers[i] || `Kandidat ${i-1}`;
+                    kandidatSuara[kName] = (kandidatSuara[kName] || 0) + (parseFloat(r[i]) || 0);
+                }
+            });
 
-        const ctxMsTms = document.getElementById('msTmsChart').getContext('2d');
-        if (msTmsChartInstance) msTmsChartInstance.destroy();
-        msTmsChartInstance = new Chart(ctxMsTms, {
-            type: 'doughnut',
-            data: {
-                labels: ['Memenuhi Syarat (MS / Aktif)', 'Tidak Memenuhi Syarat (TMS)', 'Lainnya (Ubah/Baru/Pindah)'],
-                datasets: [{
-                    data: [countMs, countTms, countOther],
-                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
-                    borderWidth: 2, borderColor: '#ffffff'
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
-        });
+            document.getElementById('accTotalCount').innerText = totalTps;
+            document.getElementById('accMsCount').innerText = totalSah;
+            document.getElementById('accTmsCount').innerText = totalTdkSah;
+            document.getElementById('accOtherCount').innerText = totalMasuk;
 
-        let detailLabels = Object.keys(detailedCounts).map(k => `${k} - ${coklitMap[k] || 'Lainnya'}`);
-        let detailValues = Object.values(detailedCounts);
+            const ctx1 = document.getElementById('msTmsChart').getContext('2d');
+            if (msTmsChartInstance) msTmsChartInstance.destroy();
+            msTmsChartInstance = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Total Suara Sah', 'Total Suara Tidak Sah'],
+                    datasets: [{ data: [totalSah, totalTdkSah], backgroundColor: ['#8b1531', '#d97706'], borderWidth: 2, borderColor: '#ffffff' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+            });
 
-        const ctxDetail = document.getElementById('detailedCoklitChart').getContext('2d');
-        if (detailChartInstance) detailChartInstance.destroy();
-        detailChartInstance = new Chart(ctxDetail, {
-            type: 'bar',
-            data: {
-                labels: detailLabels,
-                datasets: [{
-                    label: 'Jumlah Pemilih',
-                    data: detailValues,
-                    backgroundColor: '#8b1531',
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-            }
-        });
+            const ctx2 = document.getElementById('detailedCoklitChart').getContext('2d');
+            if (detailChartInstance) detailChartInstance.destroy();
+            detailChartInstance = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(kandidatSuara),
+                    datasets: [{ label: 'Perolehan Suara', data: Object.values(kandidatSuara), backgroundColor: '#700f26', borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+            });
+
+        } else if (activeSheet === 'PROFIL CALON KADES') {
+            cardLabel1.innerText = "Total Kandidat";
+            cardLabel2.innerText = "Kandidat Terdaftar";
+            cardLabel3.innerText = "Total Suara Kandidat";
+            cardLabel4.innerText = "Persentase Max";
+            chartTitleLeft.innerText = "Proporsi Perolehan Suara Kandidat";
+            chartTitleRight.innerText = "Grafik Batang Perolehan Suara";
+
+            let totalKandidat = rows.length;
+            let kandidatNama = [];
+            let kandidatPerolehanSuara = [];
+            let totalSuaraSemua = 0;
+
+            rows.forEach(r => {
+                let nama = r[2] || `Kandidat ${r[1]}`;
+                let suara = parseFloat(r[4]) || 0;
+                kandidatNama.push(nama);
+                kandidatPerolehanSuara.push(suara);
+                totalSuaraSemua += suara;
+            });
+
+            document.getElementById('accTotalCount').innerText = totalKandidat;
+            document.getElementById('accMsCount').innerText = totalKandidat;
+            document.getElementById('accTmsCount').innerText = totalSuaraSemua;
+            document.getElementById('accOtherCount').innerText = totalSuaraSemua > 0 ? "100%" : "0%";
+
+            const ctx1 = document.getElementById('msTmsChart').getContext('2d');
+            if (msTmsChartInstance) msTmsChartInstance.destroy();
+            msTmsChartInstance = new Chart(ctx1, {
+                type: 'pie',
+                data: {
+                    labels: kandidatNama,
+                    datasets: [{ data: kandidatPerolehanSuara, backgroundColor: ['#580c1f', '#8b1531', '#b91c3c', '#d97706', '#991b32'], borderWidth: 2, borderColor: '#ffffff' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+            });
+
+            const ctx2 = document.getElementById('detailedCoklitChart').getContext('2d');
+            if (detailChartInstance) detailChartInstance.destroy();
+            detailChartInstance = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: kandidatNama,
+                    datasets: [{ label: 'Suara', data: kandidatPerolehanSuara, backgroundColor: '#8b1531', borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+            });
+
+        } else {
+            cardLabel1.innerText = "Total Pemilih";
+            cardLabel2.innerText = "Memenuhi Syarat (MS - Aktif)";
+            cardLabel3.innerText = "Tidak Memenuhi Syarat (TMS)";
+            cardLabel4.innerText = "Ubah / Baru / Lainnya";
+            
+            // Penyesuaian Judul Grafik Rekapitulasi Data agar mencakup NKK, NIK, MS, dan TMS
+            chartTitleLeft.innerText = "Proporsi Rinci: NKK (Sama) vs NIK vs MS vs TMS";
+            chartTitleRight.innerText = "Rincian Lengkap per Kode Coklit";
+
+            let coklitIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
+            let nkkIdx = headers.findIndex(h => String(h).toUpperCase().includes('NKK') || String(h).toUpperCase().includes('NO KK'));
+            let nikIdx = headers.findIndex(h => String(h).toUpperCase().includes('NIK'));
+
+            let total = rows.length;
+            let countMs = 0;
+            let countTms = 0;
+            let countOther = 0;
+            let detailedCounts = {};
+            Object.keys(coklitMap).forEach(k => detailedCounts[k] = 0);
+
+            // Menghitung jumlah NKK unik yang datanya sama / keluarga unik
+            let uniqueNkkSet = new Set();
+            let totalNikCount = 0;
+
+            rows.forEach(row => {
+                let val = coklitIdx !== -1 ? String(row[coklitIdx] || '0').trim() : '0';
+                if (val === '0') countMs++;
+                else if (tmsCodes.includes(val)) countTms++;
+                else countOther++;
+
+                if (detailedCounts.hasOwnProperty(val)) detailedCounts[val]++;
+                else detailedCounts[val] = (detailedCounts[val] || 0) + 1;
+
+                if (nkkIdx !== -1 && row[nkkIdx]) {
+                    uniqueNkkSet.add(String(row[nkkIdx]).trim());
+                }
+                if (nikIdx !== -1 && row[nikIdx]) {
+                    totalNikCount++;
+                } else if (nkkIdx === -1 && nikIdx === -1) {
+                    totalNikCount = total; // Fallback jika kolom NIK tidak terdeteksi spesifik
+                }
+            });
+
+            let totalUniqueNkk = uniqueNkkSet.size > 0 ? uniqueNkkSet.size : total;
+            let totalNik = totalNikCount > 0 ? totalNikCount : total;
+
+            document.getElementById('accTotalCount').innerText = total;
+            document.getElementById('accMsCount').innerText = countMs;
+            document.getElementById('accTmsCount').innerText = countTms;
+            document.getElementById('accOtherCount').innerText = countOther;
+
+            // Doughnut chart diperbarui menampilkan NKK, NIK, MS, dan TMS dengan warna berbeda
+            const ctxMsTms = document.getElementById('msTmsChart').getContext('2d');
+            if (msTmsChartInstance) msTmsChartInstance.destroy();
+            msTmsChartInstance = new Chart(ctxMsTms, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'Jumlah NKK (Keluarga Sama)', 
+                        'Jumlah NIK (Individu)', 
+                        'Memenuhi Syarat (MS - Aktif)', 
+                        'Tidak Memenuhi Syarat (TMS)'
+                    ],
+                    datasets: [{ 
+                        data: [totalUniqueNkk, totalNik, countMs, countTms], 
+                        backgroundColor: [
+                            '#f59e0b', // Amber / Kuning Emas untuk NKK
+                            '#3b82f6', // Biru terang untuk NIK
+                            '#8b1531', // Merah Tua KPU untuk MS
+                            '#d97706'  // Oranye gelap untuk TMS
+                        ], 
+                        borderWidth: 2, 
+                        borderColor: '#ffffff' 
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+            });
+
+            let detailLabels = Object.keys(detailedCounts).map(k => `${k} - ${coklitMap[k] || 'Lainnya'}`);
+            let detailValues = Object.values(detailedCounts);
+
+            const ctxDetail = document.getElementById('detailedCoklitChart').getContext('2d');
+            if (detailChartInstance) detailChartInstance.destroy();
+            detailChartInstance = new Chart(ctxDetail, {
+                type: 'bar',
+                data: {
+                    labels: detailLabels,
+                    datasets: [{ label: 'Jumlah Pemilih', data: detailValues, backgroundColor: '#700f26', borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+            });
+        }
     }
 
     function processLogin() {
@@ -1304,7 +1331,7 @@
                     bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
                     document.getElementById('adminPassword').value = '';
                     updateAuthUI();
-                    if(!visualSheets.includes(activeSheet)) renderTablePage();
+                    renderTablePage();
                     showToast("Login Berhasil! Tombol Edit & Hapus aktif.", "bg-success");
                 } else { alert("Password salah!"); }
             });
@@ -1313,7 +1340,7 @@
     function processLogout() {
         isAdmin = false;
         updateAuthUI();
-        if(!visualSheets.includes(activeSheet)) renderTablePage();
+        renderTablePage();
         showToast("Berhasil Logout.", "bg-secondary");
     }
 
@@ -1364,7 +1391,7 @@
     }
 
     window.onload = function() {
-        loadSheetData('DPT AWAL KPU', null);
+        loadSheetData('INPUT SUARA', null);
         updateRealtimeClock();
         setInterval(updateRealtimeClock, 1000);
     };
