@@ -359,6 +359,7 @@
                 <div class="collapsible-submenu show" id="subCategoryUtama">
                     <a class="nav-link active" onclick="loadSheetData('INPUT SUARA', this)"><i class="fas fa-chart-line"></i>Live Real-Count</a>
                     <a class="nav-link" onclick="loadSheetData('PROFIL CALON KADES', this)"><i class="fas fa-user-tie"></i>Profil Calon Kades</a>
+                    <a class="nav-link" onclick="loadTahapanPilkades(this)"><i class="fas fa-calendar-alt"></i>Tahapan Pilkades</a>
                 </div>
 
                 <div class="menu-category-header" onclick="toggleSubMenu('subCategoryPemilih', this)">
@@ -381,6 +382,14 @@
                     <a class="nav-link" onclick="loadSheetData('PENGAWAS (BPD)', this)"><i class="fas fa-shield-alt"></i>PENGAWAS (BPD)</a>
                     <a class="nav-link" onclick="loadSheetData('KPPS TPS 01', this)"><i class="fas fa-vote-yea"></i>KPPS TPS 01</a>
                     <a class="nav-link" onclick="loadSheetData('KPPS TPS 02', this)"><i class="fas fa-vote-yea"></i>KPPS TPS 02</a>
+                </div>
+
+                <div class="menu-category-header" onclick="toggleSubMenu('subCategoryLayanan', this)">
+                    <span><i class="fas fa-headset me-2"></i> Pengaduan & Layanan</span>
+                    <i class="fas fa-chevron-down chevron-icon"></i>
+                </div>
+                <div class="collapsible-submenu" id="subCategoryLayanan">
+                    <a class="nav-link" onclick="loadPengaduanForm(this)"><i class="fas fa-comment-dots"></i>Buat Pengaduan</a>
                 </div>
             </div>
         </nav>
@@ -412,12 +421,15 @@
                     </div>
                 </div>
 
-                <div class="row mt-4 pt-3 border-top border-light border-opacity-10 align-items-center">
-                    <div class="col-12">
+                <div class="row mt-4 pt-3 border-top border-light border-opacity-10 align-items-center justify-content-between">
+                    <div class="col-md-auto mb-2 mb-md-0">
                         <div class="realtime-clock-box-bottom">
                             <i class="fas fa-clock text-warning"></i>
                             <span id="realtimeClockDisplay">Memuat waktu...</span>
                         </div>
+                    </div>
+                    <div class="col-md-auto">
+                        <span class="badge bg-dark text-warning border border-warning px-3 py-2 fw-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">#PpsPilkadesPayoLebar2026</span>
                     </div>
                 </div>
             </div>
@@ -740,7 +752,7 @@
 
     const tmsCodes = ["1", "2", "3", "4", "5"];
     const committeeSheets = ['PANITIA PEMUNGUTAN SUARA (PPS)', 'PENGAWAS (BPD)', 'KPPS TPS 01', 'KPPS TPS 02'];
-    const noFilterSheets = ['INPUT SUARA', 'PROFIL CALON KADES'];
+    const noFilterSheets = ['INPUT SUARA', 'PROFIL CALON KADES', 'TAHAPAN PILKADES', 'PENGADUAN DAN LAYANAN'];
 
     function toggleSubMenu(submenuId, headerEl) {
         const submenu = document.getElementById(submenuId);
@@ -801,7 +813,7 @@
 
         if (cName.includes('NKK') || cName.includes('NO KK') || cName.includes('NOMOR KARTU KELUARGA')) {
             if (sVal.length > 6) return sVal.substring(0, 6) + 'XXXXXX' + sVal.substring(sVal.length - 4);
-        } else if (cName.includes('NIK') || cName.includes('NO KTP') || cName.includes('NOMOR INDUK KEPENDUDUKAN')) {
+        } else if (sVal.includes('NIK') || cName.includes('NO KTP') || cName.includes('NOMOR INDUK KEPENDUDUKAN')) {
             if (sVal.length > 6) return sVal.substring(0, 6) + 'XXXXXX' + sVal.substring(sVal.length - 4);
         }
         return sVal;
@@ -816,6 +828,183 @@
         let m = targetDate.getMonth() - birthDate.getMonth();
         if (m < 0 || (m === 0 && targetDate.getDate() < birthDate.getDate())) age--;
         document.getElementById('rowCalculatedAgeOutput').value = age >= 0 ? `${age} Tahun (s.d 29 Okt 2026)` : '0 Tahun';
+    }
+
+    function loadTahapanPilkades(element) {
+        activeSheet = 'TAHAPAN PILKADES';
+        document.getElementById('currentTitle').innerText = 'TAHAPAN PILKADES';
+        document.getElementById('directChartTitle').innerText = 'TAHAPAN PILKADES';
+
+        if (element) {
+            document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        document.getElementById('filterControlsBox').classList.add('d-none');
+        document.getElementById('toggleChartBtn').classList.add('d-none');
+        document.getElementById('directChartSection').classList.add('d-none');
+
+        const table = document.getElementById('dataTable');
+        let html = `
+            <thead>
+                <tr>
+                    <th class="row-index">#</th>
+                    <th class="align-left">URAIAN KEGIATAN</th>
+                    <th>WAKTU</th>
+                    <th>TANGGAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Gambar 1 -->
+                <tr class="table-secondary fw-bold"><td colspan="4" class="text-start text-uppercase ps-3">-- TAHAPAN BAGIAN 1 (PERSIAPAN S.D. PENETAPAN CALON KEPALA DESA) --</td></tr>
+                <tr><td class="row-index">1</td><td class="align-left fw-bold">PERSIAPAN</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">Sosialisasi Tingkat Kabupaten</td><td>1 hari</td><td>21 Mei 2026</td></tr>
+                <tr><td class="row-index">2</td><td class="align-left fw-bold">PEMBENTUKAN PANITIA</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Pembentukan Panitia Tk.Kecamatan</td><td>10 hari</td><td>1-10 Juni 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. PPS</td><td>10 hari</td><td>11-20 Juni 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">c. KPPS</td><td>5 hari</td><td>21-26 Juni 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">d. Perekrutan Pantarlih</td><td>5 hari</td><td>26-30 Juni 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">e. pembentukan Petugas Linmas</td><td>5 hari</td><td>1-5 Juli 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">f. Sosialisasi Rencana dan Tahapan Pilkades oleh Panitia Kabupaten</td><td>14 hari</td><td>6-19 Juli 2026</td></tr>
+                <tr><td class="row-index">3</td><td class="align-left fw-bold">DPT awal dari KPU Kab.Sarolangun</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Penyampaian DPT awal dari KPU ke DPMD</td><td>16 hari</td><td>20 Juli - 4 Agustus 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Penyerahan DPT awal dari PMD ke Camat</td><td>9 hari</td><td>5-13 Agustus 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">c. Penyerahan DPT awal dari Camat ke Pemerintah Desa</td><td>4 hari</td><td>14-17 Agust 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">d. Penyerahan DPT awal dari Pemdes ke PPS</td><td>2 hari</td><td>18 - 19 Agust 2026</td></tr>
+                <tr><td class="row-index">4</td><td class="align-left fw-bold">PENDATAAN DAFTAR PEMILIH SEMENTARA (DPS)</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Pendataan, pencocokan dan penelitian oleh Pantarlih</td><td>14 hari</td><td>20 Agust - 3 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Penyusunan dan perbaikan DPS hasil pendataan</td><td>3 hari</td><td>4-6 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">c. Pencetakan dan Penetapan DPS oleh PPS</td><td>1 hari</td><td>7 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">d. Pengumuman dan tanggapan Masyarakat terhadap DPS</td><td>3 hari</td><td>8-10 Sept 2026</td></tr>
+                <tr><td class="row-index">5</td><td class="align-left fw-bold">PENDATAAN DAFTAR PEMILIH TAMBAHAN (DPTam)</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Pendataan, dan pendaftaran DPTam</td><td>3 hari</td><td>11-13 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Penyusunan dan perbaikan DPTam hasil Pemutakhiran</td><td>3 hari</td><td>14-16 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">c. Pencetakan dan Penetapan DPTam oleh PPS</td><td>1 hari</td><td>17 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">d. Pengumuman dan tanggapan Masyarakat terhadap DPTam</td><td>3 hari</td><td>18-20 Sept 2026</td></tr>
+                <tr><td class="row-index">6</td><td class="align-left fw-bold">PENETAPAN DAFTAR PEMILIH TETAP (DPT)</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Penetapan DPTam menjadi DPT oleh PPS</td><td>1 hari</td><td>21 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Pencetakan DPT oleh PPS</td><td>1 hari</td><td>22 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">c. Pengumuman DPT oleh KPPS</td><td>3 hari</td><td>23-25 Sept 2026</td></tr>
+                <tr><td class="row-index">7</td><td class="align-left fw-bold">PENJARINGAN CALON KADES</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Pengumuman dan Pendaftaran Bakal Calon</td><td>9 hari</td><td>20-28 Juli 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Perpanjangan waktu pendaftaran jika calon tunggal</td><td>15 hari</td><td>29 Juli - 12 Agst 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">c. Perpanjangan waktu pendaftaran jika masih calon tunggal</td><td>10 hari</td><td>13-22 Agst 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">d. Penelitian kelengkapan dan keabsahan berkas pendaftaran disertai klarifikasi</td><td>17 hari</td><td>23 Agst - 8 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">e. Pengumuman bakal calon yang telah memenuhi kelengkapan administrasi</td><td>2 hari</td><td>9-10 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">f. Jadwal khusus, (seleksi Tambahan/uji kompetensi jika Bakal calon lebih dari 5 (lima) orang</td><td>5 hari</td><td>11-15 Sept 2026</td></tr>
+                <tr><td class="row-index">8</td><td class="align-left fw-bold">PENETAPAN CALON KEPALA DESA</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Penetapan bakal calon Kepala Desa menjadi Calon Kepala Desa serta penetapan dan pengambilan Nomor Urut Calon</td><td>2 hari</td><td>16-17 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Pengumuman Calon Kepala Desa berdasarkan No.Urut</td><td>1 hari</td><td>18 Sept 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">c. Penyampaian Data (Photo dan CD) Calon Kepala Desa ke Dinas PMD Kab.Sarolangun</td><td>3 hari</td><td>19-21 Sept 2026</td></tr>
+
+                <!-- Gambar 2 -->
+                <tr class="table-secondary fw-bold"><td colspan="4" class="text-start text-uppercase ps-3">-- TAHAPAN BAGIAN 2 (PENCETAKAN SURAT SUARA S.D. PENETAPAN KEPALA DESA TERPILIH) --</td></tr>
+                <tr><td class="row-index">9</td><td class="align-left fw-bold">PENCETAKAN SURAT SUARA</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">- Persiapan Pencetakan Surat Suara</td><td>29 hari</td><td>22 Sept - 20 Okt 2026</td></tr>
+                <tr><td class="row-index">10</td><td class="align-left fw-bold">KAMPANYE</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Deklarasi/Penandatanganan Pernyataan Pilkades Damai</td><td>1 hari</td><td>21 Okt 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Penyampaian visi dan misi/Rapat/Pertemuan/dialog, melalui media massa (cetak/elektronik)</td><td>3 hari</td><td>22-24 Okt 2026</td></tr>
+                <tr><td class="row-index">11</td><td class="align-left fw-bold">MASA TENANG</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">- Masa tenang dan pembersihan alat peraga</td><td>3 hari</td><td>25-27 Okt 2026</td></tr>
+                <tr><td class="row-index">12</td><td class="align-left fw-bold">DISTRIBUSI ALAT PEMILIHAN</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Pembuatan TPS</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Distribusi Surat Suara</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">c. Serah terima Surat Suara dari Panitia Kabupaten/Tim Pemantau ke PPS, dan dari PPS ke KPPS langsung dimasukkan ke Kotak Suara dengan disaksikan oleh Panitia Kab./tim Pemantau, Kepala Desa dan BPD</td><td>1 hari</td><td>28 Oktober 2026</td></tr>
+                <tr><td class="row-index">13</td><td class="align-left fw-bold">PEMUNGUTAN DAN PENGHITUNGAN SURAT SUARA</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Pemungutan dan Penghitungan Surat Suara di TPS</td><td>1 hari</td><td>29 Oktober 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Pleno Penghitungan Surat Suara</td><td>1 hari</td><td>29 Oktober 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">c. Penyerahan Penghitungan Suara oleh PPS ke BPD untuk di tetapkan.</td><td>3 hari</td><td>30 Okt - 2 Nov 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">d. Penyampaian Laporan BPD kepada Bupati melalui Camat untuk di sahkan</td><td>7 hari</td><td>3-9 Nov 2026</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">e. Penyampaian hasil pemilihan Kepala Desa terpilih oleh Camat kepada Bupati untuk disahkan menjadi Kepala Desa</td><td>7 hari</td><td>10-16 Nov 2026</td></tr>
+                <tr><td class="row-index">14</td><td class="align-left fw-bold">PENETAPAN KEPALA DESA TERPILIH</td><td>-</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">a. Penetapan Keputusan Bupati tentang Pengesahan Kepala Desa terpilih</td><td>Maksimal 30 hari setelah menerima laporan dari BPD/Camat</td><td>-</td></tr>
+                <tr><td class="row-index">.</td><td class="align-left ps-4">b. Persiapan dan Pelantikan Kepala Desa terpilih</td><td>Maksimal 30 hari terhitung sejak diterbitkannya SK Bupati</td><td>-</td></tr>
+            </tbody>
+        `;
+        table.innerHTML = html;
+        document.getElementById('pageInfo').innerText = 'Menampilkan seluruh rincian tahapan Pilkades Payo Lebar 2026';
+        document.getElementById('paginationList').innerHTML = '';
+    }
+
+    function loadPengaduanForm(element) {
+        activeSheet = 'PENGADUAN DAN LAYANAN';
+        document.getElementById('currentTitle').innerText = 'LAYANAN PENGADUAN MASYARAKAT';
+        document.getElementById('directChartTitle').innerText = 'PENGADUAN';
+
+        if (element) {
+            document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        document.getElementById('filterControlsBox').classList.add('d-none');
+        document.getElementById('toggleChartBtn').classList.add('d-none');
+        document.getElementById('directChartSection').classList.add('d-none');
+
+        const table = document.getElementById('dataTable');
+        let html = `
+            <thead>
+                <tr>
+                    <th class="align-left">FORMULIR PENGADUAN & LAYANAN MASYARAKAT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="align-left p-4">
+                        <div class="alert alert-warning mb-4" role="alert">
+                            <i class="fas fa-info-circle me-2"></i> Silakan isi formulir di bawah ini dengan data yang valid untuk menyampaikan pengaduan atau laporan terkait pelaksanaan Pilkades Payo Lebar 2026.
+                        </div>
+                        <form onsubmit="event.preventDefault(); submitPengaduanForm();">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-uppercase small">Nama Pengadu:</label>
+                                <input type="text" id="pengaduNama" class="form-control" placeholder="Masukkan nama lengkap Anda..." required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-uppercase small">Alamat:</label>
+                                <textarea id="pengaduAlamat" class="form-control" rows="2" placeholder="Masukkan alamat lengkap / RT Anda..." required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-uppercase small">Nomor HP / WhatsApp:</label>
+                                <input type="tel" id="pengaduHp" class="form-control" placeholder="Contoh: 081234567890..." required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-uppercase small">Jenis Pengaduan:</label>
+                                <select id="pengaduJenis" class="form-select" required>
+                                    <option value="">-- Pilih Jenis Pengaduan --</option>
+                                    <option value="Data Pemilih / DPT">Data Pemilih / DPT</option>
+                                    <option value="Panitia / Penyelenggara">Panitia / Penyelenggara</option>
+                                    <option value="Kampanye / Kecurangan">Kampanye / Kecurangan</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-uppercase small">Upload Bukti Pengaduan (Foto / Dokumen):</label>
+                                <input type="file" id="pengaduBukti" class="form-control" accept="image/*,.pdf" required>
+                                <div class="form-text">Format yang didukung: Gambar (JPG/PNG) atau PDF.</div>
+                            </div>
+                            <button type="submit" class="btn btn-danger px-4 fw-bold text-uppercase" style="background: var(--kpu-secondary);">
+                                <i class="fas fa-paper-plane me-2"></i> Kirim Pengaduan
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        `;
+        table.innerHTML = html;
+        document.getElementById('pageInfo').innerText = 'Formulir Layanan Pengaduan Aktif';
+        document.getElementById('paginationList').innerHTML = '';
+    }
+
+    function submitPengaduanForm() {
+        let nama = document.getElementById('pengaduNama').value;
+        let hp = document.getElementById('pengaduHp').value;
+        if(!nama || !hp) {
+            showToast("Harap lengkapi formulir pengaduan dengan benar.", "bg-danger");
+            return;
+        }
+        showToast("Pengaduan Anda berhasil dikirim dan akan segera ditinjau oleh panitia!", "bg-success");
+        setTimeout(() => {
+            loadPengaduanForm();
+        }, 1500);
     }
 
     function loadSheetData(sheetName, element, forceRefresh = false) {
@@ -870,7 +1059,7 @@
             renderTablePage();
             populateRtDropdown();
             populateRowRtSelect();
-            if (!isCommittee) generateCustomChartsAndAccumulation();
+            if (!isCommittee && sheetName !== 'TAHAPAN PILKADES' && sheetName !== 'PENGADUAN DAN LAYANAN') generateCustomChartsAndAccumulation();
             return;
         }
 
@@ -887,7 +1076,7 @@
                 renderTablePage();
                 populateRtDropdown();
                 populateRowRtSelect();
-                if (!isCommittee) generateCustomChartsAndAccumulation();
+                if (!isCommittee && sheetName !== 'TAHAPAN PILKADES' && sheetName !== 'PENGADUAN DAN LAYANAN') generateCustomChartsAndAccumulation();
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -896,7 +1085,7 @@
     }
 
     function populateRtDropdown() {
-        if (committeeSheets.includes(activeSheet)) return;
+        if (committeeSheets.includes(activeSheet) || activeSheet === 'TAHAPAN PILKADES' || activeSheet === 'PENGADUAN DAN LAYANAN') return;
         const rtSelect = document.getElementById('filterRt');
         rtSelect.innerHTML = '<option value="">-- Semua RT (1-36) --</option>';
         for (let i = 1; i <= 36; i++) {
@@ -909,6 +1098,7 @@
 
     function populateRowRtSelect() {
         const rtSelect = document.getElementById('targetRowRtSelect');
+        if (!rtSelect) return;
         rtSelect.innerHTML = '';
         for (let i = 1; i <= 36; i++) {
             let opt = document.createElement('option');
@@ -966,6 +1156,7 @@
     }
 
     function renderTablePage() {
+        if (activeSheet === 'TAHAPAN PILKADES' || activeSheet === 'PENGADUAN DAN LAYANAN') return;
         const table = document.getElementById('dataTable');
         if (!currentRawData || currentRawData.length === 0) {
             table.innerHTML = '<tr><td colspan="100" class="text-center py-4 text-muted">Belum ada data tersedia.</td></tr>';
