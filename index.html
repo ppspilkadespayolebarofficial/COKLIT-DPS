@@ -227,7 +227,7 @@
 
         .sheet-table {
             width: 100% !important;
-            font-size: 0.85rem;
+            font-size: 0.80rem;
             margin-bottom: 0;
             border-collapse: separate;
             border-spacing: 0;
@@ -240,7 +240,7 @@
             color: #ffffff;
             font-weight: 700 !important;
             text-align: center;
-            padding: 12px 10px;
+            padding: 7px 8px;
             border-bottom: 2px solid #580c1f !important;
             white-space: nowrap;
             z-index: 10;
@@ -249,7 +249,7 @@
         .sheet-table td {
             border: 1px solid #f1d3d8 !important;
             vertical-align: middle;
-            padding: 9px 10px;
+            padding: 5px 7px;
             text-align: center;
             color: #334155;
         }
@@ -336,6 +336,23 @@
             #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
             .no-print { display: none !important; }
             .table-scroll-container { max-height: none !important; overflow: visible !important; }
+
+            /* Cetak lebih rapat agar hemat kertas tetapi tetap terbaca */
+            #printableArea .sheet-table {
+                font-size: 8px !important;
+                line-height: 1.05 !important;
+            }
+            #printableArea .sheet-table th {
+                padding: 4px 5px !important;
+                line-height: 1.05 !important;
+            }
+            #printableArea .sheet-table td {
+                padding: 3px 5px !important;
+                line-height: 1.05 !important;
+            }
+            #printableArea .row-index {
+                width: 32px !important;
+            }
         }
     </style>
 </head>
