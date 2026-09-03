@@ -522,15 +522,15 @@
                         <select id="filterCoklit" class="form-select form-select-sm fw-semibold shadow-sm" style="width: 175px;" onchange="applyFilters()">
                             <option value="">-- Semua Coklit --</option>
                             <option value="0">0 - Aktif (MS)</option>
+                            <option value="6">6 - Pindah Dalam Desa (MS)</option>
+                            <option value="7">7 - Pisah KK (MS)</option>
+                            <option value="U">U - Ubah (MS)</option>
+                            <option value="B">B - Baru (MS)</option>
                             <option value="1">1 - Meninggal (TMS)</option>
                             <option value="2">2 - Ganda (TMS)</option>
                             <option value="3">3 - TNI (TMS)</option>
                             <option value="4">4 - Polisi (TMS)</option>
                             <option value="5">5 - Pindah Luar Desa (TMS)</option>
-                            <option value="6">6 - Pindah Dalam Desa</option>
-                            <option value="7">7 - Pisah KK</option>
-                            <option value="U">U - Ubah</option>
-                            <option value="B">B - Baru</option>
                         </select>
 
                         <select id="filterRt" class="form-select form-select-sm fw-semibold shadow-sm" style="width: 140px;" onchange="applyFilters()">
@@ -807,7 +807,8 @@
         "B": "Baru (MS)"
     };
 
-    const tmsCodes = ["1", "2", "3", "4", "5"];
+    const tmsCodes = ["1", "2", "3", "4", "5"]; // Kode untuk TMS (Tidak Memenuhi Syarat)
+    const msCodes = ["0", "6", "7", "U", "B"]; // Kode untuk MS (Memenuhi Syarat)
     const committeeSheets = ['PANITIA PEMUNGUTAN SUARA (PPS)', 'PENGAWAS (BPD)', 'KPPS TPS 01', 'KPPS TPS 02'];
     const noFilterSheets = ['INPUT SUARA', 'PROFIL CALON KADES', 'TAHAPAN PILKADES', 'PENGADUAN DAN LAYANAN'];
 
@@ -1894,9 +1895,15 @@
 
             rows.forEach(row => {
                 let val = coklitIdx !== -1 ? String(row[coklitIdx] || '0').trim() : '0';
-                if (val === '0') countMs++;
-                else if (tmsCodes.includes(val)) countTms++;
-                else countOther++;
+                
+                // Perbaikan Logika MS dan TMS
+                if (msCodes.includes(val)) {
+                    countMs++;
+                } else if (tmsCodes.includes(val)) {
+                    countTms++;
+                } else {
+                    countOther++;
+                }
 
                 if (detailedCounts.hasOwnProperty(val)) detailedCounts[val]++;
                 else detailedCounts[val] = (detailedCounts[val] || 0) + 1;
