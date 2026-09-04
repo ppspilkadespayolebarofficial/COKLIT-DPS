@@ -641,7 +641,7 @@
             </div>
             <div class="modal-body p-4">
                 <form id="formRowEditAction" onsubmit="event.preventDefault(); executeRowEditAction();">
-                    <div class="mb-3">
+                    <div class="mb-3" id="rowEditCoklitSection">
                         <label class="form-label fw-bold text-secondary small text-uppercase">Status / Kode Coklit:</label>
                         <select id="rowEditCoklitType" class="form-select fw-semibold" onchange="toggleRowEditFields()">
                             <option value="0">0 - Aktif (MS)</option>
@@ -838,6 +838,7 @@
     const tmsCodes = ["1", "2", "3", "4", "5"]; // Kode untuk TMS (Tidak Memenuhi Syarat)
     const msCodes = ["0", "6", "7", "U", "B"]; // Kode untuk MS (Memenuhi Syarat)
     const committeeSheets = ['PANITIA PEMUNGUTAN SUARA (PPS)', 'PENGAWAS (BPD)', 'KPPS TPS 01', 'KPPS TPS 02'];
+    const voterSheets = ['DPT AWAL (PMD)', 'DPS (SEMENTARA)', 'DPTAM (TAMBAHAN)', 'DPT (TETAP)', 'TAMBAH PEMILIH BARU'];
     const noFilterSheets = ['INPUT SUARA', 'PROFIL CALON KADES', 'TAHAPAN PILKADES', 'PENGADUAN DAN LAYANAN'];
 
     function toggleSubMenu(submenuId, headerEl) {
@@ -1514,14 +1515,33 @@
         let rowData = currentRawData[originalRowIndex];
         editingTargetRowData = rowData;
 
-        let headers = currentRawData[0];
-        let coklitColIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
+        const headers = currentRawData[0];
+        const isVoterSheet = voterSheets.includes(activeSheet);
+        const coklitSection = document.getElementById('rowEditCoklitSection');
+        const coklitSelect = document.getElementById('rowEditCoklitType');
+        const modalTitle = document.querySelector('#adminRowEditModal .modal-title');
 
-        let currentCoklit = coklitColIdx !== -1 ? String(rowData[coklitColIdx] || '0').trim() : '0';
-        document.getElementById('rowEditCoklitType').value = coklitMap.hasOwnProperty(currentCoklit) ? currentCoklit : '0';
+        // Hanya menu DATA PEMILIH yang memakai istilah/aksi Coklit.
+        // Menu Utama, Panitia & Pengawas, Input Suara, dan menu non-pemilih
+        // menggunakan mode edit kolom biasa.
+        if (coklitSection) coklitSection.classList.toggle('d-none', !isVoterSheet);
+        if (modalTitle) {
+            modalTitle.innerHTML = isVoterSheet
+                ? '<i class="fas fa-user-edit me-2"></i> Edit Data & Aksi Coklit Pemilih'
+                : '<i class="fas fa-edit me-2"></i> Edit Data Sesuai Kolom';
+        }
+
+        if (isVoterSheet) {
+            let coklitColIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
+            let currentCoklit = coklitColIdx !== -1 ? String(rowData[coklitColIdx] || '0').trim() : '0';
+            coklitSelect.value = coklitMap.hasOwnProperty(currentCoklit) ? currentCoklit : '0';
+        } else {
+            // Untuk semua sheet non-Data Pemilih, selalu gunakan Ubah/Edit.
+            coklitSelect.value = 'U';
+        }
 
         document.getElementById('selectedRowTargetInfo').innerHTML = `
-            <div class="small fw-bold text-success"><i class="fas fa-id-card me-1"></i> Baris Sheet #${originalRowIndex + 1} Terpilih:</div>
+            <div class="small fw-bold text-success"><i class="fas fa-table me-1"></i> ${isVoterSheet ? 'Baris Pemilih' : 'Baris Data'} Sheet #${originalRowIndex + 1} Terpilih:</div>
             <div class="small text-dark">Data Baris: <b>${rowData[1] || rowData[0] || '-'}</b></div>
         `;
 
@@ -1531,11 +1551,12 @@
     }
 
     function toggleRowEditFields() {
-        const val = document.getElementById('rowEditCoklitType').value;
+        const isVoterSheet = voterSheets.includes(activeSheet);
+        const val = isVoterSheet ? document.getElementById('rowEditCoklitType').value : 'U';
         document.getElementById('panelRowUbah').classList.toggle('d-none', val !== 'U');
-        document.getElementById('panelRowPindahLuar').classList.toggle('d-none', val !== '5');
-        document.getElementById('panelRowPindahDalam').classList.toggle('d-none', val !== '6');
-        document.getElementById('panelRowPisahKK').classList.toggle('d-none', val !== '7');
+        document.getElementById('panelRowPindahLuar').classList.toggle('d-none', !isVoterSheet || val !== '5');
+        document.getElementById('panelRowPindahDalam').classList.toggle('d-none', !isVoterSheet || val !== '6');
+        document.getElementById('panelRowPisahKK').classList.toggle('d-none', !isVoterSheet || val !== '7');
     }
 
     function buildDynamicRowEditFields() {
@@ -1604,20 +1625,22 @@
 
     function executeRowEditAction() {
         if (!isAdmin) return;
+        const isVoterSheet = voterSheets.includes(activeSheet);
         const coklitType = document.getElementById('rowEditCoklitType').value;
-        let payload = { sheet: activeSheet, actionType: coklitType, rowIndex: editingTargetRowIndex + 1 };
+        const actionType = isVoterSheet ? coklitType : 'U';
+        let payload = { sheet: activeSheet, actionType: actionType, rowIndex: editingTargetRowIndex + 1 };
 
-        if (coklitType === 'U') {
+        if (actionType === 'U') {
             let updatedValues = [...editingTargetRowData];
             document.querySelectorAll('.dynamic-row-edit-input').forEach(input => {
                 updatedValues[parseInt(input.getAttribute('data-col-index'))] = input.value;
             });
             payload.values = updatedValues;
-        } else if (coklitType === '5') {
+        } else if (actionType === '5') {
             payload.targetPindahLuar = document.getElementById('targetRowPindahLuarInput').value;
-        } else if (coklitType === '6') {
+        } else if (actionType === '6') {
             payload.targetRt = document.getElementById('targetRowRtSelect').value;
-        } else if (coklitType === '7') {
+        } else if (actionType === '7') {
             payload.newNkk = document.getElementById('rowNewNkkInput').value;
             payload.newNik = document.getElementById('rowNewNikInput').value;
             payload.newNama = document.getElementById('rowNewNamaInput').value;
@@ -1638,7 +1661,7 @@
             if (result.status === 'success') {
                 const savedView = captureCurrentViewState();
 
-                if (coklitType === 'U' && Array.isArray(payload.values)) {
+                if (actionType === 'U' && Array.isArray(payload.values)) {
                     updateLocalRow(activeSheet, editingTargetRowIndex, payload.values);
                     bootstrap.Modal.getInstance(document.getElementById('adminRowEditModal')).hide();
                     loadSheetData(activeSheet, null, false, true);
