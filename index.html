@@ -550,10 +550,6 @@
                         <button class="btn btn-dark btn-sm fw-bold px-3 shadow-sm" onclick="printFolioLandscape()">
                             <i class="fas fa-print me-1"></i> Cetak Lanskap
                         </button>
-                        <button class="btn btn-success btn-sm fw-bold px-3 shadow-sm" onclick="openDatabaseUpload()">
-                            <i class="fas fa-file-upload me-1"></i> Upload Database
-                        </button>
-                        <input type="file" id="databaseFileInput" accept=".xlsx,.xls,.csv" class="d-none" onchange="handleDatabaseUpload(event)">
                     </div>
                 </div>
             </div>
@@ -748,18 +744,6 @@
     </div>
 </div>
 
-<!-- Popup Berhasil Simpan -->
-<div class="modal fade" id="saveSuccessModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content border-0 shadow-lg rounded-4 text-center p-4">
-            <div class="mb-3"><i class="fas fa-check-circle text-success" style="font-size: 3.5rem;"></i></div>
-            <h5 class="fw-bold mb-2">Perubahan Berhasil Disimpan</h5>
-            <p class="text-muted small mb-4" id="saveSuccessMessage">Data sudah tersimpan ke Google Sheet.</p>
-            <button type="button" class="btn btn-success fw-bold px-4" data-bs-dismiss="modal">Tutup</button>
-        </div>
-    </div>
-</div>
-
 <!-- Modal Login Admin -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -794,7 +778,6 @@
 <!-- Bootstrap JS & Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
     let activeSheet = 'INPUT SUARA';
     let currentRawData = [];
@@ -802,7 +785,9 @@
     let msTmsChartInstance = null;
     let detailChartInstance = null;
     let isAdmin = false;
-    let adminToken = sessionStorage.getItem('pilkades_admin_token') || ''; 
+    let adminToken = sessionStorage.getItem('pilkades_admin_token') || '';
+    let cacheVersionMap = {};
+    const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 30; // cache lokal boleh dipakai sampai 30 hari
     let currentPage = 1;
     // Pilihan jumlah baris: 50, 100, 500, 1000, 5000.
     // Default awal dibuat 50 agar tampilan publik ringan.
@@ -1103,237 +1088,15 @@
         }, 1500);
     }
 
-
-    // ========================= DATABASE LOKAL / CACHE CEPAT =========================
-    // Excel dipakai sebagai sumber import awal. Google Sheet tetap menjadi
-    // penyimpanan permanen untuk EDIT / TAMBAH / HAPUS melalui Apps Script.
-    const LOCAL_DB_PREFIX = 'pilkades_db_v2_';
-    const LOCAL_DB_META = 'pilkades_db_meta_v2';
-
-    function normalizeUploadedValue(value) {
-        if (value === null || value === undefined) return "";
-        if (value instanceof Date) {
-            const y = value.getFullYear();
-            const m = String(value.getMonth() + 1).padStart(2, '0');
-            const d = String(value.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}T00:00:00`;
-        }
-        return value;
-    }
-
-    function saveLocalSheetData(sheetName, data) {
-        try {
-            localStorage.setItem(LOCAL_DB_PREFIX + sheetName, JSON.stringify(data));
-            sessionStorage.setItem('cache_' + sheetName, JSON.stringify(data));
-            return true;
-        } catch (err) {
-            console.error('Gagal menyimpan cache lokal:', err);
-            showToast('Cache lokal penuh. Data server tetap aman.', 'bg-warning');
-            return false;
-        }
-    }
-
-    function getLocalSheetData(sheetName) {
-        try {
-            const raw = localStorage.getItem(LOCAL_DB_PREFIX + sheetName);
-            return raw ? JSON.parse(raw) : null;
-        } catch (err) {
-            console.error('Gagal membaca cache lokal:', err);
-            return null;
-        }
-    }
-
-    function deleteLocalSheetData(sheetName) {
-        localStorage.removeItem(LOCAL_DB_PREFIX + sheetName);
-        sessionStorage.removeItem('cache_' + sheetName);
-    }
-
-    function renderLoadedSheetData(sheetName, data, isCommittee, sourceLabel) {
-        currentRawData = Array.isArray(data) ? data : [];
-        filteredData = currentRawData;
-        currentPage = 1;
-
-        saveLocalSheetData(sheetName, currentRawData);
-        renderTablePage();
-        populateRtDropdown();
-        populateRowRtSelect();
-
-        if (!isCommittee && sheetName !== 'TAHAPAN PILKADES' && sheetName !== 'PENGADUAN DAN LAYANAN') {
-            generateCustomChartsAndAccumulation();
-        }
-
-        if (sourceLabel) {
-            console.log(`Data ${sheetName} dimuat dari ${sourceLabel}.`);
-        }
-    }
-
-    function openDatabaseUpload() {
-        if (!isAdmin) {
-            showToast('Fitur Upload Database hanya dapat digunakan oleh Admin.', 'bg-warning');
-            return;
-        }
-        const input = document.getElementById('databaseFileInput');
-        if (input) input.click();
-    }
-
-    async function handleDatabaseUpload(event) {
-        if (!isAdmin) {
-            event.target.value = '';
-            showToast('Akses ditolak. Upload Database hanya untuk Admin.', 'bg-danger');
-            return;
-        }
-
-        const file = event.target.files && event.target.files[0];
-        if (!file) return;
-
-        const savedView = captureCurrentViewState();
-
-        try {
-            if (typeof XLSX === 'undefined') {
-                throw new Error('Library pembaca Excel belum termuat.');
-            }
-
-            showToast('Memeriksa database Excel...', 'bg-info');
-
-            const buffer = await file.arrayBuffer();
-            const workbook = XLSX.read(buffer, {
-                type: 'array',
-                cellDates: true,
-                raw: true
-            });
-
-            // Excel TIDAK PERNAH ditulis ke Google Sheet.
-            // Kita baca sebagai kandidat cache saja.
-            const imported = {};
-            workbook.SheetNames.forEach(sheetName => {
-                const ws = workbook.Sheets[sheetName];
-                imported[sheetName] = XLSX.utils.sheet_to_json(ws, {
-                    header: 1,
-                    raw: true,
-                    defval: "",
-                    blankrows: true
-                }).map(row => row.map(normalizeUploadedValue));
-            });
-
-            // Pengaman utama:
-            // bila sheet yang sedang dibuka sudah mempunyai data server,
-            // upload Excel tidak boleh mengganti data tersebut tanpa validasi.
-            // Kita validasi jumlah baris data terhadap Google Sheet untuk sheet aktif.
-            const sheetName = activeSheet;
-            const excelData = imported[sheetName];
-
-            if (excelData) {
-                showToast(`Memvalidasi ${sheetName} dengan Google Sheet...`, 'bg-info');
-
-                const response = await fetch(
-                    `${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`,
-                    { cache: 'no-store' }
-                );
-                if (!response.ok) throw new Error(`Server HTTP ${response.status}`);
-
-                const serverData = await response.json();
-
-                const serverRows = Array.isArray(serverData) ? serverData : [];
-                const excelRows = Array.isArray(excelData) ? excelData : [];
-
-                // Bandingkan jumlah baris berisi data, bukan nomor baris Excel.
-                const countNonEmpty = rows => rows.slice(1).filter(r =>
-                    Array.isArray(r) && r.some(v => String(v ?? '').trim() !== '')
-                ).length;
-
-                const excelCount = countNonEmpty(excelRows);
-                const serverCount = countNonEmpty(serverRows);
-
-                if (excelCount !== serverCount) {
-                    // TOLAK import cache jika berbeda.
-                    // Ini mencegah kasus 4.999 vs 4.590 masuk ke aplikasi.
-                    renderLoadedSheetData(sheetName, serverRows, committeeSheets.includes(sheetName), 'Google Sheet');
-                    restoreCurrentViewState(savedView);
-
-                    throw new Error(
-                        `Upload ditolak: jumlah data ${sheetName} berbeda. ` +
-                        `Excel ${excelCount.toLocaleString('id-ID')} data, ` +
-                        `Google Sheet ${serverCount.toLocaleString('id-ID')} data. ` +
-                        `Google Sheet tetap dipakai sebagai sumber utama.`
-                    );
-                }
-
-                // Jika jumlah sama, gunakan Excel sebagai cache cepat untuk semua sheet.
-                workbook.SheetNames.forEach(name => {
-                    saveLocalSheetData(name, imported[name]);
-                });
-
-                localStorage.setItem(LOCAL_DB_META, JSON.stringify({
-                    fileName: file.name,
-                    importedAt: new Date().toISOString(),
-                    validatedSheet: sheetName,
-                    validatedRowCount: serverCount,
-                    sheets: workbook.SheetNames
-                }));
-
-                loadSheetData(sheetName, null, false, true);
-                restoreCurrentViewState(savedView);
-
-                showToast(
-                    `Database berhasil divalidasi dan disimpan sebagai cache. ` +
-                    `Google Sheet tetap menjadi database utama.`,
-                    'bg-success'
-                );
-            } else {
-                throw new Error(`Sheet "${sheetName}" tidak ditemukan dalam file Excel.`);
-            }
-
-            event.target.value = '';
-        } catch (error) {
-            console.error(error);
-            showToast(error.message || 'Gagal membaca file database.', 'bg-danger');
-            event.target.value = '';
-        }
-    }
-
-    function updateLocalRow(sheetName, rowIndex, values) {
-        const data = getLocalSheetData(sheetName);
-        if (!data || rowIndex < 0) return false;
-        data[rowIndex] = [...values];
-        return saveLocalSheetData(sheetName, data);
-    }
-
-    function insertLocalRow(sheetName, insertIndex, values) {
-        const data = getLocalSheetData(sheetName);
-        if (!data) return false;
-        data.splice(Math.max(1, insertIndex), 0, [...values]);
-        return saveLocalSheetData(sheetName, data);
-    }
-
-    function removeLocalRow(sheetName, rowIndex) {
-        const data = getLocalSheetData(sheetName);
-        if (!data || rowIndex <= 0 || rowIndex >= data.length) return false;
-        data.splice(rowIndex, 1);
-        return saveLocalSheetData(sheetName, data);
-    }
-
-    function clearLocalDatabase() {
-        const metaRaw = localStorage.getItem(LOCAL_DB_META);
-        if (metaRaw) {
-            try {
-                const meta = JSON.parse(metaRaw);
-                (meta.sheets || []).forEach(deleteLocalSheetData);
-            } catch (e) {}
-        }
-        localStorage.removeItem(LOCAL_DB_META);
-    }
-
-    function loadSheetData(sheetName, element, forceRefresh = false, preserveView = false) {
+        function loadSheetData(sheetName, element, forceRefresh = false) {
         activeSheet = sheetName;
         document.getElementById('currentTitle').innerText = sheetName;
         document.getElementById('directChartTitle').innerText = sheetName;
-        
-        if (!preserveView) {
-            document.getElementById('filterKeyword').value = '';
-            document.getElementById('filterCoklit').value = '';
-            document.getElementById('filterRt').value = '';
-        }
-        
+
+        document.getElementById('filterKeyword').value = '';
+        document.getElementById('filterCoklit').value = '';
+        document.getElementById('filterRt').value = '';
+
         if (element) {
             document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
@@ -1356,7 +1119,6 @@
             if (filterControlsBox) filterControlsBox.classList.remove('d-none');
             if (toggleChartBtn) toggleChartBtn.classList.remove('d-none');
             if (directChartSection) directChartSection.classList.remove('d-none');
-
             if (isNoFilter) {
                 if (filterKeywordWrapper) filterKeywordWrapper.classList.add('d-none');
                 if (filterCoklitEl) filterCoklitEl.classList.add('d-none');
@@ -1369,58 +1131,60 @@
         }
 
         const table = document.getElementById('dataTable');
+        const local = readLocalData(sheetName);
 
-        // NORMAL: baca dari database lokal terlebih dahulu => sangat cepat.
-        // FORCE REFRESH: dipakai hanya saat user memang meminta sinkronisasi
-        // atau operasi khusus membutuhkan data server terbaru.
-        if (!forceRefresh) {
-            const localData = getLocalSheetData(sheetName);
-            const metaRaw = localStorage.getItem(LOCAL_DB_META);
-            let cacheValidated = false;
-            try {
-                const meta = metaRaw ? JSON.parse(metaRaw) : null;
-                cacheValidated = !!(meta && meta.validatedSheet === sheetName && meta.validatedRowCount !== undefined);
-            } catch (e) {}
-
-            // Cache hasil upload hanya dipakai setelah tervalidasi terhadap Google Sheet.
-            if (localData && cacheValidated) {
-                renderLoadedSheetData(sheetName, localData, isCommittee, 'cache lokal tervalidasi');
-                return;
-            }
-
-            const sessionData = sessionStorage.getItem('cache_' + sheetName);
-            if (sessionData && !localData) {
-                try {
-                    const parsed = JSON.parse(sessionData);
-                    renderLoadedSheetData(sheetName, parsed, isCommittee, 'session cache');
-                    return;
-                } catch (e) {}
-            }
+        // 1) Tampilkan cache lokal SEGERA. Tidak menunggu Google Sheet.
+        if (local && !forceRefresh) {
+            currentRawData = local.data;
+            filteredData = currentRawData;
+            currentPage = 1;
+            cacheVersionMap[sheetName] = String(local.version || '');
+            renderTablePage();
+            populateRtDropdown();
+            populateRowRtSelect();
+            generateCustomChartsAndAccumulation();
         }
 
-        table.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Sinkronisasi data server...</p></td></tr>';
-
-        fetch(`${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${new Date().getTime()}`)
+        // 2) Cek versi file secara ringan. Tidak mengambil 4.000+ baris.
+        const versionUrl = `${WEB_APP_URL}?action=version&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+        fetch(versionUrl)
             .then(response => response.json())
-            .then(data => {
-                renderLoadedSheetData(sheetName, data, isCommittee, 'Google Sheet');
-                if (window.__pendingRestoreView && sheetName === activeSheet) {
-                    const savedView = window.__pendingRestoreView;
-                    window.__pendingRestoreView = null;
-                    restoreCurrentViewState(savedView);
+            .then(info => {
+                if (!info || info.status === 'error') throw new Error(info?.message || 'Gagal mengecek versi data.');
+                const serverVersion = String(info.version || '');
+                const localVersion = local ? String(local.version || '') : '';
+                const mustDownload = forceRefresh || !local || !localVersion || serverVersion !== localVersion;
+
+                if (!mustDownload) {
+                    return;
                 }
+
+                table.innerHTML = '<tr><td colspan="100" class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Memperbarui data...</p></td></tr>';
+                return fetch(`${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!Array.isArray(data)) throw new Error('Format data server tidak valid.');
+                        currentRawData = data;
+                        filteredData = data;
+                        currentPage = 1;
+                        cacheVersionMap[sheetName] = serverVersion;
+                        saveLocalData(sheetName, data, serverVersion);
+                        renderTablePage();
+                        populateRtDropdown();
+                        populateRowRtSelect();
+                        generateCustomChartsAndAccumulation();
+                    });
             })
             .catch(error => {
-                console.error('Error:', error);
-                const localData = getLocalSheetData(sheetName);
-                if (localData) {
-                    renderLoadedSheetData(sheetName, localData, isCommittee, 'cache lokal (fallback)');
-                    showToast('Server tidak merespons. Menampilkan database lokal terakhir.', 'bg-warning');
+                console.error('Sinkronisasi:', error);
+                if (!local) {
+                    table.innerHTML = '<tr><td colspan="100" class="text-center text-danger py-4">Gagal memuat data. Periksa koneksi internet Anda.</td></tr>';
                 } else {
-                    table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Upload DATABASE.xlsx atau periksa koneksi internet.</td></tr>';
+                    showToast('Data lokal ditampilkan. Sinkronisasi server belum berhasil.', 'bg-warning');
                 }
             });
     }
+
 
     function populateRtDropdown() {
         if (committeeSheets.includes(activeSheet) || activeSheet === 'TAHAPAN PILKADES' || activeSheet === 'PENGADUAN DAN LAYANAN') return;
@@ -1629,36 +1393,6 @@
         });
     }
 
-    function captureCurrentViewState() {
-        return {
-            keyword: document.getElementById('filterKeyword')?.value || '',
-            coklit: document.getElementById('filterCoklit')?.value || '',
-            rt: document.getElementById('filterRt')?.value || '',
-            page: currentPage
-        };
-    }
-
-    function restoreCurrentViewState(view) {
-        if (!view) return;
-        const keyword = document.getElementById('filterKeyword');
-        const coklit = document.getElementById('filterCoklit');
-        const rt = document.getElementById('filterRt');
-        if (keyword) keyword.value = view.keyword;
-        if (coklit) coklit.value = view.coklit;
-        if (rt) rt.value = view.rt;
-        applyFilters();
-        const totalPages = Math.max(1, Math.ceil((filteredData?.length ? filteredData.length - 1 : 0) / rowsPerPage));
-        currentPage = Math.min(Math.max(1, view.page || 1), totalPages);
-        renderTablePage();
-    }
-
-    function showSaveSuccessPopup(message) {
-        const el = document.getElementById('saveSuccessMessage');
-        if (el) el.textContent = message || 'Data sudah tersimpan ke Google Sheet.';
-        const modalEl = document.getElementById('saveSuccessModal');
-        if (modalEl) new bootstrap.Modal(modalEl).show();
-    }
-
     function getAdminTokenOrWarn() {
         if (!isAdmin || !adminToken) {
             showToast('Sesi Admin tidak valid. Silakan login kembali.', 'bg-warning');
@@ -1671,16 +1405,73 @@
     function postAdmin(payload) {
         const token = getAdminTokenOrWarn();
         if (!token) return Promise.reject(new Error('Sesi Admin tidak valid.'));
-
-        const securedPayload = Object.assign({}, payload, { adminToken: token });
-
         return fetch(WEB_APP_URL, {
             method: 'POST',
-            body: JSON.stringify(securedPayload)
-        }).then(res => res.json());
+            body: JSON.stringify(Object.assign({}, payload, { adminToken: token }))
+        }).then(r => r.json());
     }
 
-    function executeRowEditAction() {
+    function cacheKey(sheetName) {
+        return 'pilkades_cache_v2_' + sheetName;
+    }
+
+    function saveLocalData(sheetName, data, version) {
+        try {
+            localStorage.setItem(cacheKey(sheetName), JSON.stringify({
+                version: String(version || ''),
+                savedAt: Date.now(),
+                data: data
+            }));
+        } catch (e) {
+            console.warn('Cache lokal tidak dapat disimpan:', e);
+        }
+    }
+
+    function readLocalData(sheetName) {
+        try {
+            const raw = localStorage.getItem(cacheKey(sheetName));
+            if (!raw) return null;
+            const obj = JSON.parse(raw);
+            if (!obj || !Array.isArray(obj.data)) return null;
+            return obj;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function renderFromCurrentState(preservePage = true) {
+        const oldPage = currentPage;
+        if (!preservePage) currentPage = 1;
+        renderTablePage();
+        if (activeSheet !== 'INPUT SUARA' && activeSheet !== 'PROFIL CALON KADES' && activeSheet !== 'TAHAPAN PILKADES' && activeSheet !== 'PENGADUAN DAN LAYANAN') {
+            generateCustomChartsAndAccumulation();
+        } else if (activeSheet === 'INPUT SUARA' || activeSheet === 'PROFIL CALON KADES') {
+            generateCustomChartsAndAccumulation();
+        }
+        if (preservePage) currentPage = oldPage;
+    }
+
+    function refreshFilteredViewPreservingPosition() {
+        const keywordEl = document.getElementById('filterKeyword');
+        const coklitEl = document.getElementById('filterCoklit');
+        const rtEl = document.getElementById('filterRt');
+        const hasFilter = keywordEl && coklitEl && rtEl &&
+            (keywordEl.value.trim() !== '' || coklitEl.value !== '' || rtEl.value !== '');
+        const wantedPage = currentPage;
+        if (hasFilter) {
+            applyFilters();
+            currentPage = Math.min(wantedPage, Math.max(1, Math.ceil(Math.max(0, filteredData.length - 1) / rowsPerPage)));
+            renderTablePage();
+            generateCustomChartsAndAccumulation();
+        } else {
+            filteredData = currentRawData;
+            currentPage = wantedPage;
+            renderTablePage();
+            generateCustomChartsAndAccumulation();
+        }
+    }
+
+        function executeRowEditAction() {
         if (!isAdmin) return;
         const coklitType = document.getElementById('rowEditCoklitType').value;
         let payload = { sheet: activeSheet, actionType: coklitType, rowIndex: editingTargetRowIndex + 1 };
@@ -1709,42 +1500,39 @@
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...';
 
         postAdmin(payload)
-        .then(response => response.json())
-        .then(result => {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Simpan Perubahan';
-            if (result.status === 'success') {
-                const savedView = captureCurrentViewState();
+            .then(result => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Simpan Perubahan';
+                if (result.status !== 'success') throw new Error(result.message || 'Gagal menyimpan.');
 
-                if (coklitType === 'U' && Array.isArray(payload.values)) {
-                    updateLocalRow(activeSheet, editingTargetRowIndex, payload.values);
-                    bootstrap.Modal.getInstance(document.getElementById('adminRowEditModal')).hide();
-                    loadSheetData(activeSheet, null, false, true);
-                    restoreCurrentViewState(savedView);
-                } else {
-                    // Aksi 5/6/7 dapat mengubah lebih dari satu baris, sehingga
-                    // ambil data terbaru dari server, tetapi pertahankan filter & halaman.
-                    deleteLocalSheetData(activeSheet);
-                    bootstrap.Modal.getInstance(document.getElementById('adminRowEditModal')).hide();
-                    loadSheetData(activeSheet, null, true, true);
-                    // Restore dipanggil setelah data server selesai dimuat di bawah.
-                    window.__pendingRestoreView = savedView;
+                const rowArrayIndex = editingTargetRowIndex;
+                if (coklitType === 'U' && Array.isArray(result.rowData)) {
+                    currentRawData[rowArrayIndex] = result.rowData;
+                } else if (Array.isArray(result.rowData)) {
+                    currentRawData[rowArrayIndex] = result.rowData;
                 }
-                showSaveSuccessPopup('Perubahan berhasil tersimpan ke Google Sheet. Tampilan tetap pada filter yang Anda pilih.');
+
+                if (coklitType === '7' && Array.isArray(result.insertedRowData)) {
+                    currentRawData.splice(rowArrayIndex + 1, 0, result.insertedRowData);
+                }
+
+                const newVersion = String(result.version || Date.now());
+                saveLocalData(activeSheet, currentRawData, newVersion);
+                cacheVersionMap[activeSheet] = newVersion;
+
+                bootstrap.Modal.getInstance(document.getElementById('adminRowEditModal')).hide();
+                refreshFilteredViewPreservingPosition();
                 showToast("Perubahan baris berhasil disimpan!", "bg-success");
-            } else {
-                const msg = String(result.message || '');
-                if (msg.toLowerCase().includes('sesi admin') || msg.toLowerCase().includes('akses admin ditolak')) {
-                    processLogout(false);
-                }
-                showToast("Gagal menyimpan: " + (result.message || 'Error'), "bg-danger");
-            }
-        }).catch(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Simpan Perubahan';
-            showToast("Gagal terhubung ke server.", "bg-danger");
-        });
+            })
+            .catch(err => {
+                console.error(err);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Simpan Perubahan';
+                if (String(err.message || '').toLowerCase().includes('sesi admin')) processLogout(false);
+                showToast("Gagal menyimpan: " + (err.message || 'Server error'), "bg-danger");
+            });
     }
+
 
     // ========================= TAMBAH PEMILIH BARU =========================
     // Form dibuat dinamis berdasarkan header sheet yang sedang digunakan,
@@ -1971,7 +1759,7 @@
         new bootstrap.Modal(document.getElementById('addVoterModal')).show();
     }
 
-    function saveNewVoter() {
+        function saveNewVoter() {
         if (!isAdmin) return;
         if (activeSheet !== 'DPS (SEMENTARA)') {
             showToast('Tambah pemilih baru hanya dilakukan pada DPS (SEMENTARA).', 'bg-warning');
@@ -1988,87 +1776,61 @@
         const namaIdx = voterHeaderIndex(headers, ['NAMA', 'NAMA LENGKAP']);
         const tglIdx = voterHeaderIndex(headers, ['TANGGAL LAHIR', 'TGL LAHIR']);
         const coklitIdx = voterHeaderIndex(headers, ['KODE COKLIT', 'COKLIT']);
-
-        if (nkkIdx === -1 || nikIdx === -1 || namaIdx === -1) {
-            showToast('Kolom NKK, NIK, atau NAMA tidak ditemukan pada header DPS.', 'bg-danger');
-            return;
-        }
-        if (!/^\d{16}$/.test(values[nkkIdx])) {
-            showToast('NKK harus 16 digit angka.', 'bg-danger');
-            return;
-        }
-        if (!/^\d{16}$/.test(values[nikIdx])) {
-            showToast('NIK harus 16 digit angka.', 'bg-danger');
-            return;
-        }
-        if (!values[namaIdx]) {
-            showToast('Nama lengkap wajib diisi.', 'bg-danger');
-            return;
-        }
+        if (nkkIdx === -1 || nikIdx === -1 || namaIdx === -1) { showToast('Kolom NKK, NIK, atau NAMA tidak ditemukan pada header DPS.', 'bg-danger'); return; }
+        if (!/^\d{16}$/.test(values[nkkIdx])) { showToast('NKK harus 16 digit angka.', 'bg-danger'); return; }
+        if (!/^\d{16}$/.test(values[nikIdx])) { showToast('NIK harus 16 digit angka.', 'bg-danger'); return; }
+        if (!values[namaIdx]) { showToast('Nama lengkap wajib diisi.', 'bg-danger'); return; }
         if (tglIdx !== -1 && values[tglIdx]) {
             const usiaIdx = voterHeaderIndex(headers, ['USIA', 'UMUR']);
             if (usiaIdx !== -1) values[usiaIdx] = calculateNewVoterAge(values[tglIdx]);
         }
         if (coklitIdx !== -1) values[coklitIdx] = 'B';
 
-        // Cari baris terakhir keluarga dengan NKK yang sama. +1 karena rowIndex API adalah nomor baris Sheet.
         let lastSameNkkArrayIndex = -1;
-        for (let i = 1; i < currentRawData.length; i++) {
-            if (String(currentRawData[i][nkkIdx] || '').trim() === values[nkkIdx]) lastSameNkkArrayIndex = i;
-        }
+        for (let i = 1; i < currentRawData.length; i++) if (String(currentRawData[i][nkkIdx] || '').trim() === values[nkkIdx]) lastSameNkkArrayIndex = i;
         let lastNonEmptyArrayIndex = 0;
-        for (let i = currentRawData.length - 1; i >= 1; i--) {
-            if (currentRawData[i].some(v => String(v ?? '').trim() !== '')) { lastNonEmptyArrayIndex = i; break; }
-        }
+        for (let i = currentRawData.length - 1; i >= 1; i--) if (currentRawData[i].some(v => String(v ?? '').trim() !== '')) { lastNonEmptyArrayIndex = i; break; }
         const insertAfterRow = (lastSameNkkArrayIndex !== -1 ? lastSameNkkArrayIndex : lastNonEmptyArrayIndex) + 1;
 
         const btn = document.getElementById('btnSaveNewVoter');
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan ke Google Sheet...';
-
-        const payload = {
-            sheet: 'DPS (SEMENTARA)',
-            actionType: 'B',
-            values: values,
-            insertAfterRow: insertAfterRow,
-            insertMode: 'AFTER_FAMILY',
-            source: 'Tambah Pemilih Baru',
-            autoNumber: true
-        };
-
-        postAdmin(payload)
-            .then(res => res.json())
+        postAdmin({ sheet: 'DPS (SEMENTARA)', actionType: 'B', values, insertAfterRow, insertMode: 'AFTER_FAMILY', source: 'Tambah Pemilih Baru', autoNumber: true })
             .then(result => {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-save me-1"></i>Simpan Pemilih Baru';
-                if (result.status === 'success') {
-                    insertLocalRow('DPS (SEMENTARA)', insertAfterRow, values);
-                    bootstrap.Modal.getInstance(document.getElementById('addVoterModal')).hide();
-                    loadSheetData('DPS (SEMENTARA)', null, false);
-                    showToast('Pemilih baru berhasil ditambahkan dan disusun pada Google Sheet.', 'bg-success');
-                } else {
-                    showToast('Gagal menambah pemilih: ' + (result.message || 'Server belum menerima aksi B.'), 'bg-danger');
-                }
+                if (result.status !== 'success') throw new Error(result.message || 'Gagal menambah pemilih.');
+                if (Array.isArray(result.insertedRowData)) currentRawData.splice((result.row || insertAfterRow + 1) - 1, 0, result.insertedRowData);
+                saveLocalData('DPS (SEMENTARA)', currentRawData, String(result.version || Date.now()));
+                bootstrap.Modal.getInstance(document.getElementById('addVoterModal')).hide();
+                if (activeSheet === 'DPS (SEMENTARA)') refreshFilteredViewPreservingPosition();
+                showToast('Pemilih baru berhasil ditambahkan.', 'bg-success');
             })
             .catch(err => {
-                console.error(err);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-save me-1"></i>Simpan Pemilih Baru';
-                showToast('Gagal terhubung ke server Google Sheet.', 'bg-danger');
+                if (String(err.message || '').toLowerCase().includes('sesi admin')) processLogout(false);
+                showToast('Gagal menambah pemilih: ' + (err.message || 'Server error'), 'bg-danger');
             });
     }
 
-    function deleteRowData(originalRowIndex) {
+
+        function deleteRowData(originalRowIndex) {
         if (!isAdmin || !confirm(`Hapus baris sheet #${originalRowIndex + 1}?`)) return;
         postAdmin({ sheet: activeSheet, actionType: 'DELETE', rowIndex: originalRowIndex + 1 })
-        .then(res => res.json()).then(res => {
-            if (res.status === 'success') {
-                removeLocalRow(activeSheet, originalRowIndex);
-                loadSheetData(activeSheet, null, false);
+            .then(res => {
+                if (res.status !== 'success') throw new Error(res.message || 'Gagal menghapus.');
+                currentRawData.splice(originalRowIndex, 1);
+                saveLocalData(activeSheet, currentRawData, String(res.version || Date.now()));
+                refreshFilteredViewPreservingPosition();
                 showToast("Berhasil dihapus!", "bg-success");
-            } else { showToast("Gagal menghapus.", "bg-danger"); }
-        });
+            })
+            .catch(err => {
+                if (String(err.message || '').toLowerCase().includes('sesi admin')) processLogout(false);
+                showToast("Gagal menghapus: " + (err.message || 'Server error'), "bg-danger");
+            });
     }
+
 
     function toggleChartSection() {
         const section = document.getElementById('directChartSection');
@@ -2308,9 +2070,8 @@
         }, 300);
     }
 
-    function processLogin() {
+        function processLogin() {
         const pass = document.getElementById('adminPassword').value;
-
         fetch(`${WEB_APP_URL}?action=login&pass=${encodeURIComponent(pass)}`)
             .then(res => res.json())
             .then(res => {
@@ -2318,42 +2079,37 @@
                     isAdmin = true;
                     adminToken = res.token;
                     sessionStorage.setItem('pilkades_admin_token', adminToken);
-
                     bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
                     document.getElementById('adminPassword').value = '';
                     updateAuthUI();
                     renderTablePage();
-                    showToast("Login Berhasil! Sesi Admin aktif.", "bg-success");
+                    showToast("Login Berhasil! Tombol Edit & Hapus aktif.", "bg-success");
                 } else {
                     alert("Password salah!");
                 }
             })
-            .catch(err => {
-                console.error(err);
-                showToast("Gagal terhubung ke server login.", "bg-danger");
-            });
+            .catch(() => showToast('Gagal terhubung ke server login.', 'bg-danger'));
     }
 
-    function processLogout(sendToServer = true) {
+        function processLogout(sendToServer = true) {
         const oldToken = adminToken;
-
         isAdmin = false;
         adminToken = '';
         sessionStorage.removeItem('pilkades_admin_token');
-
         updateAuthUI();
         renderTablePage();
         showToast("Berhasil Logout.", "bg-secondary");
-
         if (sendToServer && oldToken) {
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    actionType: 'LOGOUT',
-                    adminToken: oldToken
-                })
-            }).catch(() => {});
+            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ actionType: 'LOGOUT', adminToken: oldToken }) }).catch(() => {});
         }
+    }
+
+
+    function processLogout() {
+        isAdmin = false;
+        updateAuthUI();
+        renderTablePage();
+        showToast("Berhasil Logout.", "bg-secondary");
     }
 
     function updateAuthUI() {
@@ -2450,23 +2206,13 @@
         setTimeout(() => toastEl.classList.remove('show'), 2500);
     }
 
-    function refreshData() {
-        // Refresh manual = ambil data terbaru dari Google Sheet, tanpa keluar dari filter.
-        const savedView = captureCurrentViewState();
-        deleteLocalSheetData(activeSheet);
-
-        // Cache upload untuk sheet aktif tidak lagi dianggap tervalidasi.
-        try {
-            const meta = JSON.parse(localStorage.getItem(LOCAL_DB_META) || 'null');
-            if (meta && meta.validatedSheet === activeSheet) {
-                localStorage.removeItem(LOCAL_DB_META);
-            }
-        } catch (e) {}
-
-        window.__pendingRestoreView = savedView;
-        loadSheetData(activeSheet, null, true, true);
-        showToast("Mengambil data terbaru dari Google Sheet...", "bg-info");
+        function refreshData() {
+        // Tombol Refresh Cache memang sengaja menjadi sinkronisasi penuh.
+        localStorage.removeItem(cacheKey(activeSheet));
+        loadSheetData(activeSheet, null, true);
+        showToast("Sinkronisasi penuh dimulai...", "bg-success");
     }
+
 
     window.onload = function() {
         loadSheetData('INPUT SUARA', null);
