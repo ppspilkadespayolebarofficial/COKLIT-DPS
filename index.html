@@ -133,65 +133,28 @@
             color: #fbbf24;
         }
 
-        /* Header utama: tetap kontras agar judul, lokasi, dan waktu sangat jelas */
         .portal-header {
-            background:
-                radial-gradient(circle at 88% 18%, rgba(245, 158, 11, 0.18) 0 10%, transparent 26%),
-                linear-gradient(135deg, #071a2b 0%, #173b58 48%, #4f0a21 100%);
+            background: linear-gradient(135deg, #700f26 0%, #40030d 100%);
             color: white;
-            border-radius: 18px;
+            border-radius: 16px;
             padding: 32px 36px;
-            box-shadow: 0 14px 36px rgba(15, 23, 42, 0.22);
+            box-shadow: 0 10px 30px rgba(112, 15, 38, 0.25);
             margin-bottom: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(245, 158, 11, 0.2);
             position: relative;
             overflow: hidden;
-            isolation: isolate;
         }
 
         .portal-header::after {
             content: '';
             position: absolute;
-            top: -95px;
-            right: -70px;
-            width: 280px;
-            height: 280px;
-            background: rgba(245, 158, 11, 0.09);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(245, 158, 11, 0.08);
             border-radius: 50%;
             pointer-events: none;
-            z-index: -1;
-        }
-
-        /* Bola-bola cahaya bergerak di header — dekoratif, tidak mengganggu isi */
-        .portal-header .header-orb {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: -1;
-            filter: blur(0.2px);
-            opacity: 0.42;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            box-shadow: 0 0 24px rgba(255, 255, 255, 0.08);
-            animation: headerOrbFloat 9s ease-in-out infinite;
-        }
-
-        .portal-header .orb-1 { width: 92px; height: 92px; top: 18px; right: 26%; background: rgba(245, 158, 11, 0.14); animation-delay: -1s; }
-        .portal-header .orb-2 { width: 48px; height: 48px; top: 68px; right: 12%; background: rgba(96, 165, 250, 0.18); animation-delay: -3s; animation-duration: 11s; }
-        .portal-header .orb-3 { width: 28px; height: 28px; top: 28px; right: 42%; background: rgba(255, 255, 255, 0.16); animation-delay: -5s; animation-duration: 7s; }
-        .portal-header .orb-4 { width: 66px; height: 66px; bottom: -18px; right: 31%; background: rgba(56, 189, 248, 0.10); animation-delay: -6s; animation-duration: 12s; }
-        .portal-header .orb-5 { width: 22px; height: 22px; bottom: 24px; right: 17%; background: rgba(245, 158, 11, 0.22); animation-delay: -2s; animation-duration: 8s; }
-        .portal-header .orb-6 { width: 38px; height: 38px; top: 112px; right: 37%; background: rgba(255, 255, 255, 0.10); animation-delay: -7s; animation-duration: 10s; }
-
-        @keyframes headerOrbFloat {
-            0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-            25% { transform: translate3d(12px, -9px, 0) scale(1.06); }
-            50% { transform: translate3d(-8px, 13px, 0) scale(0.94); }
-            75% { transform: translate3d(-15px, -5px, 0) scale(1.03); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .portal-header .header-orb { animation: none; }
         }
 
         .portal-header h2 {
@@ -392,6 +355,20 @@
             }
         }
     </style>
+
+<style id="adminTransitionStyles">
+#adminTransitionOverlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,rgba(150,15,50,.96),rgba(45,0,18,.99));backdrop-filter:blur(5px);}
+#adminTransitionOverlay.show{display:flex;animation:adminFadeIn .25s ease-out;}
+.admin-transition-card{text-align:center;color:#fff;width:min(430px,90vw);padding:34px 28px;border-radius:24px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);box-shadow:0 25px 80px rgba(0,0,0,.35);overflow:hidden;}
+.admin-transition-icon{font-size:54px;color:#ffd400;animation:adminPulse 1s infinite;}
+.admin-transition-title{font-weight:800;font-size:25px;margin-top:15px;text-transform:uppercase;}
+.admin-transition-subtitle{opacity:.82;margin-top:8px;}
+.admin-slides{position:relative;height:7px;margin-top:25px;border-radius:10px;background:rgba(255,255,255,.16);overflow:hidden;}
+.admin-slides:after{content:"";position:absolute;left:0;top:0;height:100%;width:35%;background:#ffd400;border-radius:10px;animation:adminSlide 1.15s ease-in-out infinite;}
+@keyframes adminFadeIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+@keyframes adminPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.12);opacity:.78}}
+@keyframes adminSlide{0%{left:-35%}100%{left:100%}}
+</style>
 </head>
 <body>
 
@@ -452,12 +429,6 @@
         <!-- Area Konten Utama -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
             <div class="portal-header no-print">
-                <span class="header-orb orb-1"></span>
-                <span class="header-orb orb-2"></span>
-                <span class="header-orb orb-3"></span>
-                <span class="header-orb orb-4"></span>
-                <span class="header-orb orb-5"></span>
-                <span class="header-orb orb-6"></span>
                 <div class="row align-items-center">
                     <div class="col-lg-7 mb-3 mb-lg-0">
                         <span class="badge bg-warning text-dark mb-2 px-2 py-1 fw-bold shadow-sm" style="font-size: 0.75rem;">PORTAL PUBLIKASI RESMI PILKADES</span>
@@ -670,7 +641,7 @@
             </div>
             <div class="modal-body p-4">
                 <form id="formRowEditAction" onsubmit="event.preventDefault(); executeRowEditAction();">
-                    <div class="mb-3">
+                    <div class="mb-3" id="rowEditCoklitSection">
                         <label class="form-label fw-bold text-secondary small text-uppercase">Status / Kode Coklit:</label>
                         <select id="rowEditCoklitType" class="form-select fw-semibold" onchange="toggleRowEditFields()">
                             <option value="0">0 - Aktif (MS)</option>
@@ -787,6 +758,18 @@
     </div>
 </div>
 
+<!-- Popup Berhasil Simpan -->
+<div class="modal fade" id="saveSuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4 text-center p-4">
+            <div class="mb-3"><i class="fas fa-check-circle text-success" style="font-size: 3.5rem;"></i></div>
+            <h5 class="fw-bold mb-2">Perubahan Berhasil Disimpan</h5>
+            <p class="text-muted small mb-4" id="saveSuccessMessage">Data sudah tersimpan ke Google Sheet.</p>
+            <button type="button" class="btn btn-success fw-bold px-4" data-bs-dismiss="modal">Tutup</button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Login Admin -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -821,13 +804,15 @@
 <!-- Bootstrap JS & Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
     let activeSheet = 'INPUT SUARA';
     let currentRawData = [];
     let filteredData = [];
     let msTmsChartInstance = null;
     let detailChartInstance = null;
-    let isAdmin = false; 
+    let isAdmin = false;
+    let adminToken = sessionStorage.getItem('pilkades_admin_token') || ''; 
     let currentPage = 1;
     // Pilihan jumlah baris: 50, 100, 500, 1000, 5000.
     // Default awal dibuat 50 agar tampilan publik ringan.
@@ -853,13 +838,8 @@
     const tmsCodes = ["1", "2", "3", "4", "5"]; // Kode untuk TMS (Tidak Memenuhi Syarat)
     const msCodes = ["0", "6", "7", "U", "B"]; // Kode untuk MS (Memenuhi Syarat)
     const committeeSheets = ['PANITIA PEMUNGUTAN SUARA (PPS)', 'PENGAWAS (BPD)', 'KPPS TPS 01', 'KPPS TPS 02'];
+    const voterSheets = ['DPT AWAL (PMD)', 'DPS (SEMENTARA)', 'DPTAM (TAMBAHAN)', 'DPT (TETAP)', 'TAMBAH PEMILIH BARU'];
     const noFilterSheets = ['INPUT SUARA', 'PROFIL CALON KADES', 'TAHAPAN PILKADES', 'PENGADUAN DAN LAYANAN'];
-    const coklitDataSheets = ['DPT AWAL (PMD)', 'DPS (SEMENTARA)', 'DPTAM (TAMBAHAN)', 'DPT (TETAP)'];
-    let pendingViewState = null;
-
-    function isCoklitDataSheet(sheetName) {
-        return coklitDataSheets.includes(sheetName);
-    }
 
     function toggleSubMenu(submenuId, headerEl) {
         const submenu = document.getElementById(submenuId);
@@ -1134,22 +1114,107 @@
         }, 1500);
     }
 
-    function restoreViewAfterSave(viewState) {
-        if (!viewState || !currentRawData || currentRawData.length === 0) return;
-        const keywordEl = document.getElementById('filterKeyword');
-        const coklitEl = document.getElementById('filterCoklit');
-        const rtEl = document.getElementById('filterRt');
-        if (keywordEl) keywordEl.value = viewState.keyword || '';
-        if (coklitEl) coklitEl.value = viewState.coklit || '';
-        if (rtEl) rtEl.value = viewState.rt || '';
-        applyFilters();
-        const totalRows = Math.max(0, filteredData.length - 1);
-        const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
-        currentPage = Math.min(Math.max(1, Number(viewState.page) || 1), totalPages);
+
+    // ========================= DATABASE LOKAL / CACHE CEPAT =========================
+    // Excel dipakai sebagai sumber import awal. Google Sheet tetap menjadi
+    // penyimpanan permanen untuk EDIT / TAMBAH / HAPUS melalui Apps Script.
+    const LOCAL_DB_PREFIX = 'pilkades_db_v2_';
+    const LOCAL_DB_META = 'pilkades_db_meta_v2';
+    const LOCAL_DB_VERSION_PREFIX = 'pilkades_db_version_v1_';
+
+    function normalizeUploadedValue(value) {
+        if (value === null || value === undefined) return "";
+        if (value instanceof Date) {
+            const y = value.getFullYear();
+            const m = String(value.getMonth() + 1).padStart(2, '0');
+            const d = String(value.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}T00:00:00`;
+        }
+        return value;
+    }
+
+    function saveLocalSheetData(sheetName, data, version) {
+        try {
+            localStorage.setItem(LOCAL_DB_PREFIX + sheetName, JSON.stringify(data));
+            sessionStorage.setItem('cache_' + sheetName, JSON.stringify(data));
+            if (version) localStorage.setItem(LOCAL_DB_VERSION_PREFIX + sheetName, String(version));
+            return true;
+        } catch (err) {
+            console.error('Gagal menyimpan cache lokal:', err);
+            showToast('Cache lokal penuh. Data server tetap aman.', 'bg-warning');
+            return false;
+        }
+    }
+
+    function getLocalSheetVersion(sheetName) {
+        return localStorage.getItem(LOCAL_DB_VERSION_PREFIX + sheetName) || '';
+    }
+
+    function deleteLocalSheetData(sheetName) {
+        localStorage.removeItem(LOCAL_DB_PREFIX + sheetName);
+        localStorage.removeItem(LOCAL_DB_VERSION_PREFIX + sheetName);
+        sessionStorage.removeItem('cache_' + sheetName);
+    }
+
+    function getLocalSheetData(sheetName) {
+        try {
+            const raw = localStorage.getItem(LOCAL_DB_PREFIX + sheetName);
+            return raw ? JSON.parse(raw) : null;
+        } catch (err) {
+            console.error('Gagal membaca cache lokal:', err);
+            return null;
+        }
+    }
+
+    function renderLoadedSheetData(sheetName, data, isCommittee, sourceLabel, serverVersion) {
+        currentRawData = Array.isArray(data) ? data : [];
+        filteredData = currentRawData;
+        currentPage = 1;
+
+        saveLocalSheetData(sheetName, currentRawData, serverVersion);
         renderTablePage();
-        if (!committeeSheets.includes(activeSheet) && !noFilterSheets.includes(activeSheet)) {
+        populateRtDropdown();
+        populateRowRtSelect();
+
+        if (!isCommittee && sheetName !== 'TAHAPAN PILKADES' && sheetName !== 'PENGADUAN DAN LAYANAN') {
             generateCustomChartsAndAccumulation();
         }
+
+        if (sourceLabel) {
+            console.log(`Data ${sheetName} dimuat dari ${sourceLabel}.`);
+        }
+    }
+
+    function updateLocalRow(sheetName, rowIndex, values) {
+        const data = getLocalSheetData(sheetName);
+        if (!data || rowIndex < 0) return false;
+        data[rowIndex] = [...values];
+        return saveLocalSheetData(sheetName, data);
+    }
+
+    function insertLocalRow(sheetName, insertIndex, values) {
+        const data = getLocalSheetData(sheetName);
+        if (!data) return false;
+        data.splice(Math.max(1, insertIndex), 0, [...values]);
+        return saveLocalSheetData(sheetName, data);
+    }
+
+    function removeLocalRow(sheetName, rowIndex) {
+        const data = getLocalSheetData(sheetName);
+        if (!data || rowIndex <= 0 || rowIndex >= data.length) return false;
+        data.splice(rowIndex, 1);
+        return saveLocalSheetData(sheetName, data);
+    }
+
+    function clearLocalDatabase() {
+        const metaRaw = localStorage.getItem(LOCAL_DB_META);
+        if (metaRaw) {
+            try {
+                const meta = JSON.parse(metaRaw);
+                (meta.sheets || []).forEach(deleteLocalSheetData);
+            } catch (e) {}
+        }
+        localStorage.removeItem(LOCAL_DB_META);
     }
 
     function loadSheetData(sheetName, element, forceRefresh = false, preserveView = false) {
@@ -1162,7 +1227,7 @@
             document.getElementById('filterCoklit').value = '';
             document.getElementById('filterRt').value = '';
         }
-        
+
         if (element) {
             document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
@@ -1185,7 +1250,6 @@
             if (filterControlsBox) filterControlsBox.classList.remove('d-none');
             if (toggleChartBtn) toggleChartBtn.classList.remove('d-none');
             if (directChartSection) directChartSection.classList.remove('d-none');
-
             if (isNoFilter) {
                 if (filterKeywordWrapper) filterKeywordWrapper.classList.add('d-none');
                 if (filterCoklitEl) filterCoklitEl.classList.add('d-none');
@@ -1198,39 +1262,87 @@
         }
 
         const table = document.getElementById('dataTable');
-        const cachedData = sessionStorage.getItem('cache_' + sheetName);
-        if (cachedData && !forceRefresh) {
-            currentRawData = JSON.parse(cachedData);
-            filteredData = currentRawData;
-            currentPage = 1;
-            renderTablePage();
-            populateRtDropdown();
-            populateRowRtSelect();
-            if (!isCommittee && sheetName !== 'TAHAPAN PILKADES' && sheetName !== 'PENGADUAN DAN LAYANAN') generateCustomChartsAndAccumulation();
-            if (preserveView && pendingViewState) { const state = pendingViewState; pendingViewState = null; restoreViewAfterSave(state); }
+        const localData = getLocalSheetData(sheetName);
+
+        // Cache-first: tampilkan data yang sudah ada SEKETIKA.
+        // Setelah itu cek versi server di background agar perubahan Google Sheet
+        // tetap terbaca otomatis tanpa mengunduh ribuan baris setiap kali membuka menu.
+        if (!forceRefresh && localData) {
+            renderLoadedSheetData(sheetName, localData, isCommittee, 'cache lokal');
+            refreshSheetIfChanged(sheetName, isCommittee, localData);
             return;
         }
 
-        table.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Sinkronisasi data server...</p></td></tr>';
+        table.innerHTML = '<tr><td class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-3 text-danger"></i><p>Mengambil data terbaru...</p></td></tr>';
+        fetchSheetFromServer(sheetName, isCommittee, preserveView);
+    }
 
-        fetch(`${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${new Date().getTime()}`)
-            .then(response => response.json())
+    function fetchSheetFromServer(sheetName, isCommittee, preserveView = true) {
+        const savedView = preserveView ? captureCurrentViewState() : null;
+        const url = `${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+
+        fetch(url, { cache: 'no-store' })
+            .then(response => {
+                if (!response.ok) throw new Error(`Server HTTP ${response.status}`);
+                return response.json();
+            })
+            .catch(firstError => {
+                // Kompatibilitas dengan deployment Apps Script lama:
+                // endpoint tanpa action juga mengembalikan data sheet.
+                const fallbackUrl = `${WEB_APP_URL}?sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+                return fetch(fallbackUrl, { cache: 'no-store' })
+                    .then(response => {
+                        if (!response.ok) throw firstError;
+                        return response.json();
+                    });
+            })
             .then(data => {
-                currentRawData = data;
-                filteredData = data;
-                sessionStorage.setItem('cache_' + sheetName, JSON.stringify(data));
-                currentPage = 1;
-
-                renderTablePage();
-                populateRtDropdown();
-                populateRowRtSelect();
-                if (!isCommittee && sheetName !== 'TAHAPAN PILKADES' && sheetName !== 'PENGADUAN DAN LAYANAN') generateCustomChartsAndAccumulation();
-                if (preserveView && pendingViewState) { const state = pendingViewState; pendingViewState = null; restoreViewAfterSave(state); }
+                if (!Array.isArray(data)) throw new Error('Format data server tidak valid.');
+                renderLoadedSheetData(sheetName, data, isCommittee, 'Google Sheet');
+                if (savedView) restoreCurrentViewState(savedView);
+                if (window.__pendingRestoreView && sheetName === activeSheet) {
+                    const pending = window.__pendingRestoreView;
+                    window.__pendingRestoreView = null;
+                    restoreCurrentViewState(pending);
+                }
             })
             .catch(error => {
-                console.error('Error:', error);
-                table.innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data. Periksa koneksi internet Anda.</td></tr>';
+                console.error('Error mengambil data server:', error);
+                const localData = getLocalSheetData(sheetName);
+                if (localData) {
+                    renderLoadedSheetData(sheetName, localData, isCommittee, 'cache lokal (fallback)');
+                    showToast('Server belum merespons. Data terakhir tetap ditampilkan.', 'bg-warning');
+                } else {
+                    document.getElementById('dataTable').innerHTML = '<tr><td class="text-center text-danger py-4">Gagal memuat data dari Google Sheet. Pastikan Web App Apps Script sudah dideploy sebagai versi terbaru.</td></tr>';
+                }
             });
+    }
+
+    async function refreshSheetIfChanged(sheetName, isCommittee, localData) {
+        try {
+            const versionUrl = `${WEB_APP_URL}?action=version&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+            const response = await fetch(versionUrl, { cache: 'no-store' });
+            if (!response.ok) return;
+            const result = await response.json();
+            if (result.status !== 'success' || !result.version) return;
+
+            const localVersion = getLocalSheetVersion(sheetName);
+            if (localVersion && localVersion === String(result.version)) return;
+
+            // Versi berbeda (atau cache lama belum punya versi): ambil data sekali.
+            if (activeSheet === sheetName) {
+                const savedView = captureCurrentViewState();
+                fetchSheetFromServer(sheetName, isCommittee, true);
+                window.__pendingRestoreView = savedView;
+            } else {
+                fetch(`${WEB_APP_URL}?action=getData&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`, { cache: 'no-store' })
+                    .then(r => r.json())
+                    .then(data => { if (Array.isArray(data)) saveLocalSheetData(sheetName, data, result.version); })
+                    .catch(() => {});
+            }
+        } catch (err) {
+            console.warn('Pengecekan versi server dilewati:', err);
+        }
     }
 
     function populateRtDropdown() {
@@ -1403,29 +1515,34 @@
         let rowData = currentRawData[originalRowIndex];
         editingTargetRowData = rowData;
 
-        const isCoklit = isCoklitDataSheet(activeSheet);
-        const titleEl = document.querySelector('#adminRowEditModal .modal-title');
-        const statusGroup = document.getElementById('rowEditCoklitType')?.closest('.mb-3');
-        const infoTitle = document.querySelector('#panelRowUbah h6');
+        const headers = currentRawData[0];
+        const isVoterSheet = voterSheets.includes(activeSheet);
+        const coklitSection = document.getElementById('rowEditCoklitSection');
+        const coklitSelect = document.getElementById('rowEditCoklitType');
+        const modalTitle = document.querySelector('#adminRowEditModal .modal-title');
 
-        if (titleEl) {
-            titleEl.innerHTML = isCoklit
+        // Hanya menu DATA PEMILIH yang memakai istilah/aksi Coklit.
+        // Menu Utama, Panitia & Pengawas, Input Suara, dan menu non-pemilih
+        // menggunakan mode edit kolom biasa.
+        if (coklitSection) coklitSection.classList.toggle('d-none', !isVoterSheet);
+        if (modalTitle) {
+            modalTitle.innerHTML = isVoterSheet
                 ? '<i class="fas fa-user-edit me-2"></i> Edit Data & Aksi Coklit Pemilih'
-                : '<i class="fas fa-user-edit me-2"></i> Edit Data Admin';
+                : '<i class="fas fa-edit me-2"></i> Edit Data Sesuai Kolom';
         }
-        if (statusGroup) statusGroup.classList.toggle('d-none', !isCoklit);
-        if (infoTitle) infoTitle.innerHTML = isCoklit
-            ? '<i class="fas fa-edit me-1"></i> Form Edit Kolom Data Pemilih'
-            : '<i class="fas fa-edit me-1"></i> Form Edit Kolom Data';
 
-        let headers = currentRawData[0];
-        let coklitColIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
-        let currentCoklit = coklitColIdx !== -1 ? String(rowData[coklitColIdx] || '0').trim() : '0';
-        document.getElementById('rowEditCoklitType').value = coklitMap.hasOwnProperty(currentCoklit) ? currentCoklit : '0';
+        if (isVoterSheet) {
+            let coklitColIdx = headers.findIndex(h => String(h).toUpperCase().includes('KODE COKLIT') || String(h).toUpperCase().includes('COKLIT'));
+            let currentCoklit = coklitColIdx !== -1 ? String(rowData[coklitColIdx] || '0').trim() : '0';
+            coklitSelect.value = coklitMap.hasOwnProperty(currentCoklit) ? currentCoklit : '0';
+        } else {
+            // Untuk semua sheet non-Data Pemilih, selalu gunakan Ubah/Edit.
+            coklitSelect.value = 'U';
+        }
 
         document.getElementById('selectedRowTargetInfo').innerHTML = `
-            <div class="small fw-bold text-success"><i class="fas fa-database me-1"></i> Baris Sheet #${originalRowIndex + 1} Terpilih:</div>
-            <div class="small text-dark">Data: <b>${rowData[1] || rowData[0] || '-'}</b></div>
+            <div class="small fw-bold text-success"><i class="fas fa-table me-1"></i> ${isVoterSheet ? 'Baris Pemilih' : 'Baris Data'} Sheet #${originalRowIndex + 1} Terpilih:</div>
+            <div class="small text-dark">Data Baris: <b>${rowData[1] || rowData[0] || '-'}</b></div>
         `;
 
         toggleRowEditFields();
@@ -1434,12 +1551,12 @@
     }
 
     function toggleRowEditFields() {
-        const isCoklit = isCoklitDataSheet(activeSheet);
-        const val = document.getElementById('rowEditCoklitType').value;
-        document.getElementById('panelRowUbah').classList.toggle('d-none', isCoklit ? val !== 'U' : false);
-        document.getElementById('panelRowPindahLuar').classList.toggle('d-none', !isCoklit || val !== '5');
-        document.getElementById('panelRowPindahDalam').classList.toggle('d-none', !isCoklit || val !== '6');
-        document.getElementById('panelRowPisahKK').classList.toggle('d-none', !isCoklit || val !== '7');
+        const isVoterSheet = voterSheets.includes(activeSheet);
+        const val = isVoterSheet ? document.getElementById('rowEditCoklitType').value : 'U';
+        document.getElementById('panelRowUbah').classList.toggle('d-none', val !== 'U');
+        document.getElementById('panelRowPindahLuar').classList.toggle('d-none', !isVoterSheet || val !== '5');
+        document.getElementById('panelRowPindahDalam').classList.toggle('d-none', !isVoterSheet || val !== '6');
+        document.getElementById('panelRowPisahKK').classList.toggle('d-none', !isVoterSheet || val !== '7');
     }
 
     function buildDynamicRowEditFields() {
@@ -1455,24 +1572,75 @@
         });
     }
 
+    function captureCurrentViewState() {
+        return {
+            keyword: document.getElementById('filterKeyword')?.value || '',
+            coklit: document.getElementById('filterCoklit')?.value || '',
+            rt: document.getElementById('filterRt')?.value || '',
+            page: currentPage
+        };
+    }
+
+    function restoreCurrentViewState(view) {
+        if (!view) return;
+        const keyword = document.getElementById('filterKeyword');
+        const coklit = document.getElementById('filterCoklit');
+        const rt = document.getElementById('filterRt');
+        if (keyword) keyword.value = view.keyword;
+        if (coklit) coklit.value = view.coklit;
+        if (rt) rt.value = view.rt;
+        applyFilters();
+        const totalPages = Math.max(1, Math.ceil((filteredData?.length ? filteredData.length - 1 : 0) / rowsPerPage));
+        currentPage = Math.min(Math.max(1, view.page || 1), totalPages);
+        renderTablePage();
+    }
+
+    function showSaveSuccessPopup(message) {
+        const el = document.getElementById('saveSuccessMessage');
+        if (el) el.textContent = message || 'Data sudah tersimpan ke Google Sheet.';
+        const modalEl = document.getElementById('saveSuccessModal');
+        if (modalEl) new bootstrap.Modal(modalEl).show();
+    }
+
+    function getAdminTokenOrWarn() {
+        if (!isAdmin || !adminToken) {
+            showToast('Sesi Admin tidak valid. Silakan login kembali.', 'bg-warning');
+            processLogout(false);
+            return null;
+        }
+        return adminToken;
+    }
+
+    function postAdmin(payload) {
+        const token = getAdminTokenOrWarn();
+        if (!token) return Promise.reject(new Error('Sesi Admin tidak valid.'));
+
+        const securedPayload = Object.assign({}, payload, { adminToken: token });
+
+        return fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify(securedPayload)
+        }).then(res => res.json());
+    }
+
     function executeRowEditAction() {
         if (!isAdmin) return;
-        const isCoklit = isCoklitDataSheet(activeSheet);
+        const isVoterSheet = voterSheets.includes(activeSheet);
         const coklitType = document.getElementById('rowEditCoklitType').value;
-        const actionType = isCoklit ? coklitType : 'U';
+        const actionType = isVoterSheet ? coklitType : 'U';
         let payload = { sheet: activeSheet, actionType: actionType, rowIndex: editingTargetRowIndex + 1 };
 
-        if (!isCoklit || coklitType === 'U') {
+        if (actionType === 'U') {
             let updatedValues = [...editingTargetRowData];
             document.querySelectorAll('.dynamic-row-edit-input').forEach(input => {
                 updatedValues[parseInt(input.getAttribute('data-col-index'))] = input.value;
             });
             payload.values = updatedValues;
-        } else if (coklitType === '5') {
+        } else if (actionType === '5') {
             payload.targetPindahLuar = document.getElementById('targetRowPindahLuarInput').value;
-        } else if (coklitType === '6') {
+        } else if (actionType === '6') {
             payload.targetRt = document.getElementById('targetRowRtSelect').value;
-        } else if (coklitType === '7') {
+        } else if (actionType === '7') {
             payload.newNkk = document.getElementById('rowNewNkkInput').value;
             payload.newNik = document.getElementById('rowNewNikInput').value;
             payload.newNama = document.getElementById('rowNewNamaInput').value;
@@ -1485,23 +1653,35 @@
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...';
 
-        fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) })
+        postAdmin(payload)
         .then(response => response.json())
         .then(result => {
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Simpan Perubahan';
             if (result.status === 'success') {
-                pendingViewState = {
-                    keyword: document.getElementById('filterKeyword')?.value || '',
-                    coklit: document.getElementById('filterCoklit')?.value || '',
-                    rt: document.getElementById('filterRt')?.value || '',
-                    page: currentPage
-                };
-                sessionStorage.removeItem('cache_' + activeSheet);
-                bootstrap.Modal.getInstance(document.getElementById('adminRowEditModal')).hide();
-                loadSheetData(activeSheet, null, true, true);
-                showToast("Perubahan baris berhasil disimpan! Tampilan filter tetap dipertahankan.", "bg-success");
+                const savedView = captureCurrentViewState();
+
+                if (actionType === 'U' && Array.isArray(payload.values)) {
+                    updateLocalRow(activeSheet, editingTargetRowIndex, payload.values);
+                    bootstrap.Modal.getInstance(document.getElementById('adminRowEditModal')).hide();
+                    loadSheetData(activeSheet, null, false, true);
+                    restoreCurrentViewState(savedView);
+                } else {
+                    // Aksi 5/6/7 dapat mengubah lebih dari satu baris, sehingga
+                    // ambil data terbaru dari server, tetapi pertahankan filter & halaman.
+                    deleteLocalSheetData(activeSheet);
+                    bootstrap.Modal.getInstance(document.getElementById('adminRowEditModal')).hide();
+                    loadSheetData(activeSheet, null, true, true);
+                    // Restore dipanggil setelah data server selesai dimuat di bawah.
+                    window.__pendingRestoreView = savedView;
+                }
+                showSaveSuccessPopup('Perubahan berhasil tersimpan ke Google Sheet. Tampilan tetap pada filter yang Anda pilih.');
+                showToast("Perubahan baris berhasil disimpan!", "bg-success");
             } else {
+                const msg = String(result.message || '');
+                if (msg.toLowerCase().includes('sesi admin') || msg.toLowerCase().includes('akses admin ditolak')) {
+                    processLogout(false);
+                }
                 showToast("Gagal menyimpan: " + (result.message || 'Error'), "bg-danger");
             }
         }).catch(() => {
@@ -1801,15 +1981,15 @@
             autoNumber: true
         };
 
-        fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) })
+        postAdmin(payload)
             .then(res => res.json())
             .then(result => {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-save me-1"></i>Simpan Pemilih Baru';
                 if (result.status === 'success') {
-                    sessionStorage.removeItem('cache_DPS (SEMENTARA)');
+                    insertLocalRow('DPS (SEMENTARA)', insertAfterRow, values);
                     bootstrap.Modal.getInstance(document.getElementById('addVoterModal')).hide();
-                    loadSheetData('DPS (SEMENTARA)', null, true);
+                    loadSheetData('DPS (SEMENTARA)', null, false);
                     showToast('Pemilih baru berhasil ditambahkan dan disusun pada Google Sheet.', 'bg-success');
                 } else {
                     showToast('Gagal menambah pemilih: ' + (result.message || 'Server belum menerima aksi B.'), 'bg-danger');
@@ -1825,11 +2005,11 @@
 
     function deleteRowData(originalRowIndex) {
         if (!isAdmin || !confirm(`Hapus baris sheet #${originalRowIndex + 1}?`)) return;
-        fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ sheet: activeSheet, actionType: 'DELETE', rowIndex: originalRowIndex + 1 }) })
+        postAdmin({ sheet: activeSheet, actionType: 'DELETE', rowIndex: originalRowIndex + 1 })
         .then(res => res.json()).then(res => {
             if (res.status === 'success') {
-                sessionStorage.removeItem('cache_' + activeSheet);
-                loadSheetData(activeSheet, null, true);
+                removeLocalRow(activeSheet, originalRowIndex);
+                loadSheetData(activeSheet, null, false);
                 showToast("Berhasil dihapus!", "bg-success");
             } else { showToast("Gagal menghapus.", "bg-danger"); }
         });
@@ -2073,26 +2253,75 @@
         }, 300);
     }
 
+    function showAdminTransition(title, subtitle, iconClass) {
+        const overlay = document.getElementById('adminTransitionOverlay');
+        if (!overlay) return;
+        document.getElementById('adminTransitionTitle').textContent = title || 'Memproses Admin';
+        document.getElementById('adminTransitionSubtitle').textContent = subtitle || 'Mohon tunggu sebentar...';
+        const icon = overlay.querySelector('.admin-transition-icon i');
+        if (icon) icon.className = iconClass || 'fas fa-shield-alt';
+        overlay.classList.add('show');
+        overlay.setAttribute('aria-hidden','false');
+    }
+
+    function hideAdminTransition() {
+        const overlay = document.getElementById('adminTransitionOverlay');
+        if (!overlay) return;
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden','true');
+    }
+
     function processLogin() {
         const pass = document.getElementById('adminPassword').value;
+        if (!pass) { alert('Masukkan password Admin.'); return; }
+        showAdminTransition('Login Admin', 'Memverifikasi akses dan menyiapkan panel Admin...', 'fas fa-user-shield');
+
         fetch(`${WEB_APP_URL}?action=login&pass=${encodeURIComponent(pass)}`)
-            .then(res => res.json()).then(res => {
-                if(res.status === 'success') {
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'success' && res.token) {
                     isAdmin = true;
+                    adminToken = res.token;
+                    sessionStorage.setItem('pilkades_admin_token', adminToken);
+
                     bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
                     document.getElementById('adminPassword').value = '';
                     updateAuthUI();
                     renderTablePage();
-                    showToast("Login Berhasil! Tombol Edit & Hapus aktif.", "bg-success");
-                } else { alert("Password salah!"); }
+                    setTimeout(() => { hideAdminTransition(); showToast("Login Berhasil! Sesi Admin aktif.", "bg-success"); }, 650);
+                } else {
+                    hideAdminTransition();
+                    alert("Password salah!");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                hideAdminTransition();
+                showToast("Gagal terhubung ke server login.", "bg-danger");
             });
     }
 
-    function processLogout() {
+    function processLogout(sendToServer = true) {
+        const oldToken = adminToken;
+        if (sendToServer) showAdminTransition('Logout Admin', 'Menutup sesi Admin dengan aman...', 'fas fa-sign-out-alt');
+
         isAdmin = false;
+        adminToken = '';
+        sessionStorage.removeItem('pilkades_admin_token');
+
         updateAuthUI();
         renderTablePage();
-        showToast("Berhasil Logout.", "bg-secondary");
+        if (sendToServer) setTimeout(() => { hideAdminTransition(); showToast("Berhasil Logout.", "bg-secondary"); }, 650);
+
+        if (sendToServer && oldToken) {
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    actionType: 'LOGOUT',
+                    adminToken: oldToken
+                })
+            }).catch(() => {});
+        }
     }
 
     function updateAuthUI() {
@@ -2190,9 +2419,21 @@
     }
 
     function refreshData() {
-        sessionStorage.removeItem('cache_' + activeSheet);
-        loadSheetData(activeSheet, null, true);
-        showToast("Cache dibersihkan, data diperbarui!", "bg-success");
+        // Refresh manual = ambil data terbaru dari Google Sheet, tanpa keluar dari filter.
+        const savedView = captureCurrentViewState();
+        deleteLocalSheetData(activeSheet);
+
+        // Cache upload untuk sheet aktif tidak lagi dianggap tervalidasi.
+        try {
+            const meta = JSON.parse(localStorage.getItem(LOCAL_DB_META) || 'null');
+            if (meta && meta.validatedSheet === activeSheet) {
+                localStorage.removeItem(LOCAL_DB_META);
+            }
+        } catch (e) {}
+
+        window.__pendingRestoreView = savedView;
+        loadSheetData(activeSheet, null, true, true);
+        showToast("Mengambil data terbaru dari Google Sheet...", "bg-info");
     }
 
     window.onload = function() {
@@ -2207,5 +2448,14 @@
         }, 500);
     };
 </script>
+
+<div id="adminTransitionOverlay" aria-hidden="true">
+  <div class="admin-transition-card">
+    <div class="admin-transition-icon"><i class="fas fa-shield-alt"></i></div>
+    <div class="admin-transition-title" id="adminTransitionTitle">Memproses Admin</div>
+    <div class="admin-transition-subtitle" id="adminTransitionSubtitle">Mohon tunggu sebentar...</div>
+    <div class="admin-slides"></div>
+  </div>
+</div>
 </body>
 </html>
