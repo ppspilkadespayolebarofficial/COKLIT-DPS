@@ -368,6 +368,12 @@
 @keyframes adminFadeIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
 @keyframes adminPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.12);opacity:.78}}
 @keyframes adminSlide{0%{left:-35%}100%{left:100%}}
+
+/* ===== GRAFIK RINGKAS / NON-LINGKARAN ===== */
+.chart-container { height: 210px !important; min-height: 210px !important; }
+.chart-section-box { padding: 12px !important; margin-bottom: 12px !important; }
+#directChartSection .row { --bs-gutter-x: .75rem; --bs-gutter-y: .5rem; }
+#directChartSection h5, #directChartSection .chart-title { margin-bottom: 6px !important; }
 </style>
 </head>
 <body>
@@ -2131,12 +2137,12 @@
             const ctx1 = document.getElementById('msTmsChart').getContext('2d');
             if (msTmsChartInstance) msTmsChartInstance.destroy();
             msTmsChartInstance = new Chart(ctx1, {
-                type: 'doughnut',
+                type: 'bar',
                 data: {
                     labels: ['Total Suara Sah', 'Total Suara Tidak Sah'],
                     datasets: [{ data: [totalSah, totalTdkSah], backgroundColor: ['#065f46', '#b45309'], borderWidth: 2, borderColor: '#ffffff' }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } }, scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } } }, y: { ticks: { font: { size: 9 } } } } }
             });
 
             const ctx2 = document.getElementById('detailedCoklitChart').getContext('2d');
@@ -2147,7 +2153,7 @@
                     labels: Object.keys(kandidatSuara),
                     datasets: [{ label: 'Perolehan Suara', data: Object.values(kandidatSuara), backgroundColor: '#1e3a8a', borderRadius: 6 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } } }, y: { ticks: { font: { size: 9 } } } } }
             });
 
         } else if (activeSheet === 'PROFIL CALON KADES') {
@@ -2179,12 +2185,12 @@
             const ctx1 = document.getElementById('msTmsChart').getContext('2d');
             if (msTmsChartInstance) msTmsChartInstance.destroy();
             msTmsChartInstance = new Chart(ctx1, {
-                type: 'pie',
+                type: 'bar',
                 data: {
                     labels: kandidatNama,
                     datasets: [{ data: kandidatPerolehanSuara, backgroundColor: ['#1e3a8a', '#065f46', '#b45309', '#6b21a8', '#0891b2'], borderWidth: 2, borderColor: '#ffffff' }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } }, scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } } }, y: { ticks: { font: { size: 9 } } } } }
             });
 
             const ctx2 = document.getElementById('detailedCoklitChart').getContext('2d');
@@ -2195,7 +2201,7 @@
                     labels: kandidatNama,
                     datasets: [{ label: 'Suara', data: kandidatPerolehanSuara, backgroundColor: '#065f46', borderRadius: 6 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } } }, y: { ticks: { font: { size: 9 } } } } }
             });
 
         } else {
@@ -2257,7 +2263,7 @@
             const ctxMsTms = document.getElementById('msTmsChart').getContext('2d');
             if (msTmsChartInstance) msTmsChartInstance.destroy();
             msTmsChartInstance = new Chart(ctxMsTms, {
-                type: 'doughnut',
+                type: 'bar',
                 data: {
                     labels: [
                         'Jumlah NKK (Keluarga Sama)', 
@@ -2277,7 +2283,7 @@
                         borderColor: '#ffffff' 
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } }, scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } } }, y: { ticks: { font: { size: 9 } } } } }
             });
 
             let detailLabels = Object.keys(detailedCounts).map(k => `${k} - ${coklitMap[k] || 'Lainnya'}`);
@@ -2291,7 +2297,7 @@
                     labels: detailLabels,
                     datasets: [{ label: 'Jumlah Pemilih', data: detailValues, backgroundColor: '#065f46', borderRadius: 6 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } } }, y: { ticks: { font: { size: 9 } } } } }
             });
         }
     }
