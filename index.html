@@ -368,15 +368,17 @@
 @keyframes adminFadeIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
 @keyframes adminPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.12);opacity:.78}}
 @keyframes adminSlide{0%{left:-35%}100%{left:100%}}
-
-/* ===== GRAFIK RINGKAS / NON-LINGKARAN ===== */
-.chart-container { height: 210px !important; min-height: 210px !important; }
-.chart-section-box { padding: 12px !important; margin-bottom: 12px !important; }
-#directChartSection .row { --bs-gutter-x: .75rem; --bs-gutter-y: .5rem; }
-#directChartSection h5, #directChartSection .chart-title { margin-bottom: 6px !important; }
 </style>
-</head>
-<body>
+<style id="compactMenuFinalStyles">
+#sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:238px!important;max-width:86vw!important;z-index:3000!important;transform:translateX(-105%);transition:transform .25s ease;box-shadow:10px 0 30px rgba(0,0,0,.22)}
+#sidebar.menu-visible{transform:translateX(0)}
+#sidebar + main, main.col-md-9, main.col-lg-10{width:100%!important;max-width:100%!important;flex:0 0 100%!important;margin-left:0!important}
+#menuToggleButton{position:fixed;left:12px;top:12px;z-index:3100;border:0;border-radius:10px;padding:9px 13px;font-weight:800;background:#ffd400;color:#5a0920;box-shadow:0 4px 14px rgba(0,0,0,.22);cursor:pointer}
+#menuBackdrop{display:none;position:fixed;inset:0;z-index:2999;background:rgba(0,0,0,.28)}
+#menuBackdrop.show{display:block}
+.chart-container{height:210px!important;min-height:210px!important}
+</style></head>
+<body><button id="menuToggleButton" type="button" aria-label="Tampilkan menu" aria-expanded="false" onclick="toggleHiddenMenu()"><i class="fas fa-bars me-1"></i> MENU</button><div id="menuBackdrop" onclick="toggleHiddenMenu(false)"></div>
 
 <div class="container-fluid">
     <div class="row">
@@ -2507,6 +2509,9 @@
             welcomeModal.show();
         }, 500);
     };
+
+function toggleHiddenMenu(force){const sidebar=document.getElementById('sidebar'),btn=document.getElementById('menuToggleButton'),back=document.getElementById('menuBackdrop');if(!sidebar)return;const open=typeof force==='boolean'?force:!sidebar.classList.contains('menu-visible');sidebar.classList.toggle('menu-visible',open);if(back)back.classList.toggle('show',open);if(btn){btn.setAttribute('aria-expanded',String(open));btn.innerHTML=open?'<i class="fas fa-times me-1"></i> TUTUP MENU':'<i class="fas fa-bars me-1"></i> MENU';}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')toggleHiddenMenu(false);});
 </script>
 
 <div id="adminTransitionOverlay" aria-hidden="true">
