@@ -553,6 +553,7 @@
                             <option value="3">3 - TNI (TMS)</option>
                             <option value="4">4 - Polisi (TMS)</option>
                             <option value="5">5 - Pindah Luar Desa (TMS)</option>
+                            <option value="8">8 - Lainnya (TMS)</option>
                         </select>
 
                         <select id="filterRt" class="form-select form-select-sm fw-semibold shadow-sm" style="width: 140px;" onchange="applyFilters()">
@@ -658,6 +659,7 @@
                             <option value="3">3 - TNI (TMS)</option>
                             <option value="4">4 - Polisi (TMS)</option>
                             <option value="5">5 - Pindah domisili Luar Desa (TMS)</option>
+                            <option value="8">8 - Lainnya (TMS)</option>
                             <option value="6">6 - Pindah Domisili Dalam Desa (Pindah RT 1 s.d 36)</option>
                             <option value="7">7 - Pisah KK (Buat NKK & Anggota Keluarga Baru)</option>
                             <option value="U">U - Ubah</option>
@@ -837,13 +839,14 @@
         "3": "TNI (TMS)",
         "4": "Polisi (TMS)",
         "5": "Pindah Luar Desa (TMS)",
+        "8": "Lainnya (TMS)",
         "6": "Pindah Dalam Desa (MS)",
         "7": "Pisah KK (MS)",
         "U": "Ubah (MS)",
         "B": "Baru (MS)"
     };
 
-    const tmsCodes = ["1", "2", "3", "4", "5"]; // Kode untuk TMS (Tidak Memenuhi Syarat)
+    const tmsCodes = ["1", "2", "3", "4", "5", "8"]; // Kode untuk TMS (Tidak Memenuhi Syarat)
     const msCodes = ["0", "6", "7", "U", "B"]; // Kode untuk MS (Memenuhi Syarat)
     const committeeSheets = ['PANITIA PEMUNGUTAN SUARA (PPS)', 'PENGAWAS (BPD)', 'KPPS TPS 01', 'KPPS TPS 02'];
     const voterSheets = ['DPT AWAL (PMD)', 'DPS (SEMENTARA)', 'DPTAM (TAMBAHAN)', 'DPT (TETAP)', 'TAMBAH PEMILIH BARU'];
@@ -1664,7 +1667,7 @@
         // Aksi 6 memakai penulisan baris lengkap (U) agar Kode Coklit DAN
         // kolom RT/alamat tujuan benar-benar tersimpan ke Google Sheet.
         // Label/menu tetap 6 - Pindah Dalam Desa; yang berubah hanya mekanisme simpan.
-        const actionType = (isVoterSheet && coklitType === '6') ? 'U' : (isVoterSheet ? coklitType : 'U');
+        const actionType = (isVoterSheet && (coklitType === '6' || coklitType === '8')) ? 'U' : (isVoterSheet ? coklitType : 'U');
         let payload = { sheet: activeSheet, actionType: actionType, rowIndex: editingTargetRowIndex + 1 };
 
         if (actionType === 'U') {
@@ -1690,6 +1693,20 @@
                 if (rtIdx !== -1 && targetRt) updatedValues[rtIdx] = targetRt;
                 payload.targetRt = targetRt;
                 payload.coklitAction = '6';
+            }
+
+            // Khusus Coklit 8 (Lainnya/TMS): pertahankan seluruh data lama
+            // dan hanya mengubah kolom Kode Coklit menjadi 8.
+            // Disimpan melalui mekanisme edit baris lengkap agar tidak
+            // bergantung pada action handler lama untuk kode 8.
+            if (coklitType === '8' && isVoterSheet) {
+                const headers = currentRawData[0] || [];
+                const coklitIdx = headers.findIndex(h => {
+                    const n = String(h || '').toUpperCase();
+                    return n.includes('KODE COKLIT') || n.includes('COKLIT');
+                });
+                if (coklitIdx !== -1) updatedValues[coklitIdx] = '8';
+                payload.coklitAction = '8';
             }
 
             payload.values = updatedValues;
