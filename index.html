@@ -923,6 +923,32 @@
             }
         }
 
+        // Sensor tambahan KHUSUS MODE PUBLIK:
+        // Tempat lahir dan tanggal lahir tidak ditampilkan lengkap kepada publik.
+        // Data asli tetap berada di currentRawData dan tidak pernah diubah.
+        const isTempatLahir =
+            cName.includes('TEMPAT LAHIR') ||
+            cName.includes('TEMPAT KELAHIRAN') ||
+            cName === 'TTL TEMPAT';
+
+        const isTanggalLahir =
+            cName.includes('TANGGAL LAHIR') ||
+            cName.includes('TGL LAHIR') ||
+            cName.includes('DATE OF BIRTH') ||
+            cName === 'TTL TANGGAL';
+
+        if (isTempatLahir) {
+            if (sVal.length <= 2) return 'XX';
+            if (sVal.length <= 4) return sVal.charAt(0) + 'XX';
+            return sVal.charAt(0) + 'XXXX' + sVal.charAt(sVal.length - 1);
+        }
+
+        if (isTanggalLahir) {
+            // Tanggal lahir publik disamarkan penuh.
+            // Tetap menggunakan bentuk dd/mm/yyyy agar struktur tabel tidak berubah.
+            return 'XX/XX/XXXX';
+        }
+
         return sVal;
     }
 
@@ -1627,7 +1653,10 @@
         if (!isAdmin) return;
         const isVoterSheet = voterSheets.includes(activeSheet);
         const coklitType = document.getElementById('rowEditCoklitType').value;
-        const actionType = isVoterSheet ? coklitType : 'U';
+        // Aksi 6 memakai penulisan baris lengkap (U) agar Kode Coklit DAN
+        // kolom RT/alamat tujuan benar-benar tersimpan ke Google Sheet.
+        // Label/menu tetap 6 - Pindah Dalam Desa; yang berubah hanya mekanisme simpan.
+        const actionType = (isVoterSheet && coklitType === '6') ? 'U' : (isVoterSheet ? coklitType : 'U');
         let payload = { sheet: activeSheet, actionType: actionType, rowIndex: editingTargetRowIndex + 1 };
 
         if (actionType === 'U') {
@@ -1635,6 +1664,26 @@
             document.querySelectorAll('.dynamic-row-edit-input').forEach(input => {
                 updatedValues[parseInt(input.getAttribute('data-col-index'))] = input.value;
             });
+
+            // Khusus pilih Coklit 6: pertahankan semua data lama, ubah kode Coklit
+            // menjadi 6 dan tulis RT tujuan ke kolom RT yang benar berdasarkan header.
+            if (coklitType === '6' && isVoterSheet) {
+                const targetRt = String(document.getElementById('targetRowRtSelect')?.value || '').trim();
+                const headers = currentRawData[0] || [];
+                const rtIdx = headers.findIndex(h => {
+                    const n = String(h || '').toUpperCase().trim();
+                    return n === 'RT' || n === 'NO RT' || n === 'RT.' || n.includes('RT');
+                });
+                const coklitIdx = headers.findIndex(h => {
+                    const n = String(h || '').toUpperCase();
+                    return n.includes('KODE COKLIT') || n.includes('COKLIT');
+                });
+                if (coklitIdx !== -1) updatedValues[coklitIdx] = '6';
+                if (rtIdx !== -1 && targetRt) updatedValues[rtIdx] = targetRt;
+                payload.targetRt = targetRt;
+                payload.coklitAction = '6';
+            }
+
             payload.values = updatedValues;
         } else if (actionType === '5') {
             payload.targetPindahLuar = document.getElementById('targetRowPindahLuarInput').value;
@@ -1654,14 +1703,13 @@
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...';
 
         postAdmin(payload)
-        .then(response => response.json())
         .then(result => {
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Simpan Perubahan';
             if (result.status === 'success') {
                 const savedView = captureCurrentViewState();
 
-                if (actionType === 'U' && Array.isArray(payload.values)) {
+                if (actionType === 'U' && Array.isArray(payload.values) && coklitType !== '6') {
                     updateLocalRow(activeSheet, editingTargetRowIndex, payload.values);
                     bootstrap.Modal.getInstance(document.getElementById('adminRowEditModal')).hide();
                     loadSheetData(activeSheet, null, false, true);
@@ -1982,7 +2030,6 @@
         };
 
         postAdmin(payload)
-            .then(res => res.json())
             .then(result => {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-save me-1"></i>Simpan Pemilih Baru';
@@ -2006,12 +2053,19 @@
     function deleteRowData(originalRowIndex) {
         if (!isAdmin || !confirm(`Hapus baris sheet #${originalRowIndex + 1}?`)) return;
         postAdmin({ sheet: activeSheet, actionType: 'DELETE', rowIndex: originalRowIndex + 1 })
-        .then(res => res.json()).then(res => {
+        .then(res => {
             if (res.status === 'success') {
-                removeLocalRow(activeSheet, originalRowIndex);
-                loadSheetData(activeSheet, null, false);
-                showToast("Berhasil dihapus!", "bg-success");
-            } else { showToast("Gagal menghapus.", "bg-danger"); }
+                deleteLocalSheetData(activeSheet);
+                bootstrap.Modal.getInstance(document.getElementById('adminRowEditModal'))?.hide();
+                loadSheetData(activeSheet, null, true);
+                showToast("Berhasil dihapus dari Google Sheet!", "bg-success");
+            } else {
+                showToast("Gagal menghapus: " + (res.message || 'Server menolak penghapusan.'), "bg-danger");
+            }
+        })
+        .catch(err => {
+            console.error('DELETE error:', err);
+            showToast("Gagal menghapus: " + (err?.message || 'Tidak dapat terhubung ke server.'), "bg-danger");
         });
     }
 
